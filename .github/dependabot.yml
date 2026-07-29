@@ -11,6 +11,10 @@ updates:
       npm-dependencies:
         patterns:
           - "*"
+    ignore:
+      # typescript-eslint only supports TS <6.1; don't propose TS major bumps
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   # Keep actions in workflows (e.g. actions/checkout) current too.
   - package-ecosystem: github-actions
