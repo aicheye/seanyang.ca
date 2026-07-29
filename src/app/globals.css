@@ -492,12 +492,13 @@ h2 span {
 }
 
 .not-found-link {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: none;
   font-size: 14px;
 }
 
 .not-found-link:hover {
+  color: var(--link);
   text-decoration: underline;
 }
 
