@@ -492,12 +492,13 @@ h2 span {
 }
 
 .not-found-link {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: none;
   font-size: 14px;
 }
 
 .not-found-link:hover {
+  color: var(--link);
   text-decoration: underline;
 }
 
@@ -607,6 +608,12 @@ footer a {
 .site .now-playing:hover,
 .site .now-playing:focus {
   text-decoration: none;
+}
+
+/* Whole panel is the link — highlight only the title to keep it quiet */
+.now-playing:hover .np-title,
+.now-playing:focus .np-title {
+  color: var(--link);
 }
 
 .np-album {
@@ -950,7 +957,7 @@ footer a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--badge-bg);
+  background: none;
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 6px;
