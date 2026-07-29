@@ -481,6 +481,16 @@ h2 span {
 
 /* Not found */
 
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
 .not-found-link {
   color: var(--accent);
   text-decoration: none;
@@ -1037,6 +1047,7 @@ footer a {
     inset: 0;
     background: var(--surface);
     z-index: 1;
+    pointer-events: none;
   }
 
   .site {
