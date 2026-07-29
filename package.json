@@ -11,14 +11,14 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "next": "^16.2.10",
+    "next": "^16.2.12",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-icons": "^5.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@next/eslint-plugin-next": "^16.2.10",
+    "@next/eslint-plugin-next": "^16.2.12",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -30,9 +30,10 @@
     "typescript-eslint": "^8.63.0"
   },
   "overrides": {
-    "postcss": "^8.5.16"
+    "postcss": "^8.5.24",
+    "sharp": "^0.35.3"
   },
   "allowScripts": {
-    "sharp@0.34.5": true
+    "sharp@0.35.3": true
   }
 }

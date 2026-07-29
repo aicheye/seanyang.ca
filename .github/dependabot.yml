@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Weekly npm updates, grouped into a single PR to keep noise down.
+  # Security updates arrive immediately and are not grouped.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+
+  # Keep actions in workflows (e.g. actions/checkout) current too.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
