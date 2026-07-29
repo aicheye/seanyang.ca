@@ -11,7 +11,10 @@
   --surface-shadow: rgba(253, 246, 227, 0.96);
   --display: var(--font-unbounded), system-ui, sans-serif;
 
-  font: 16px/1.7 var(--font-geist), system-ui, sans-serif;
+  font:
+    16px/1.7 var(--font-geist),
+    system-ui,
+    sans-serif;
   user-select: none;
   color: var(--text);
   background: var(--bg);
@@ -88,8 +91,6 @@ header {
   font-size: 14px;
 }
 
-
-
 .location {
   margin-left: auto;
   display: inline-flex;
@@ -109,7 +110,6 @@ header {
 }
 
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
@@ -140,7 +140,6 @@ h2 {
   color: var(--secondary);
   margin: 0;
   padding-top: 3px;
-
 }
 
 h2 span {
@@ -194,7 +193,6 @@ h2 span {
   position: relative;
   padding-left: 20px;
 }
-
 
 .job {
   position: relative;
@@ -301,8 +299,6 @@ h2 span {
   font-weight: 500;
   text-decoration: none;
 }
-
-
 
 .project p {
   margin: 3px 0 0;
@@ -436,7 +432,6 @@ h2 span {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .demo-overlay,
   .demo-modal {
     animation: none;
@@ -476,8 +471,6 @@ h2 span {
   width: fit-content;
   border-radius: 4px;
 }
-
-
 
 /* Not found */
 
@@ -519,7 +512,6 @@ footer a {
   color: var(--text);
   text-decoration: none;
 }
-
 
 .webring-wrapper {
   display: flex;
@@ -715,7 +707,7 @@ footer a {
   /* overlay (not screen) so the grain shows on light covers too — screen only
      adds light and vanishes on bright art. */
   mix-blend-mode: overlay;
-  opacity: 0.50;
+  opacity: 0.5;
   content: '';
 }
 
@@ -802,7 +794,6 @@ footer a {
 }
 
 @keyframes np-eq-bounce {
-
   0%,
   100% {
     transform: scaleY(0.25);
@@ -855,7 +846,6 @@ footer a {
 }
 
 @keyframes np-skel-pulse {
-
   0%,
   100% {
     opacity: 0.7;
@@ -925,7 +915,7 @@ footer a {
   color: var(--text);
 }
 
-.gol-slider-row input[type="range"] {
+.gol-slider-row input[type='range'] {
   width: 80px;
   accent-color: var(--accent);
   cursor: pointer;

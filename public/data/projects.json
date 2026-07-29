@@ -3,63 +3,41 @@
     "title": "swarm_ws",
     "description": "robotic swarm maze exploration",
     "github": "https://github.com/RRohan4/swarm_ws",
-    "technologies": [
-      "Python",
-      "ROS 2",
-      "Docker"
-    ],
+    "technologies": ["Python", "ROS 2", "Docker"],
     "media": "/assets/demos/swarm_ws.gif"
   },
   {
     "title": "CRusTTY",
     "description": "tui c interpreter from scratch",
     "github": "https://github.com/aicheye/crustty",
-    "technologies": [
-      "Rust",
-      "C"
-    ],
+    "technologies": ["Rust", "C"],
     "media": "/assets/demos/crustty.gif"
   },
   {
     "title": "Wunder RNN Challenge",
     "description": "top 5% market prediction model",
     "github": "https://github.com/aicheye/wundernn",
-    "technologies": [
-      "Python",
-      "ML",
-      "Jupyter"
-    ],
+    "technologies": ["Python", "ML", "Jupyter"],
     "media": "/assets/demos/wundernn.png"
   },
   {
     "title": "aicheye's Combat Tagging",
     "description": "minecraft mod w/ 1k+ downloads",
     "github": "https://github.com/aicheye/combat-tag",
-    "technologies": [
-      "Java",
-      "Gradle"
-    ]
+    "technologies": ["Java", "Gradle"]
   },
   {
     "title": "Bucket",
     "description": "intuitive student dashboard",
     "github": "https://github.com/aicheye/bucket",
-    "technologies": [
-      "TypeScript",
-      "React",
-      "GraphQL"
-    ],
+    "technologies": ["TypeScript", "React", "GraphQL"],
     "media": "/assets/demos/bucket.png"
   },
   {
     "title": "ezp2p Arcade",
     "description": "p2p serverless minigames",
     "github": "https://github.com/aicheye/ezp2p",
-    "technologies": [
-      "TypeScript",
-      "Vite",
-      "WebRTC"
-    ],
+    "technologies": ["TypeScript", "Vite", "WebRTC"],
     "media": "/assets/demos/ezp2p.png"
   }
 ]

@@ -12,8 +12,11 @@ interface Track {
 const FALLBACK_COLOR = '#8a5c42'
 
 function rgbToHsl(r: number, g: number, b: number) {
-  r /= 255; g /= 255; b /= 255
-  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  r /= 255
+  g /= 255
+  b /= 255
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b)
   const d = max - min
   const l = (max + min) / 2
   let h = 0
@@ -83,10 +86,15 @@ async function extractDominantColor(artUrl: string): Promise<string> {
     let bestS = -1
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] < 128) continue // skip transparent
-      const r = data[i], g = data[i + 1], b = data[i + 2]
+      const r = data[i],
+        g = data[i + 1],
+        b = data[i + 2]
       const { s, l } = rgbToHsl(r, g, b)
       if (l < 0.12 || l > 0.92) continue // ignore near-black / near-white cells
-      if (s > bestS) { bestS = s; best = `rgb(${r},${g},${b})` }
+      if (s > bestS) {
+        bestS = s
+        best = `rgb(${r},${g},${b})`
+      }
     }
     return best
   } catch {
@@ -133,8 +141,9 @@ export function NowPlaying() {
     if (!track?.title) return // nothing real yet — don't touch the refs (avoids a first-load flip)
 
     // Which face currently shows: front when the angle is an even multiple of 180°, else back.
-    const frontVisible = (Math.round(angleRef.current / 180)) % 2 === 0
-    const setVisibleArt = (art: string | null) => (frontVisible ? setFrontArt(art) : setBackArt(art))
+    const frontVisible = Math.round(angleRef.current / 180) % 2 === 0
+    const setVisibleArt = (art: string | null) =>
+      frontVisible ? setFrontArt(art) : setBackArt(art)
 
     // Kick off colour extraction as soon as the art changes (runs in parallel with everything).
     const artChanged = albumArt !== prevArtRef.current
@@ -142,7 +151,7 @@ export function NowPlaying() {
     const colorPromise = artChanged && albumArt ? extractDominantColor(albumArt) : null
     // Static frame for display (keeps the blend-mode texture working on animated
     // covers); resolves to the raw URL if freezing fails.
-    const framePromise = albumArt ? freezeFrame(albumArt).then(f => f ?? albumArt) : null
+    const framePromise = albumArt ? freezeFrame(albumArt).then((f) => f ?? albumArt) : null
 
     const wasPlaying = wasPlayingRef.current
     wasPlayingRef.current = isPlaying
@@ -152,30 +161,31 @@ export function NowPlaying() {
     const runFlip = (slideOutAtEnd: boolean) => {
       let cancelled = false
       const timers: ReturnType<typeof setTimeout>[] = []
-      const wait = (ms: number) => new Promise<void>(r => timers.push(setTimeout(r, ms)))
+      const wait = (ms: number) => new Promise<void>((r) => timers.push(setTimeout(r, ms)))
 
       ;(async () => {
-        setRecordOut(false)                            // 1. record slides in behind the cover
+        setRecordOut(false) // 1. record slides in behind the cover
         const [, frame] = await Promise.all([wait(1000), framePromise]) // slide-in AND the frozen frame
         if (cancelled) return
 
         // 2. disk colour + flip, in parallel
         const color = colorPromise ? await colorPromise.catch(() => null) : null
         if (cancelled) return
-        if (color) setLabelColor(color)            //    change the disk colour…
-        if (frontVisible) setBackArt(frame ?? albumArt)  // …and put the new art on the hidden face
+        if (color) setLabelColor(color) //    change the disk colour…
+        if (frontVisible)
+          setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
         else setFrontArt(frame ?? albumArt)
-        setFlipHide(true)                          //    hide the record through the whole flip
+        setFlipHide(true) //    hide the record through the whole flip
         angleRef.current += 180
-        setCoverAngle(angleRef.current)            //    …and start the flip
-        await wait(450)                            //    reach edge-on (90°)
+        setCoverAngle(angleRef.current) //    …and start the flip
+        await wait(450) //    reach edge-on (90°)
         if (cancelled) return
-        setFrontOnTop(!frontVisible)               //    bring the incoming face forward at the edge
-        await wait(450)                            //    finish the flip (180°)
+        setFrontOnTop(!frontVisible) //    bring the incoming face forward at the edge
+        await wait(450) //    finish the flip (180°)
         if (cancelled) return
         setFlipHide(false)
 
-        if (slideOutAtEnd) setRecordOut(true)      // 3. record slides back out (skipped when stopped)
+        if (slideOutAtEnd) setRecordOut(true) // 3. record slides back out (skipped when stopped)
       })()
 
       return () => {
@@ -187,8 +197,10 @@ export function NowPlaying() {
 
     const settle = (out: boolean) => {
       setRecordOut(out)
-      setVisibleArt(albumArt)                              // paint something immediately…
-      framePromise?.then(f => { if (f) setVisibleArt(f) }) // …then upgrade to the static frame
+      setVisibleArt(albumArt) // paint something immediately…
+      framePromise?.then((f) => {
+        if (f) setVisibleArt(f)
+      }) // …then upgrade to the static frame
       setFrontOnTop(frontVisible)
       colorPromise?.then(setLabelColor).catch(() => {})
     }
@@ -226,9 +238,13 @@ export function NowPlaying() {
         </div>
         <div className="np-info">
           <span className="np-title">
-            <span className="np-title-text"><span className="np-skel np-skel-title" /></span>
+            <span className="np-title-text">
+              <span className="np-skel np-skel-title" />
+            </span>
           </span>
-          <span className="np-artist"><span className="np-skel np-skel-artist" /></span>
+          <span className="np-artist">
+            <span className="np-skel np-skel-artist" />
+          </span>
         </div>
       </div>
     )
@@ -253,7 +269,9 @@ export function NowPlaying() {
       rel="noopener noreferrer"
     >
       <div className="np-album">
-        <div className={`np-vinyl${recordOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}>
+        <div
+          className={`np-vinyl${recordOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
+        >
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>

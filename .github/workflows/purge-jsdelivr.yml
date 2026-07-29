@@ -1,6 +1,6 @@
 name: Purge jsDelivr
 
-# When data/ files chagne on main, tell jsDelivr to re-fetch the 
+# When data/ files chagne on main, tell jsDelivr to re-fetch the
 # edited files without waiting for the CDN TTL.
 on:
   push:

@@ -19,8 +19,8 @@ export async function GET() {
   const timestamp = isPlaying ? null : parseInt(track.date?.uts ?? '0', 10) || null
 
   const images: { '#text': string; size: string }[] = track.image ?? []
-  const bySize = new Map(images.map(i => [i.size, i['#text']]))
-  const pick = (...names: string[]) => names.map(n => bySize.get(n)).find(Boolean) || null
+  const bySize = new Map(images.map((i) => [i.size, i['#text']]))
+  const pick = (...names: string[]) => names.map((n) => bySize.get(n)).find(Boolean) || null
 
   return Response.json({
     isPlaying,

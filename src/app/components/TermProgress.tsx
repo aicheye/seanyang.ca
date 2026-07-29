@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
-const START_MS = Date.UTC(2025, 8, 1)  // 2025-09-01
-const END_MS = Date.UTC(2030, 4, 1)    // 2030-05-01
+const START_MS = Date.UTC(2025, 8, 1) // 2025-09-01
+const END_MS = Date.UTC(2030, 4, 1) // 2030-05-01
 const TOTAL_MS = END_MS - START_MS
 
 function toPct(ms: number): number {
@@ -27,7 +27,9 @@ const TICK_PCTS = [
 ].map(toPct)
 
 export function TermProgress() {
-  const [progressPct, setProgressPct] = useState(() => Math.max(0, Math.min(100, toPct(Date.now()))))
+  const [progressPct, setProgressPct] = useState(() =>
+    Math.max(0, Math.min(100, toPct(Date.now()))),
+  )
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -40,7 +42,9 @@ export function TermProgress() {
     <div className="term-progress">
       <div className="term-label">
         <span>uwaterloo bse &apos;30</span>
-        <span suppressHydrationWarning style={{ fontFamily: 'var(--font-mono), monospace' }}>{progressPct.toFixed(8)}%</span>
+        <span suppressHydrationWarning style={{ fontFamily: 'var(--font-mono), monospace' }}>
+          {progressPct.toFixed(8)}%
+        </span>
       </div>
       <div className="term-bar">
         <div className="term-fill" suppressHydrationWarning style={{ width: `${progressPct}%` }} />

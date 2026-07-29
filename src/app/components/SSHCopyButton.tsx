@@ -17,7 +17,9 @@ export function SSHCopyButton() {
       prefer a terminal?
       <button className="ssh-copy" onClick={copySSH}>
         <code>$ ssh seanyang.me</code>
-        <span className="ssh-copy-label">{copied ? <FiCheck size={13} /> : <FiCopy size={13} />}</span>
+        <span className="ssh-copy-label">
+          {copied ? <FiCheck size={13} /> : <FiCopy size={13} />}
+        </span>
       </button>
     </div>
   )

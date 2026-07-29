@@ -27,9 +27,12 @@ async function findSpotifyTrackUrl(title: string, artist: string): Promise<strin
     if (!token) return null
 
     const q = `track:${title} artist:${artist}`
-    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=track&limit=1`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const res = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=track&limit=1`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
     if (!res.ok) return null
 
     const json = await res.json()

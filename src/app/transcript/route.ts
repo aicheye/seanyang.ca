@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
   })
 
   if (!upstreamRes.ok) {
-    return new NextResponse(`Upstream fetch error: ${upstreamRes.status}`, { status: upstreamRes.status })
+    return new NextResponse(`Upstream fetch error: ${upstreamRes.status}`, {
+      status: upstreamRes.status,
+    })
   }
 
   const filename = UPSTREAM.split('/').pop()

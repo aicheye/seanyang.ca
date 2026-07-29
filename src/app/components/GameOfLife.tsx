@@ -4,18 +4,42 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 
 const CELL = 14
 const TICK = 80
-const SIM_STEPS = 300      // generations to look ahead when scoring a seed
+const SIM_STEPS = 300 // generations to look ahead when scoring a seed
 const SEED_BUDGET_MS = 500 // max time spent searching for a lively seed
 const METHUSELAH_CHANCE = 0.5
 
 // Long-running starter patterns ("methuselahs"), as [row, col] offsets.
 const METHUSELAHS: [number, number][][] = [
   // R-pentomino (~1,100 generations)
-  [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
+  [
+    [0, 1],
+    [0, 2],
+    [1, 0],
+    [1, 1],
+    [2, 1],
+  ],
   // Acorn (~5,200 generations)
-  [[0, 1], [1, 3], [2, 0], [2, 1], [2, 4], [2, 5], [2, 6]],
+  [
+    [0, 1],
+    [1, 3],
+    [2, 0],
+    [2, 1],
+    [2, 4],
+    [2, 5],
+    [2, 6],
+  ],
   // Rabbits (~17,300 generations)
-  [[0, 0], [0, 4], [0, 5], [0, 6], [1, 0], [1, 1], [1, 2], [1, 5], [2, 1]],
+  [
+    [0, 0],
+    [0, 4],
+    [0, 5],
+    [0, 6],
+    [1, 0],
+    [1, 1],
+    [1, 2],
+    [1, 5],
+    [2, 1],
+  ],
 ]
 
 function step(g: Uint8Array, C: number, R: number): Uint8Array {
@@ -27,7 +51,7 @@ function step(g: Uint8Array, C: number, R: number): Uint8Array {
         for (let dc = -1; dc <= 1; dc++)
           if (dr || dc) n += g[((r + dr + R) % R) * C + ((c + dc + C) % C)]
       const alive = g[r * C + c]
-      next[r * C + c] = alive ? (n === 2 || n === 3 ? 1 : 0) : (n === 3 ? 1 : 0)
+      next[r * C + c] = alive ? (n === 2 || n === 3 ? 1 : 0) : n === 3 ? 1 : 0
     }
   }
   return next
@@ -56,13 +80,19 @@ function activityScore(start: Uint8Array, C: number, R: number): number {
 
 function stampMethuselah(g: Uint8Array, C: number, R: number) {
   const pattern = METHUSELAHS[Math.floor(Math.random() * METHUSELAHS.length)]
-  const t = Math.floor(Math.random() * 8)  // one of the 8 grid symmetries
+  const t = Math.floor(Math.random() * 8) // one of the 8 grid symmetries
   const r0 = Math.floor(Math.random() * R)
   const c0 = Math.floor(Math.random() * C)
   for (const [pr, pc] of pattern) {
     const [r, c] = [
-      [pr, pc], [pr, -pc], [-pr, pc], [-pr, -pc],
-      [pc, pr], [pc, -pr], [-pc, pr], [-pc, -pr],
+      [pr, pc],
+      [pr, -pc],
+      [-pr, pc],
+      [-pr, -pc],
+      [pc, pr],
+      [pc, -pr],
+      [-pc, pr],
+      [-pc, -pr],
     ][t]
     const rr = (((r0 + r) % R) + R) % R
     const cc = (((c0 + c) % C) + C) % C
@@ -78,10 +108,14 @@ export function GameOfLife() {
   const painting = useRef(false)
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
-  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false)
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
 
-  const [density, setDensity] = useState(5)  // 1–10: sparse → dense
-  const sparsityRef = useRef(6)              // derived: 11 - density
+  const [density, setDensity] = useState(5) // 1–10: sparse → dense
+  const sparsityRef = useRef(6) // derived: 11 - density
   const densityRef = useRef(5)
   const render = useCallback(() => {
     const canvas = canvasRef.current
@@ -106,19 +140,22 @@ export function GameOfLife() {
     render()
   }, [render])
 
-  const paint = useCallback((clientX: number, clientY: number) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const c = Math.floor((clientX - rect.left) / CELL)
-    const r = Math.floor((clientY - rect.top) / CELL)
-    const C = cols.current
-    const R = rows.current
-    if (c >= 0 && c < C && r >= 0 && r < R) {
-      grid.current[r * C + c] = 1
-      render()
-    }
-  }, [render])
+  const paint = useCallback(
+    (clientX: number, clientY: number) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const rect = canvas.getBoundingClientRect()
+      const c = Math.floor((clientX - rect.left) / CELL)
+      const r = Math.floor((clientY - rect.top) / CELL)
+      const C = cols.current
+      const R = rows.current
+      if (c >= 0 && c < C && r >= 0 && r < R) {
+        grid.current[r * C + c] = 1
+        render()
+      }
+    },
+    [render],
+  )
 
   const buildCandidate = useCallback((C: number, R: number): Uint8Array => {
     const g = new Uint8Array(C * R)
@@ -127,7 +164,7 @@ export function GameOfLife() {
     const divisor = (mobile ? 100 : 200) * Math.pow(25, (sparsityRef.current - 1) / 9)
     const clusterCount = Math.max(1, Math.floor((C * R) / divisor))
     // Cap fill so clusters stay porous — solid blobs all die at once on the first tick (the "flash").
-    const fillProb = 0.15 + (densityRef.current / 10) * 0.35  // 0.18 (sparse) → 0.5 (dense)
+    const fillProb = 0.15 + (densityRef.current / 10) * 0.35 // 0.18 (sparse) → 0.5 (dense)
     for (let k = 0; k < clusterCount; k++) {
       const cx = Math.random() * C
       const cy = Math.random() * R
@@ -199,8 +236,7 @@ export function GameOfLife() {
         const minR = Math.min(oldRows, newRows)
         const minC = Math.min(oldCols, newCols)
         for (let r = 0; r < minR; r++)
-          for (let c = 0; c < minC; c++)
-            newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
+          for (let c = 0; c < minC; c++) newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         cols.current = newCols
@@ -211,9 +247,16 @@ export function GameOfLife() {
     }
     window.addEventListener('resize', resize)
 
-    const down = (e: MouseEvent) => { painting.current = true; paint(e.clientX, e.clientY) }
-    const move = (e: MouseEvent) => { if (painting.current) paint(e.clientX, e.clientY) }
-    const up = () => { painting.current = false }
+    const down = (e: MouseEvent) => {
+      painting.current = true
+      paint(e.clientX, e.clientY)
+    }
+    const move = (e: MouseEvent) => {
+      if (painting.current) paint(e.clientX, e.clientY)
+    }
+    const up = () => {
+      painting.current = false
+    }
     window.addEventListener('mousedown', down)
     window.addEventListener('mousemove', move)
     window.addEventListener('mouseup', up)
@@ -234,33 +277,43 @@ export function GameOfLife() {
         ref={canvasRef}
         style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
       />
-      {mounted && <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
-        <a
-          href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="gol-link"
-        >
-          Conway&apos;s Game of Life ↗
-        </a>
-        <label className="gol-slider-row">
-          <span>density</span>
-          <input
-            type="range" min={1} max={10} step={1} value={density}
-            onChange={e => {
-              const v = Number(e.target.value)
-              setDensity(v)
-              densityRef.current = v
-              sparsityRef.current = 11 - v
-              seed()
-            }}
-          />
-        </label>
-        <div className="gol-btn-row">
-          <button className="gol-btn" onClick={clear}>clear</button>
-          <button className="gol-btn" onClick={seed}>regenerate</button>
+      {mounted && (
+        <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
+          <a
+            href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="gol-link"
+          >
+            Conway&apos;s Game of Life ↗
+          </a>
+          <label className="gol-slider-row">
+            <span>density</span>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={density}
+              onChange={(e) => {
+                const v = Number(e.target.value)
+                setDensity(v)
+                densityRef.current = v
+                sparsityRef.current = 11 - v
+                seed()
+              }}
+            />
+          </label>
+          <div className="gol-btn-row">
+            <button className="gol-btn" onClick={clear}>
+              clear
+            </button>
+            <button className="gol-btn" onClick={seed}>
+              regenerate
+            </button>
+          </div>
         </div>
-      </div>}
+      )}
     </>
   )
 }

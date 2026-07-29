@@ -4,7 +4,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FiPlay, FiX } from 'react-icons/fi'
 
-export function ProjectDemo({ title, media, github }: { title: string; media: string; github: string }) {
+export function ProjectDemo({
+  title,
+  media,
+  github,
+}: {
+  title: string
+  media: string
+  github: string
+}) {
   const [open, setOpen] = useState(false)
   const [src, setSrc] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
@@ -79,7 +87,12 @@ export function ProjectDemo({ title, media, github }: { title: string; media: st
             >
               <div className="demo-header">
                 <span className="demo-title">{title}</span>
-                <button ref={closeBtn} className="demo-close" aria-label="Close demo" onClick={close}>
+                <button
+                  ref={closeBtn}
+                  className="demo-close"
+                  aria-label="Close demo"
+                  onClick={close}
+                >
                   <FiX size={14} />
                 </button>
               </div>
