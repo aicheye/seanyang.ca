@@ -957,7 +957,7 @@ footer a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--badge-bg);
+  background: none;
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 6px;
