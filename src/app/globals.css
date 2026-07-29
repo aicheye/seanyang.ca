@@ -614,6 +614,7 @@ footer a {
 .now-playing:hover .np-title,
 .now-playing:focus .np-title {
   color: var(--link);
+  text-decoration: underline;
 }
 
 .np-album {
