@@ -3,5 +3,5 @@
   "semi": false,
   "singleQuote": true,
   "printWidth": 100,
-  "ignorePatterns": [".next"]
+  "ignorePatterns": [".next", "next-env.d.ts"]
 }
