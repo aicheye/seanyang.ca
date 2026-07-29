@@ -1,9 +1,7 @@
 name: Purge jsDelivr
 
-# The data under public/data/ is consumed by the SSH TUI (tui.seanyang.me) via
-# jsDelivr, which caches a branch ref (@main) for up to ~12h. When that data
-# changes on main, tell jsDelivr to re-fetch the edited files so the TUI picks
-# them up without waiting for the CDN TTL.
+# When data/ files chagne on main, tell jsDelivr to re-fetch the 
+# edited files without waiting for the CDN TTL.
 on:
   push:
     branches: [main]
