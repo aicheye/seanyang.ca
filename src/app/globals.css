@@ -610,6 +610,12 @@ footer a {
   text-decoration: none;
 }
 
+/* Whole panel is the link — highlight only the title to keep it quiet */
+.now-playing:hover .np-title,
+.now-playing:focus .np-title {
+  color: var(--link);
+}
+
 .np-album {
   position: relative;
   width: 100px;
