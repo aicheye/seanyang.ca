@@ -4,13 +4,9 @@ import { REGISTERED_ORIGIN } from '@/data/site'
 export function Footer() {
   return (
     <footer>
-      {/*
-        Still the .me report: websitecarbon's slug is whatever host was
-        scanned, so this stays until seanyang.ca has been scanned and the
-        new report page exists.
-      */}
+      {/* The slug is the scanned host, so it tracks the canonical domain. */}
       <a
-        href="https://websitecarbon.com/website/seanyang-me/"
+        href="https://websitecarbon.com/website/seanyang-ca/"
         target="_blank"
         rel="noopener noreferrer"
       >

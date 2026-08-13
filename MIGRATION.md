@@ -21,8 +21,12 @@ registered with someone else rather than addresses we control:
 | `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs | GitHub **repository** names, not hostnames. Renaming the repos would break the TUI's data fetch and every published release download URL. |
 | `tui-seanyang-me` crate/binary | `Cargo.toml`, Dockerfile, systemd unit, release assets | The published artifact name. Renaming breaks `Dockerfile`'s release lookup and every existing install. |
 | SE'30 webring `from=` origin | `src/data/site.ts` → `REGISTERED_ORIGIN` | The ring resolves a member by the origin it is handed. Sending `.ca` before re-registering finds no member and kills the prev/next arrows. |
-| websitecarbon report slug | `src/app/components/Footer.tsx` | The slug is whatever host was scanned. `seanyang-ca` 404s until the new domain is scanned. |
-| Bluesky handle `seanyang.me` | `public/data/socials.json`, TUI `fallback.json` | A DNS-verified atproto handle. The profile URL only becomes valid *after* the handle is re-verified against `_atproto.seanyang.ca`. |
+
+The Bluesky profile link and the websitecarbon report slug **do** name `.ca`
+already, ahead of the registrations they depend on. Both are dead links until
+the corresponding item in [phase 4](#phase-4--identities-to-re-register) is
+done — the footer badge 404s, and the Bluesky link resolves to no account. They
+are listed first there for that reason.
 
 ## Phase 1 — dual domain (code, done)
 
@@ -89,20 +93,32 @@ Do **not** redirect `bucket-hasura.seanyang.me` or the SSH hostnames.
 ## Phase 4 — identities to re-register
 
 None of these are code. Each one is a place the old domain is written down
-somewhere we do not control, and each has a code reference waiting on it (see
-the table at the top).
+somewhere we do not control.
+
+The first two are **blocking**: the code already links to `.ca` for both, so
+until they are done the site ships two dead links.
+
+- [ ] **Bluesky** — add the `_atproto.seanyang.ca` TXT record, then change the
+      handle in the app under *Settings → Account → Handle*. Until then
+      `bsky.app/profile/seanyang.ca` resolves to no account. `socials.json`
+      already names `.ca`, and the TUI picks that up from jsDelivr on its next
+      pull, so no deploy is needed once the handle is live.
+- [ ] **websitecarbon** — scan `https://seanyang.ca` at
+      <https://websitecarbon.com/>, which is what creates the
+      `/website/seanyang-ca/` report page the footer badge now links to. Until
+      then the badge 404s. Worth re-checking the quoted figure (`0.04 g CO₂ /
+      view`) against the new report while you are there.
+
+Not blocking:
 
 - [ ] **Email** — confirm `sean@seanyang.ca` delivers, and keep `.me` forwarding
       to it indefinitely. Every published copy of the old address (resumes in
       circulation, old commits, the sunset notice in `bucket`) points at `.me`
       forever.
-- [ ] **Bluesky** — add the `_atproto.seanyang.ca` TXT record, change the handle,
-      then update the URL and handle in `public/data/socials.json` (the TUI picks
-      this up from jsDelivr automatically).
 - [ ] **SE'30 webring** — re-register as `https://seanyang.ca`, then flip
-      `REGISTERED_ORIGIN` in `src/data/site.ts`.
-- [ ] **websitecarbon** — re-scan `seanyang.ca`, then update the report slug in
-      `Footer.tsx`.
+      `REGISTERED_ORIGIN` in `src/data/site.ts`. Left on `.me` on purpose: unlike
+      the two above, a wrong value here breaks a *working* feature (the prev/next
+      arrows) rather than leaving a link dead.
 - [ ] **Resume and transcript PDFs** — the documents themselves carry the old
       email and site. They are built outside this repo and served from `docs.`;
       regenerate them.
