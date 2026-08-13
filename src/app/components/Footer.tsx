@@ -1,8 +1,14 @@
 import Image from 'next/image'
+import { REGISTERED_ORIGIN } from '@/data/site'
 
 export function Footer() {
   return (
     <footer>
+      {/*
+        Still the .me report: websitecarbon's slug is whatever host was
+        scanned, so this stays until seanyang.ca has been scanned and the
+        new report page exists.
+      */}
       <a
         href="https://websitecarbon.com/website/seanyang-me/"
         target="_blank"
@@ -22,7 +28,7 @@ export function Footer() {
         <div className="webring">
           <a
             className="webring-arrow"
-            href="https://se30webring.com?from=https://seanyang.me&dir=prev"
+            href={`https://se30webring.com?from=${REGISTERED_ORIGIN}&dir=prev`}
           >
             ←
           </a>
@@ -36,7 +42,7 @@ export function Footer() {
           </a>
           <a
             className="webring-arrow"
-            href="https://se30webring.com?from=https://seanyang.me&dir=next"
+            href={`https://se30webring.com?from=${REGISTERED_ORIGIN}&dir=next`}
           >
             →
           </a>

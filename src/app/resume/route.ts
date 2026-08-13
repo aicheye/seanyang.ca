@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { DOCS_URL, SITE_DOMAIN } from '@/data/site'
 
 export const revalidate = 60
 
-const UPSTREAM = 'https://docs.seanyang.me/Sean_Yang_resume/Sean_Yang_resume.pdf'
+const UPSTREAM = `${DOCS_URL}/Sean_Yang_resume/Sean_Yang_resume.pdf`
 
 export async function GET(req: NextRequest) {
   const upstreamRes = await fetch(UPSTREAM, {
     next: { revalidate: 60 },
     headers: {
-      'user-agent': req.headers.get('user-agent') ?? 'seanyang.me-proxy',
+      'user-agent': req.headers.get('user-agent') ?? `${SITE_DOMAIN}-proxy`,
       accept: req.headers.get('accept') ?? 'application/pdf',
     },
   })
