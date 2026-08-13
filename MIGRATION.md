@@ -13,20 +13,20 @@ Nothing branches on the request's `Host`. That means the redirect in phase 2 is
 purely additive — no code changes when it lands, and no code changes if it has
 to be rolled back.
 
-Two categories are deliberately left on `.me`, because they are identities
-registered with someone else rather than addresses we control:
+The only things still written as `.me` are names that were never hostnames:
 
 | Thing | Where | Why it stays |
 |---|---|---|
-| `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs | GitHub **repository** names, not hostnames. Renaming the repos would break the TUI's data fetch and every published release download URL. |
+| `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs | GitHub **repository** names. Renaming the repos would break the TUI's data fetch and every published release download URL. |
 | `tui-seanyang-me` crate/binary | `Cargo.toml`, Dockerfile, systemd unit, release assets | The published artifact name. Renaming breaks `Dockerfile`'s release lookup and every existing install. |
-| SE'30 webring `from=` origin | `src/data/site.ts` → `REGISTERED_ORIGIN` | The ring resolves a member by the origin it is handed. Sending `.ca` before re-registering finds no member and kills the prev/next arrows. |
 
-The Bluesky profile link and the websitecarbon report slug **do** name `.ca`
-already, ahead of the registrations they depend on. Both are dead links until
-the corresponding item in [phase 4](#phase-4--identities-to-re-register) is
-done — the footer badge 404s, and the Bluesky link resolves to no account. They
-are listed first there for that reason.
+Everything else names `.ca`, including three links that point at registrations
+not yet moved — the Bluesky profile, the websitecarbon badge, and the SE'30
+webring arrows. Each is broken until its item in
+[phase 4](#phase-4--identities-to-re-register) is done. That is a deliberate
+choice to carry three known-broken links for the length of the migration rather
+than track per-service exceptions in code; it is only safe because the list is
+short and written down.
 
 ## Phase 1 — dual domain (code, done)
 
@@ -95,8 +95,8 @@ Do **not** redirect `bucket-hasura.seanyang.me` or the SSH hostnames.
 None of these are code. Each one is a place the old domain is written down
 somewhere we do not control.
 
-The first two are **blocking**: the code already links to `.ca` for both, so
-until they are done the site ships two dead links.
+The first three are **blocking**: the code already links to `.ca` for each, so
+until they are done the footer ships three dead links.
 
 - [ ] **Bluesky** — add the `_atproto.seanyang.ca` TXT record, then change the
       handle in the app under *Settings → Account → Handle*. Until then
@@ -105,9 +105,16 @@ until they are done the site ships two dead links.
       pull, so no deploy is needed once the handle is live.
 - [ ] **websitecarbon** — scan `https://seanyang.ca` at
       <https://websitecarbon.com/>, which is what creates the
-      `/website/seanyang-ca/` report page the footer badge now links to. Until
-      then the badge 404s. Worth re-checking the quoted figure (`0.04 g CO₂ /
-      view`) against the new report while you are there.
+      `/website/seanyang-ca/` report page the footer badge links to. Until then
+      the badge 404s. The quoted figure in `Footer.tsx` is hand-maintained
+      (currently `0.05 g CO₂ / view`) — check it against the new report.
+- [ ] **SE'30 webring** — re-register the member as `https://seanyang.ca`. The
+      ring resolves a member by the `from=` origin it is handed, so until the
+      registry has the new origin the prev/next arrows find no member. This is
+      the one that degrades a feature that used to work rather than merely
+      leaving a link dead — if the ring is slow to update, reverting the two
+      `from=` values in `Footer.tsx` to `https://seanyang.me` restores the
+      arrows without touching anything else.
 
 Not blocking:
 
@@ -115,10 +122,6 @@ Not blocking:
       to it indefinitely. Every published copy of the old address (resumes in
       circulation, old commits, the sunset notice in `bucket`) points at `.me`
       forever.
-- [ ] **SE'30 webring** — re-register as `https://seanyang.ca`, then flip
-      `REGISTERED_ORIGIN` in `src/data/site.ts`. Left on `.me` on purpose: unlike
-      the two above, a wrong value here breaks a *working* feature (the prev/next
-      arrows) rather than leaving a link dead.
 - [ ] **Resume and transcript PDFs** — the documents themselves carry the old
       email and site. They are built outside this repo and served from `docs.`;
       regenerate them.

@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { REGISTERED_ORIGIN } from '@/data/site'
+import { SITE_URL } from '@/data/site'
 
 export function Footer() {
   return (
@@ -10,7 +10,7 @@ export function Footer() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        0.04 g CO₂ / view
+        0.05 g CO₂ / view
       </a>
       <div className="webring-wrapper">
         <a
@@ -24,7 +24,7 @@ export function Footer() {
         <div className="webring">
           <a
             className="webring-arrow"
-            href={`https://se30webring.com?from=${REGISTERED_ORIGIN}&dir=prev`}
+            href={`https://se30webring.com?from=${SITE_URL}&dir=prev`}
           >
             ←
           </a>
@@ -38,7 +38,7 @@ export function Footer() {
           </a>
           <a
             className="webring-arrow"
-            href={`https://se30webring.com?from=${REGISTERED_ORIGIN}&dir=next`}
+            href={`https://se30webring.com?from=${SITE_URL}&dir=next`}
           >
             →
           </a>
