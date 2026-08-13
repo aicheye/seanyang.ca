@@ -18,7 +18,13 @@ The only things still written as `.me` are names that were never hostnames:
 | Thing | Where | Why it stays |
 |---|---|---|
 | `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs | GitHub **repository** names. Renaming the repos would break the TUI's data fetch and every published release download URL. |
-| `tui-seanyang-me` crate/binary | `Cargo.toml`, Dockerfile, systemd unit, release assets | The published artifact name. Renaming breaks `Dockerfile`'s release lookup and every existing install. |
+
+The crate and binary **were** renamed `tui-seanyang-me` → `tui-seanyang-ca`, along
+with the release assets, Docker `ENTRYPOINT`, and systemd unit. That has a
+release-ordering consequence: `Dockerfile` resolves the *latest* release and
+picks its asset by name, so `docker compose build` fails against any release
+published before the rename. Cut a new release before rebuilding, and expect the
+first build after it to be the one that works.
 
 Everything else names `.ca`, including three links that point at registrations
 not yet moved — the Bluesky profile, the websitecarbon badge, and the SE'30
