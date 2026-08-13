@@ -1,7 +1,7 @@
 {
   "primaryEmail": {
-    "label": "sean@seanyang.me",
-    "url": "mailto:sean@seanyang.me"
+    "label": "sean@seanyang.ca",
+    "url": "mailto:sean@seanyang.ca"
   },
   "socials": [
     {
@@ -21,8 +21,8 @@
     },
     {
       "label": "Bluesky",
-      "url": "https://bsky.app/profile/seanyang.me",
-      "handle": "seanyang.me"
+      "url": "https://bsky.app/profile/seanyang.ca",
+      "handle": "seanyang.ca"
     },
     {
       "label": "Instagram",

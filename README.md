@@ -1,6 +1,10 @@
-# seanyang.me
+# seanyang.ca
 
 Personal website built with Next.js, React, and TypeScript. Deployed on Vercel.
+
+Served from **seanyang.ca** (canonical) and **seanyang.me**. The `.me` domain is
+kept live during the migration and will redirect to `.ca` at the platform level;
+`src/data/site.ts` holds the canonical origin that metadata and self-links use.
 
 ## Tech Stack
 

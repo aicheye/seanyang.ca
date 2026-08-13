@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { SITE_URL } from '@/data/site'
 import './globals.css'
 
 const geist = Geist({
@@ -20,6 +21,12 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
+  // Both seanyang.me and seanyang.ca serve this app during the migration, so
+  // every page has to declare which one is the real address. Without a
+  // canonical the two hosts are duplicate content and search engines pick a
+  // winner themselves — this points them at .ca before .me redirects.
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: './' },
   title: 'Sean Yang',
   description: 'Student and software developer based in Waterloo, ON.',
   icons: {
