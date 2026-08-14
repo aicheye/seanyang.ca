@@ -1,8 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
-<!-- pixel-art smile: exact unit squares on an integer grid, rotated 15deg, real circle clip.
-     the pixel layer is painted 3x (identical geometry) to defeat antialiasing seams. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" baseProfile="tiny-ps" viewBox="0 0 1000 1000">
+<title>Sean Yang</title>
 <defs>
-<clipPath id="c"><circle cx="500" cy="500" r="500"/></clipPath>
 <g id="px">
 <rect x="6" y="7" width="1" height="1" fill="#fafafa"/>
 <rect x="7" y="7" width="1" height="1" fill="#9d9d9d"/>
@@ -124,12 +122,10 @@
 <rect x="13" y="23" width="1" height="1" fill="#f7f7f7"/>
 </g>
 </defs>
-<g clip-path="url(#c)">
 <circle cx="500" cy="500" r="500" fill="#ffffff"/>
 <g transform="translate(82.8711 -234.5202) rotate(15) scale(42.8094)">
-<use href="#px"/>
-<use href="#px"/>
-<use href="#px"/>
-</g>
+<use xlink:href="#px"/>
+<use xlink:href="#px"/>
+<use xlink:href="#px"/>
 </g>
 </svg>
