@@ -7,8 +7,8 @@
     "logo": "/assets/logos/moss.jpg",
     "location": "San Francisco, CA",
     "technologies": ["ROS 2", "Rust", "C++", "Linux"],
-    "dates": ["2026.5", "present"],
-    "current": true
+    "dates": ["2026.5", "2026.8"],
+    "current": false
   },
   {
     "title": "Robotics SWE",
