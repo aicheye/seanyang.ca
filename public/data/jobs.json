@@ -34,6 +34,7 @@
     ],
     "website": "https://watonomous.ca/projects/eve",
     "logo": "/assets/logos/watonomous.jpg",
+    "media": "/assets/demos/watonomous.gif",
     "location": "Waterloo, ON",
     "technologies": [
       "C++",
