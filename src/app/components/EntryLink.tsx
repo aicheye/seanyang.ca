@@ -189,9 +189,7 @@ export function EntryLink({
                     {title}
                     {company && (
                       <>
-                        {/* No line break at the @: non-breaking spaces glue it
-                            to the words on both sides. */}
-                        {' @ '}
+                        {' @ '}
                         <span className="modal-title-company">{company}</span>
                       </>
                     )}
