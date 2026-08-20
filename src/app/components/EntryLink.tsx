@@ -142,14 +142,13 @@ export function EntryLink({
         first.focus()
       }
     }
-    /* No body scroll lock: making the page unscrollable flips mobile browser
-       bars (URL bar, gesture areas) from translucent to opaque while the
-       dialog is open. overscroll-behavior on .modal contains scrolling
-       instead; a drag on the backdrop can still pan the page behind. */
     document.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     closeBtn.current?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
     }
   }, [open, close])
 
