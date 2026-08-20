@@ -197,7 +197,7 @@ h2 span {
 
 .job {
   position: relative;
-  padding-bottom: 24px;
+  padding-bottom: 48px;
 }
 
 .job:last-child {
@@ -294,7 +294,7 @@ h2 span {
 .projects {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px 28px;
+  gap: 32px 36px;
 }
 
 .project a {
