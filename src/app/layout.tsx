@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -19,6 +19,14 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
 })
+
+/* viewport-fit=cover draws the page edge-to-edge on iOS, so the dialog
+   overlay's dim extends under the notch and home-indicator zones instead of
+   Safari painting them opaque while a dialog is open. Content keeps clear of
+   those zones via env(safe-area-inset-*) padding in globals.css. */
+export const viewport: Viewport = {
+  viewportFit: 'cover',
+}
 
 export const metadata: Metadata = {
   // Both seanyang.me and seanyang.ca serve this app during the migration, so

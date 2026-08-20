@@ -48,7 +48,9 @@ a:focus-visible {
 .site {
   max-width: 700px;
   margin: 0 auto;
-  padding: 64px 32px;
+  /* max() with the safe-area insets keeps content clear of the notch in
+     landscape now that viewport-fit=cover draws the page edge-to-edge */
+  padding: 64px max(32px, env(safe-area-inset-right)) 64px max(32px, env(safe-area-inset-left));
   position: relative;
   z-index: 1;
   background: var(--surface);
@@ -320,7 +322,10 @@ h2 span {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  /* the overlay itself extends into the safe areas (viewport-fit=cover);
+     this padding keeps the dialog box out of them */
+  padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
   background: rgba(59, 32, 16, 0.45);
   animation: modal-fade 0.15s ease-out;
 }
@@ -1083,7 +1088,8 @@ footer a {
   }
 
   .site {
-    padding: 48px 20px 40px;
+    padding: 48px max(20px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom))
+      max(20px, env(safe-area-inset-left));
     min-height: unset;
   }
 
