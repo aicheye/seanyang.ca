@@ -2,7 +2,7 @@
   {
     "title": "swarm_ws",
     "description": "robotic swarm maze exploration",
-    "details": "Four robots map procedurally-generated mazes with no central coordinator, exploring 7.5x faster than one robot alone. A geodesic Voronoi partition over the merged map gives each robot the region it can reach fastest, so they spread out instead of racing for the same frontier. Four ROS 2 packages with per-robot state machines run containerized against Gazebo, with live Foxglove visualization.",
+    "details": "Four robots map procedurally-generated mazes with no central coordinator, exploring 7.5x faster than one robot alone. A geodesic Voronoi partition over the merged map gives each robot the region it can reach fastest, so they spread out instead of racing for the same frontier. Four ROS 2 packages with per-robot state machines run across seven Docker services, with Gazebo simulation and live Foxglove visualization.",
     "github": "https://github.com/RRohan4/swarm_ws",
     "technologies": [
       "Python",
