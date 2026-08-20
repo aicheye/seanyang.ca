@@ -11,7 +11,6 @@ export function Header() {
       <div className="name-row">
         <h1>Sean Yang</h1>
         <span className="location">
-          <span className="pulse" />
           San Francisco, CA
           <FiMapPin size={12} />
         </span>
