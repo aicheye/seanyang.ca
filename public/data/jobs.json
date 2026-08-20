@@ -26,6 +26,7 @@
     "details": "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team. Rapid-inference models predicting how external agents behave cut safety incidents by 3x. Integrated those models with the perception, world modelling, planning, and action nodes, and maintained the Docker environments that keep the stack reproducible.",
     "website": "https://watonomous.ca/projects/eve",
     "logo": "/assets/logos/watonomous.jpg",
+    "media": "/assets/demos/watonomous.gif",
     "location": "Waterloo, ON",
     "technologies": [
       "C++",
