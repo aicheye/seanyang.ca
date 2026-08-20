@@ -142,14 +142,29 @@ export function EntryLink({
         first.focus()
       }
     }
-    /* No body scroll lock: making the page unscrollable flips mobile browser
-       bars (URL bar, gesture areas) from translucent to opaque while the
-       dialog is open. overscroll-behavior on .modal contains scrolling
-       instead; a drag on the backdrop can still pan the page behind. */
     document.addEventListener('keydown', onKey)
+    /* overflow:hidden alone doesn't stop touch scrolling on iOS Safari, so
+       pin the body at the current scroll offset while the dialog is open and
+       restore the position on close. */
+    const { scrollY } = window
+    const prev = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    }
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
     closeBtn.current?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev.overflow
+      document.body.style.position = prev.position
+      document.body.style.top = prev.top
+      document.body.style.width = prev.width
+      window.scrollTo(0, scrollY)
     }
   }, [open, close])
 
