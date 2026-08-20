@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { withBase } from '@/lib/basePath'
 import { SITE_URL } from '@/data/site'
 
 export function Footer() {
@@ -19,7 +20,7 @@ export function Footer() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image src="/logo_b.svg" alt="SE Webring" width={32} height={22} />
+          <Image src={withBase('/logo_b.svg')} alt="SE Webring" width={32} height={22} />
         </a>
         <div className="webring">
           <a

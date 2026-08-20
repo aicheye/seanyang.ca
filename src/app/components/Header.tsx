@@ -1,9 +1,18 @@
 import adjectives from '@/data/adjectives'
+import { DOCS_URL } from '@/data/site'
 import { primaryEmail } from '@/data/socials'
 import { FiMapPin } from 'react-icons/fi'
 import { NowPlaying } from './NowPlaying'
 import { SSHCopyButton } from './SSHCopyButton'
 import { TermProgress } from './TermProgress'
+
+// The static mirror has no server: /resume proxies through a route handler
+// on prod, so the mirror links straight to the PDF, and the Last.fm/Spotify
+// widget is dropped entirely.
+const staticExport = process.env.STATIC_EXPORT === '1'
+const resumeHref = staticExport
+  ? `${DOCS_URL}/Sean_Yang_resume/Sean_Yang_resume.pdf`
+  : '/resume'
 
 export function Header() {
   return (
@@ -18,11 +27,11 @@ export function Header() {
       <div className="tagline">
         <a href={primaryEmail.url}>{primaryEmail.label}</a>
         <span>|</span>
-        <a href="/resume" target="_blank" rel="noopener noreferrer">
+        <a href={resumeHref} target="_blank" rel="noopener noreferrer">
           résumé ↗
         </a>
       </div>
-      <NowPlaying />
+      {!staticExport && <NowPlaying />}
       <div className="about">
         <span className="sep">&#91;</span>
         {adjectives.flatMap((w, i) =>

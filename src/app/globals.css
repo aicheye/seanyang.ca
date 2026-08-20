@@ -151,6 +151,24 @@ h2 span {
   margin: 0 3px 60px;
 }
 
+/* Static mirror only (RandomQuoteClient): the quote is rolled in the browser,
+   so a wrapper around .quote reserves room up front instead of growing when
+   the quote lands. It sits on a wrapper, not on .quote itself, so the
+   border-left only spans the actual text. Sized to fit the second-longest
+   quote (93 chars); the one 137-char outlier adds a line when rolled rather
+   than every load paying for it in blank space. 1lh = one blockquote line;
+   the 28px is the cite line (14px × 1.7 + 4px margin). Prod never renders
+   this class. */
+.quote-reserve {
+  min-height: calc(2lh + 28px);
+}
+
+@media (max-width: 400px) {
+  .quote-reserve {
+    min-height: calc(3lh + 28px);
+  }
+}
+
 .quote blockquote {
   margin: 0;
   font-style: italic;
@@ -1024,6 +1042,10 @@ footer a {
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: 0px 8px;
+  }
+
+  .quote {
+    margin-bottom: 40px;
   }
 
   .site {
