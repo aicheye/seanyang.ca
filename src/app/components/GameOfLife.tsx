@@ -57,6 +57,45 @@ function step(g: Uint8Array, C: number, R: number): Uint8Array {
   return next
 }
 
+// Like step(), but also advances a parallel hue grid (degrees; NaN = uncolored).
+// Survivors keep their hue; births take the circular mean of colored parents.
+function stepColored(
+  g: Uint8Array,
+  hues: Float32Array,
+  C: number,
+  R: number,
+): [Uint8Array, Float32Array] {
+  const next = new Uint8Array(C * R)
+  const nextHues = new Float32Array(C * R).fill(NaN)
+  for (let r = 0; r < R; r++) {
+    for (let c = 0; c < C; c++) {
+      let n = 0
+      let hx = 0
+      let hy = 0
+      for (let dr = -1; dr <= 1; dr++)
+        for (let dc = -1; dc <= 1; dc++) {
+          if (!dr && !dc) continue
+          const i = ((r + dr + R) % R) * C + ((c + dc + C) % C)
+          if (g[i]) {
+            n++
+            if (!Number.isNaN(hues[i])) {
+              hx += Math.cos((hues[i] * Math.PI) / 180)
+              hy += Math.sin((hues[i] * Math.PI) / 180)
+            }
+          }
+        }
+      const i = r * C + c
+      const alive = g[i] ? n === 2 || n === 3 : n === 3
+      if (alive) {
+        next[i] = 1
+        if (g[i]) nextHues[i] = hues[i]
+        else if (hx || hy) nextHues[i] = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
+      }
+    }
+  }
+  return [next, nextHues]
+}
+
 function diffCount(a: Uint8Array, b: Uint8Array): number {
   let d = 0
   for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d++
@@ -103,9 +142,12 @@ function stampMethuselah(g: Uint8Array, C: number, R: number) {
 export function GameOfLife() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const grid = useRef<Uint8Array>(new Uint8Array(0))
+  const hues = useRef<Float32Array>(new Float32Array(0))
   const cols = useRef(0)
   const rows = useRef(0)
   const painting = useRef(false)
+  const paintHue = useRef(Math.random() * 360)
+  const lastPainted = useRef(-1)
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
   const mounted = useSyncExternalStore(
@@ -122,13 +164,15 @@ export function GameOfLife() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.fillStyle = '#eae3cd'
     const C = cols.current
     const R = rows.current
     const g = grid.current
+    const h = hues.current
     for (let r = 0; r < R; r++) {
       for (let c = 0; c < C; c++) {
-        if (g[r * C + c]) {
+        const i = r * C + c
+        if (g[i]) {
+          ctx.fillStyle = Number.isNaN(h[i]) ? '#eae3cd' : `hsl(${h[i]}, 65%, 82%)`
           ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
         }
       }
@@ -136,7 +180,12 @@ export function GameOfLife() {
   }, [])
 
   const tick = useCallback(() => {
-    grid.current = step(grid.current, cols.current, rows.current)
+    ;[grid.current, hues.current] = stepColored(
+      grid.current,
+      hues.current,
+      cols.current,
+      rows.current,
+    )
     render()
   }, [render])
 
@@ -150,7 +199,14 @@ export function GameOfLife() {
       const C = cols.current
       const R = rows.current
       if (c >= 0 && c < C && r >= 0 && r < R) {
-        grid.current[r * C + c] = 1
+        const i = r * C + c
+        grid.current[i] = 1
+        hues.current[i] = paintHue.current
+        // Advance the rainbow only on entering a new cell, not on every mousemove
+        if (i !== lastPainted.current) {
+          lastPainted.current = i
+          paintHue.current = (paintHue.current + 7) % 360
+        }
         render()
       }
     },
@@ -202,11 +258,13 @@ export function GameOfLife() {
       }
     }
     grid.current = best
+    hues.current = new Float32Array(cols.current * rows.current).fill(NaN)
     render()
   }, [buildCandidate, render])
 
   const clear = useCallback(() => {
     grid.current = new Uint8Array(cols.current * rows.current)
+    hues.current = new Float32Array(cols.current * rows.current).fill(NaN)
     render()
   }, [render])
 
@@ -232,16 +290,22 @@ export function GameOfLife() {
         const oldGrid = grid.current
         const oldCols = cols.current
         const oldRows = rows.current
+        const oldHues = hues.current
         const newGrid = new Uint8Array(newCols * newRows)
+        const newHues = new Float32Array(newCols * newRows).fill(NaN)
         const minR = Math.min(oldRows, newRows)
         const minC = Math.min(oldCols, newCols)
         for (let r = 0; r < minR; r++)
-          for (let c = 0; c < minC; c++) newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
+          for (let c = 0; c < minC; c++) {
+            newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
+            newHues[r * newCols + c] = oldHues[r * oldCols + c]
+          }
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
         cols.current = newCols
         rows.current = newRows
         grid.current = newGrid
+        hues.current = newHues
         render()
       }, 400)
     }
