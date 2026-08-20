@@ -21,7 +21,8 @@ export function ExperienceSection() {
                 <div className="job-body">
                   <strong>
                     <EntryLink
-                      title={`${job.title} @ ${job.company}`}
+                      title={job.title}
+                      company={job.company}
                       href={job.website}
                       description={job.details ?? job.description}
                       technologies={job.technologies}

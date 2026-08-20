@@ -11,6 +11,8 @@ import { cachedMedia, loadMedia, prefetchMedia } from '@/lib/media'
 export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
   title: string
+  /** Appended to the title as "title @ company"; kept on its own line on narrow screens. */
+  company?: string
   href: string
   /** Blurb shown inside the dialog, longer than the summary on the card. An
       array is stored one sentence per line in the data files and joined here. */
@@ -32,6 +34,7 @@ function linkLabel(href: string): string {
 
 export function EntryLink({
   title,
+  company,
   href,
   description,
   technologies,
@@ -52,6 +55,7 @@ export function EntryLink({
   const closeBtn = useRef<HTMLButtonElement>(null)
   const objectUrl = useRef<string | null>(null)
   const titleId = useId()
+  const label = company ? `${title} @ ${company}` : title
 
   const close = useCallback(() => {
     setOpen(false)
@@ -161,7 +165,7 @@ export function EntryLink({
         onPointerEnter={onIntent}
         onFocus={onIntent}
       >
-        {title}
+        {label}
       </a>
       {open &&
         createPortal(
@@ -183,13 +187,19 @@ export function EntryLink({
                 <div className="modal-heading">
                   <h3 id={titleId} className="modal-title">
                     {title}
+                    {company && (
+                      <>
+                        {' @ '}
+                        <span className="modal-title-company">{company}</span>
+                      </>
+                    )}
                   </h3>
                   {meta && meta.length > 0 && <p className="modal-meta">{meta.join(' · ')}</p>}
                 </div>
                 <button
                   ref={closeBtn}
                   className="modal-close"
-                  aria-label={`Close ${title}`}
+                  aria-label={`Close ${label}`}
                   onClick={close}
                 >
                   <FiX size={14} />
@@ -198,7 +208,7 @@ export function EntryLink({
               {media &&
                 (src ? (
                   /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
-                  <img className="modal-media" src={src} alt={`${title} demo`} />
+                  <img className="modal-media" src={src} alt={`${label} demo`} />
                 ) : (
                   <div className="modal-loading">{failed ? 'demo unavailable' : 'loading…'}</div>
                 ))}

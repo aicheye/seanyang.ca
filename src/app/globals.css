@@ -458,6 +458,44 @@ h2 span {
   text-decoration: underline;
 }
 
+/* The dialog tops out at 560px, so it only runs out of room on phones: past
+   that point the meta drops to a full-width row of its own instead of sitting
+   indented under the title, and the company gets its own line. */
+@media (max-width: 640px) {
+
+  .modal-header {
+    flex-wrap: wrap;
+    /* row gap matches the 2px the meta sat at while it was under the title */
+    gap: 2px 12px;
+  }
+
+  /* Lift the title and meta out of .modal-heading so the header's own wrapping
+     can put the meta on the row below the logo. */
+  .modal-heading {
+    display: contents;
+  }
+
+  .modal-title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .modal-title-company {
+    display: block;
+  }
+
+  /* The close button stays on the first row; the meta wraps past it. */
+  .modal-close {
+    order: 1;
+  }
+
+  .modal-meta {
+    order: 2;
+    flex-basis: 100%;
+    margin-top: 0;
+  }
+}
+
 @keyframes modal-fade {
   from {
     opacity: 0;
