@@ -50,7 +50,7 @@
     "title": "aicheye's Combat Tagging",
     "description": "minecraft mod w/ 1k+ downloads",
     "details": [
-      "A Fabric server mod that closes the combat-logging loophole.",
+      "A Fabric server mod that penalizes players in combat that quit the game.",
       "Once tagged in PvP you cannot pearl away, eat a god apple, or escape on elytra, and disconnecting mid-fight costs health and absorption on return.",
       "A boss-bar timer and red nametag keep the tag state legible to everyone in the fight, and every rule is configurable."
     ],
