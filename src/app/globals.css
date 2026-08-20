@@ -7,7 +7,7 @@
   --secondary: #77934d;
   --link: #268bd2;
   --badge-bg: #eee8d5;
-  --surface: rgba(253, 246, 227, 0.86);
+  --surface: rgba(253, 246, 227, 0.8);
   --surface-shadow: var(--surface);
   --display: var(--font-unbounded), system-ui, sans-serif;
 

@@ -122,7 +122,7 @@ export function GameOfLife() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.fillStyle = '#d6cfb8'
+    ctx.fillStyle = '#eae3cd'
     const C = cols.current
     const R = rows.current
     const g = grid.current
