@@ -341,9 +341,6 @@ h2 span {
   width: min(560px, 100%);
   max-height: 100%;
   overflow-y: auto;
-  /* Keep dialog scrolling from chaining to the page; replaces the body
-     overflow lock, which turned mobile browser bars opaque. */
-  overscroll-behavior: contain;
   animation: modal-pop 0.15s ease-out;
 }
 
