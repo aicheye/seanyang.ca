@@ -5,8 +5,8 @@ export interface Job {
   company: string
   /** One-line summary shown in the timeline. */
   description: string
-  /** Longer blurb shown in the entry dialog; falls back to `description`. */
-  details?: string
+  /** Longer blurb shown in the entry dialog, one sentence per entry; falls back to `description`. */
+  details?: string[]
   website: string
   logo: string
   location: string

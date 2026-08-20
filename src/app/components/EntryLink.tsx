@@ -11,8 +11,9 @@ export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
   title: string
   href: string
-  /** Blurb shown inside the dialog — longer than the summary on the card. */
-  description?: string
+  /** Blurb shown inside the dialog, longer than the summary on the card. An
+      array is stored one sentence per line in the data files and joined here. */
+  description?: string | string[]
   technologies?: string[]
   /** Demo gif/image shown inside the dialog. */
   media?: string
@@ -196,7 +197,11 @@ export function EntryLink({
                 ) : (
                   <div className="modal-loading">{failed ? 'demo unavailable' : 'loading…'}</div>
                 ))}
-              {description && <p className="modal-description">{description}</p>}
+              {description && (
+                <p className="modal-description">
+                  {Array.isArray(description) ? description.join(' ') : description}
+                </p>
+              )}
               {technologies && technologies.length > 0 && (
                 <div className="badges">
                   {technologies.map((t) => (

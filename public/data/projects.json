@@ -2,7 +2,11 @@
   {
     "title": "swarm_ws",
     "description": "robotic swarm maze exploration",
-    "details": "Four robots map procedurally-generated mazes with no central coordinator, exploring 7.5x faster than one robot alone. A geodesic Voronoi partition over the merged map gives each robot the region it can reach fastest, so they spread out instead of racing for the same frontier. Four ROS 2 packages with per-robot state machines run across seven Docker services, with Gazebo simulation and live Foxglove visualization.",
+    "details": [
+      "Four robots map procedurally-generated mazes with no central coordinator, exploring 7.5x faster than one robot alone.",
+      "A geodesic Voronoi partition over the merged map gives each robot the region it can reach fastest, so they spread out instead of racing for the same frontier.",
+      "Four ROS 2 packages with per-robot state machines run across seven Docker services, with Gazebo simulation and live Foxglove visualization."
+    ],
     "github": "https://github.com/RRohan4/swarm_ws",
     "technologies": [
       "Python",
@@ -14,7 +18,11 @@
   {
     "title": "CRusTTY",
     "description": "tui c interpreter from scratch",
-    "details": "A C interpreter and debugger written from scratch in Rust, with a recursive-descent parser and a terminal UI that visualizes the stack and heap as a program runs. A snapshot-based execution engine records state after every statement, so execution steps backward through history as easily as forward. Open-sourced at 50+ stars, with GitHub Actions covering tests, builds, and releases.",
+    "details": [
+      "A C interpreter and debugger written from scratch in Rust, with a recursive-descent parser and a terminal UI that visualizes the stack and heap as a program runs.",
+      "A snapshot-based execution engine records state after every statement, so execution steps backward through history as easily as forward.",
+      "Open-sourced at 50+ stars, with GitHub Actions covering tests, builds, and releases."
+    ],
     "github": "https://github.com/aicheye/crustty",
     "technologies": [
       "Rust",
@@ -25,7 +33,11 @@
   {
     "title": "Wunder RNN Challenge",
     "description": "top 5% market prediction model",
-    "details": "A Transformer time-series model in PyTorch for the Wunderlab ML Challenge, predicting the next state of noisy 1000-step financial sequences. Combining sinusoidal and learnable positional encodings captured long-range dependencies better than either alone. It scored a mean R² of 0.396 against a 0.309 participant average, placing top 5% of 3000+ competitors.",
+    "details": [
+      "A Transformer time-series model in PyTorch for the Wunderlab ML Challenge, predicting the next state of noisy 1000-step financial sequences.",
+      "Combining sinusoidal and learnable positional encodings captured long-range dependencies better than either alone.",
+      "It scored a mean R² of 0.396 against a 0.309 participant average, placing top 5% of 3000+ competitors."
+    ],
     "github": "https://github.com/aicheye/wundernn",
     "technologies": [
       "Python",
@@ -37,7 +49,11 @@
   {
     "title": "aicheye's Combat Tagging",
     "description": "minecraft mod w/ 1k+ downloads",
-    "details": "A Fabric server mod that closes the combat-logging loophole. Once tagged in PvP you cannot pearl away, eat a god apple, or escape on elytra, and disconnecting mid-fight costs health and absorption on return. A boss-bar timer and red nametag keep the tag state legible to everyone in the fight, and every rule is configurable.",
+    "details": [
+      "A Fabric server mod that closes the combat-logging loophole.",
+      "Once tagged in PvP you cannot pearl away, eat a god apple, or escape on elytra, and disconnecting mid-fight costs health and absorption on return.",
+      "A boss-bar timer and red nametag keep the tag state legible to everyone in the fight, and every rule is configurable."
+    ],
     "github": "https://github.com/aicheye/combat-tag",
     "technologies": [
       "Java",
@@ -47,7 +63,11 @@
   {
     "title": "Bucket",
     "description": "intuitive student dashboard",
-    "details": "A course and grade dashboard for Waterloo students that imports outlines and marks straight out of D2L. Everything lives in the browser's IndexedDB, so there is no account and no backend database. The only server-side code is the HTML and PDF parsing that the import needs.",
+    "details": [
+      "A course and grade dashboard for Waterloo students that imports outlines and marks straight out of D2L.",
+      "Everything lives in the browser's IndexedDB, so there is no account and no backend database.",
+      "The only server-side code is the HTML and PDF parsing that the import needs."
+    ],
     "github": "https://github.com/aicheye/bucket",
     "technologies": [
       "TypeScript",
@@ -59,7 +79,11 @@
   {
     "title": "ezp2p Arcade",
     "description": "p2p serverless minigames",
-    "details": "Browser multiplayer with no game server behind it. Peers connect over WebRTC DataChannels and trade offers, answers, and ICE candidates through a lobby code, so no lobby database exists anywhere. Each peer applies its own moves immediately and broadcasts them with sequence numbers, keeping both sides deterministic and convergent.",
+    "details": [
+      "Browser multiplayer with no game server behind it.",
+      "Peers connect over WebRTC DataChannels and trade offers, answers, and ICE candidates through a lobby code, so no lobby database exists anywhere.",
+      "Each peer applies its own moves immediately and broadcasts them with sequence numbers, keeping both sides deterministic and convergent."
+    ],
     "github": "https://github.com/aicheye/ezp2p",
     "technologies": [
       "TypeScript",
