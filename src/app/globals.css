@@ -460,7 +460,8 @@ h2 span {
 
 /* The dialog tops out at 560px, so it only runs out of room on phones: past
    that point the meta drops to a full-width row of its own instead of sitting
-   indented under the title, and the company gets its own line. */
+   indented under the title. The "title @ company" phrase wraps naturally (the
+   nbsp glue in EntryLink keeps the words around the @ together). */
 @media (max-width: 640px) {
 
   .modal-header {
@@ -478,10 +479,6 @@ h2 span {
   .modal-title {
     flex: 1;
     min-width: 0;
-  }
-
-  .modal-title-company {
-    display: block;
   }
 
   /* The close button stays on the first row; the meta wraps past it. */
