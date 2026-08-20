@@ -46,7 +46,7 @@ a:focus-visible {
 }
 
 .site {
-  max-width: 670px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 64px 32px;
   position: relative;
@@ -134,7 +134,7 @@ section {
 
 h2 {
   font-family: var(--display);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
@@ -181,7 +181,7 @@ h2 span {
 .quote cite {
   display: block;
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 14px;
   font-style: normal;
   color: var(--text);
 }
@@ -251,7 +251,7 @@ h2 span {
 }
 
 .job-meta {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   white-space: nowrap;
   flex-shrink: 0;
@@ -385,7 +385,7 @@ h2 span {
 
 .modal-meta {
   margin: 2px 0 0;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   opacity: 0.8;
 }
@@ -428,7 +428,7 @@ h2 span {
 }
 
 .modal-loading {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   padding: 48px 0;
   text-align: center;
@@ -451,7 +451,7 @@ h2 span {
   align-items: center;
   align-self: flex-start;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--link);
   text-decoration: none;
   word-break: break-all;
@@ -492,7 +492,7 @@ h2 span {
 }
 
 .badge {
-  font-size: 12px;
+  font-size: 14px;
   padding: 1px 6px;
   border-radius: 3px;
   background: var(--badge-bg);
@@ -545,7 +545,7 @@ footer {
   margin-top: auto;
   padding-top: 16px;
   border-top: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   display: flex;
   justify-content: space-between;
@@ -592,7 +592,7 @@ footer a {
 .term-label {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text);
   margin-bottom: 3px;
 }
@@ -793,7 +793,7 @@ footer a {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-h);
   min-width: 0;
@@ -857,7 +857,7 @@ footer a {
 }
 
 .np-artist {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -926,7 +926,7 @@ footer a {
 }
 
 .gol-link {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text);
   text-decoration: none;
 }
@@ -937,7 +937,7 @@ footer a {
 }
 
 .gol-btn {
-  font-size: 11px;
+  font-size: 14px;
   font-family: inherit;
   color: var(--text);
   background: none;
@@ -957,7 +957,7 @@ footer a {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--text);
 }
 
@@ -977,14 +977,14 @@ footer a {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   margin-top: 16px;
 }
 
 .ssh-hint code {
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 14px;
   background: var(--badge-bg);
   padding: 1px 6px;
   border-radius: 3px;
@@ -999,7 +999,7 @@ footer a {
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -1012,7 +1012,7 @@ footer a {
   background: none;
   padding: 0;
   border-radius: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: inherit;
 }
 
@@ -1023,6 +1023,16 @@ footer a {
 }
 
 @media (max-width: 1000px) {
+  .name-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .location {
+    margin-left: 0;
+  }
+
   .about {
     justify-content: flex-start;
     flex-wrap: wrap;
