@@ -5,7 +5,7 @@
     "description": "autonomy, cv pipelines, and firmware for agbots",
     "details": [
       "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
-      "RTK-odometry fusion and microsecond-level sensor sync into real-time FAST-LIO SLAM held mean follow error under 20cm over 500m of autonomous tests.",
+      "RTK-odometry fusion and microsecond-level sensor sync into real-time SLAM held mean follow error under 20cm over 500m of autonomous tests.",
       "Also built Rust synthetic point cloud pipelines at 4M+ points per second for computer vision training."
     ],
     "website": "https://moss.ag",
@@ -30,7 +30,7 @@
     "details": [
       "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
       "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
-      "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained the Docker environments that keep the stack reproducible."
+      "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained Docker environments."
     ],
     "website": "https://watonomous.ca/projects/eve",
     "logo": "/assets/logos/watonomous.jpg",
