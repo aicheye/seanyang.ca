@@ -23,7 +23,7 @@ export function ExperienceSection() {
                     <EntryLink
                       title={`${job.title} @ ${job.company}`}
                       href={job.website}
-                      description={job.description}
+                      description={job.details ?? job.description}
                       technologies={job.technologies}
                       media={job.media}
                       icon={job.logo}

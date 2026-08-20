@@ -11,6 +11,7 @@ export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
   title: string
   href: string
+  /** Blurb shown inside the dialog — longer than the summary on the card. */
   description?: string
   technologies?: string[]
   /** Demo gif/image shown inside the dialog. */

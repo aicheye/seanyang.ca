@@ -15,7 +15,7 @@ export function ProjectsSection() {
                 <EntryLink
                   title={p.title}
                   href={p.github}
-                  description={p.description}
+                  description={p.details ?? p.description}
                   technologies={p.technologies}
                   media={p.media}
                 />
