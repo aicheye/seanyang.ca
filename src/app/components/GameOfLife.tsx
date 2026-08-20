@@ -326,7 +326,7 @@ export function GameOfLife() {
         cols.current = newCols
         rows.current = newRows
         grid.current = newGrid
-        hues.current = newHues
+        hueVec.current = newHv
         render()
       }, 400)
     }
