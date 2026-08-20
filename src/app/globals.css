@@ -1033,6 +1033,14 @@ footer a {
     margin-left: 0;
   }
 
+  .location svg {
+    order: -1;
+  }
+
+  .location .pulse {
+    order: 1;
+  }
+
   .about {
     justify-content: flex-start;
     flex-wrap: wrap;
