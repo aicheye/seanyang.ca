@@ -226,7 +226,8 @@ h2 span {
 .job-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  /* the 12px date column and the 16px title sit on the same first baseline */
+  align-items: baseline;
   gap: 24px;
   position: relative;
 }
@@ -314,31 +315,6 @@ h2 span {
 
 /* Entry dialogs */
 
-.entry-media-hint {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  margin-left: 5px;
-  vertical-align: 1px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  color: var(--text);
-  opacity: 0.7;
-}
-
-.entry-media-hint svg {
-  /* optically center the triangle */
-  margin-left: 1px;
-}
-
-a:hover > .entry-media-hint {
-  border-color: var(--accent);
-  color: var(--accent);
-  opacity: 1;
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -358,8 +334,9 @@ a:hover > .entry-media-hint {
   background: var(--bg);
   border: 1px solid var(--border);
   padding: 16px;
+  box-sizing: border-box;
   width: min(560px, 100%);
-  max-height: calc(100vh - 48px);
+  max-height: 100%;
   overflow-y: auto;
   animation: modal-pop 0.15s ease-out;
 }
@@ -371,11 +348,23 @@ a:hover > .entry-media-hint {
 }
 
 .modal-icon {
-  width: 32px;
-  height: 32px;
+  /* 48px squares up with the title + meta block beside it. Stretching to that
+     block instead would feed back: a wider icon wraps the title, which grows
+     the block, which grows the icon. */
+  display: block;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
+  box-sizing: border-box;
   border: 1px solid var(--border);
   border-radius: 4px;
+  overflow: hidden;
+}
+
+.modal-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -402,6 +391,7 @@ a:hover > .entry-media-hint {
 
 .modal-close {
   display: inline-flex;
+  align-self: flex-start;
   align-items: center;
   justify-content: center;
   width: 22px;
@@ -428,6 +418,8 @@ a:hover > .entry-media-hint {
 .modal-media {
   display: block;
   width: 100%;
+  /* the border has to sit inside the 100%, or it overflows the dialog */
+  box-sizing: border-box;
   max-height: 60vh;
   object-fit: contain;
   background: var(--badge-bg);
@@ -439,6 +431,7 @@ a:hover > .entry-media-hint {
   color: var(--text);
   padding: 48px 0;
   text-align: center;
+  box-sizing: border-box;
   border: 1px solid var(--border);
 }
 
@@ -1106,6 +1099,7 @@ footer a {
 
   .job-header {
     flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
   }
 

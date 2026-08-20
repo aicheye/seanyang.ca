@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
-import { FiExternalLink, FiPlay, FiX } from 'react-icons/fi'
+import { FiExternalLink, FiX } from 'react-icons/fi'
+import { cachedMedia, loadMedia, prefetchMedia } from '@/lib/media'
 
 export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
@@ -42,6 +43,7 @@ export function EntryLink({
   const trigger = useRef<HTMLAnchorElement>(null)
   const modal = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
+  const objectUrl = useRef<string | null>(null)
   const titleId = useId()
 
   const close = useCallback(() => {
@@ -49,39 +51,64 @@ export function EntryLink({
     trigger.current?.focus()
   }, [])
 
-  /* Let modified clicks (new tab/window, middle click) reach the browser so the
-     link still behaves like a link; a plain click opens the dialog instead. */
-  const onTriggerClick = useCallback((e: MouseEvent<HTMLAnchorElement>) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
-    e.preventDefault()
-    setOpen(true)
+  /* A fresh object URL per open so a gif always restarts from frame 0 —
+     a cached <img> src can resume mid-loop in some browsers. */
+  const showBlob = useCallback((blob: Blob) => {
+    if (objectUrl.current) URL.revokeObjectURL(objectUrl.current)
+    objectUrl.current = URL.createObjectURL(blob)
+    setSrc(objectUrl.current)
   }, [])
 
-  /* Fetch as a blob URL so playback always restarts from frame 0 —
-     a cached <img> src can resume mid-loop in some browsers. */
+  /* Let modified clicks (new tab/window, middle click) reach the browser so the
+     link still behaves like a link; a plain click opens the dialog instead. */
+  const onTriggerClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+      e.preventDefault()
+      // Already warmed: show it in this same render, with no loading flash.
+      const blob = media ? cachedMedia(media) : undefined
+      if (blob) showBlob(blob)
+      setOpen(true)
+    },
+    [media, showBlob],
+  )
+
+  /* Hovering or tabbing to the title is a strong hint the demo is about to be
+     opened, so start the download ahead of the click. */
+  const onIntent = useCallback(() => {
+    if (media) loadMedia(media).catch(() => {})
+  }, [media])
+
+  // Warm the demo in the background once the page goes idle.
   useEffect(() => {
-    if (!open || !media) return
-    const controller = new AbortController()
-    let url: string | null = null
-    fetch(media, { signal: controller.signal })
-      .then((r) => {
-        if (!r.ok) throw new Error(`${r.status}`)
-        return r.blob()
-      })
+    if (media) prefetchMedia(media)
+  }, [media])
+
+  useEffect(() => {
+    if (!open || !media || cachedMedia(media)) return
+    let cancelled = false
+    loadMedia(media)
       .then((blob) => {
-        url = URL.createObjectURL(blob)
-        setSrc(url)
+        if (!cancelled) showBlob(blob)
       })
       .catch(() => {
-        if (!controller.signal.aborted) setFailed(true)
+        if (!cancelled) setFailed(true)
       })
     return () => {
-      controller.abort()
-      if (url) URL.revokeObjectURL(url)
-      setSrc(null)
-      setFailed(false)
+      cancelled = true
     }
-  }, [open, media])
+  }, [open, media, showBlob])
+
+  // Drop the object URL when the dialog closes; the blob itself stays cached.
+  useEffect(() => {
+    if (open) return
+    if (objectUrl.current) {
+      URL.revokeObjectURL(objectUrl.current)
+      objectUrl.current = null
+    }
+    setSrc(null)
+    setFailed(false)
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -124,13 +151,10 @@ export function EntryLink({
         className={className}
         aria-haspopup="dialog"
         onClick={onTriggerClick}
+        onPointerEnter={onIntent}
+        onFocus={onIntent}
       >
         {title}
-        {media && (
-          <span className="entry-media-hint" aria-hidden="true">
-            <FiPlay size={8} />
-          </span>
-        )}
       </a>
       {open &&
         createPortal(
@@ -144,7 +168,11 @@ export function EntryLink({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="modal-header">
-                {icon && <Image className="modal-icon" src={icon} alt="" width={32} height={32} />}
+                {icon && (
+                  <span className="modal-icon">
+                    <Image src={icon} alt="" width={64} height={64} />
+                  </span>
+                )}
                 <div className="modal-heading">
                   <h3 id={titleId} className="modal-title">
                     {title}

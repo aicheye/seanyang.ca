@@ -1,17 +1,4 @@
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 interface ParsedDate {
   year: number
@@ -38,7 +25,7 @@ export function formatDate(token: string): string {
   return parsed ? render(parsed) : token.trim()
 }
 
-/** "2026.5" + "2026.8" -> "May – August 2026"; "2025.9" + "2026.4" -> "September 2025 – April 2026". */
+/** "2026.5" + "2026.8" -> "May – Aug 2026"; "2025.9" + "2026.4" -> "Sep 2025 – Apr 2026". */
 export function formatDateRange(dates: string[]): string {
   const tokens = dates.map((d) => d.trim()).filter(Boolean)
   if (tokens.length === 0) return ''
