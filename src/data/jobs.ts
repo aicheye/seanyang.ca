@@ -8,6 +8,8 @@ export interface Job {
   logo: string
   location: string
   technologies: string[]
+  /** Optional demo gif/image shown in the entry dialog. */
+  media?: string
   dates: string[]
   current: boolean
 }
