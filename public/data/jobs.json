@@ -3,22 +3,49 @@
     "title": "Perception Engineering Intern",
     "company": "moss",
     "description": "autonomy, cv pipelines, and firmware for agbots",
+    "details": [
+      "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
+      "RTK-odometry fusion and microsecond-level sensor sync into real-time FAST-LIO SLAM held mean follow error under 20cm over 500m of autonomous tests.",
+      "Also built Rust synthetic point cloud pipelines at 4M+ points per second for computer vision training."
+    ],
     "website": "https://moss.ag",
     "logo": "/assets/logos/moss.jpg",
     "location": "San Francisco, CA",
-    "technologies": ["ROS 2", "Rust", "C++", "Linux"],
-    "dates": ["2026.5", "2026.8"],
+    "technologies": [
+      "ROS 2",
+      "Rust",
+      "C++",
+      "Linux"
+    ],
+    "dates": [
+      "2026.5",
+      "2026.8"
+    ],
     "current": false
   },
   {
     "title": "Robotics SWE",
     "company": "WATonomous",
     "description": "prediction pipelines for autonomous vehicles",
+    "details": [
+      "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
+      "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
+      "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained the Docker environments that keep the stack reproducible."
+    ],
     "website": "https://watonomous.ca/projects/eve",
     "logo": "/assets/logos/watonomous.jpg",
+    "media": "/assets/demos/watonomous.gif",
     "location": "Waterloo, ON",
-    "technologies": ["C++", "ROS 2", "Docker", "Foxglove"],
-    "dates": ["2025.9", "2026.4"],
+    "technologies": [
+      "C++",
+      "ROS 2",
+      "Docker",
+      "Foxglove"
+    ],
+    "dates": [
+      "2025.9",
+      "2026.4"
+    ],
     "current": false
   }
 ]

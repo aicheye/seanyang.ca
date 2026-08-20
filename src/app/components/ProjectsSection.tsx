@@ -1,4 +1,4 @@
-import { ProjectDemo } from '@/app/components/ProjectDemo'
+import { EntryLink } from '@/app/components/EntryLink'
 import projects from '@/data/projects'
 
 export function ProjectsSection() {
@@ -12,11 +12,14 @@ export function ProjectsSection() {
           <div key={p.title} className="project">
             <div className="project-title">
               <strong>
-                <a href={p.github} target="_blank" rel="noopener noreferrer">
-                  {p.title}
-                </a>
+                <EntryLink
+                  title={p.title}
+                  href={p.github}
+                  description={p.details ?? p.description}
+                  technologies={p.technologies}
+                  media={p.media}
+                />
               </strong>
-              {p.media && <ProjectDemo title={p.title} media={p.media} github={p.github} />}
             </div>
             <p>{p.description}</p>
             <div className="badges">
