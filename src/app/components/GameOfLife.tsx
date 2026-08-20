@@ -57,16 +57,22 @@ function step(g: Uint8Array, C: number, R: number): Uint8Array {
   return next
 }
 
-// Like step(), but also advances a parallel hue grid (degrees; NaN = uncolored).
-// Survivors keep their hue; births take the circular mean of colored parents.
+// Color state per cell: a hue vector (hx, hy) whose direction is the hue and
+// whose magnitude is the paint strength (1 = freshly painted, 0 = default tan).
+const HUE_DECAY = 0.85 // strength multiplier per generation
+const HUE_FLOOR = 0.03 // below this a cell renders as plain default
+
+// Like step(), but also advances the hue-vector grid (2 floats per cell).
+// Survivors keep their hue and decay; births take the mean of colored
+// parents' vectors, also decayed.
 function stepColored(
   g: Uint8Array,
-  hues: Float32Array,
+  hv: Float32Array,
   C: number,
   R: number,
 ): [Uint8Array, Float32Array] {
   const next = new Uint8Array(C * R)
-  const nextHues = new Float32Array(C * R).fill(NaN)
+  const nextHv = new Float32Array(2 * C * R)
   for (let r = 0; r < R; r++) {
     for (let c = 0; c < C; c++) {
       let n = 0
@@ -78,22 +84,25 @@ function stepColored(
           const i = ((r + dr + R) % R) * C + ((c + dc + C) % C)
           if (g[i]) {
             n++
-            if (!Number.isNaN(hues[i])) {
-              hx += Math.cos((hues[i] * Math.PI) / 180)
-              hy += Math.sin((hues[i] * Math.PI) / 180)
-            }
+            hx += hv[2 * i]
+            hy += hv[2 * i + 1]
           }
         }
       const i = r * C + c
       const alive = g[i] ? n === 2 || n === 3 : n === 3
       if (alive) {
         next[i] = 1
-        if (g[i]) nextHues[i] = hues[i]
-        else if (hx || hy) nextHues[i] = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
+        if (g[i]) {
+          nextHv[2 * i] = hv[2 * i] * HUE_DECAY
+          nextHv[2 * i + 1] = hv[2 * i + 1] * HUE_DECAY
+        } else if (n) {
+          nextHv[2 * i] = (hx / n) * HUE_DECAY
+          nextHv[2 * i + 1] = (hy / n) * HUE_DECAY
+        }
       }
     }
   }
-  return [next, nextHues]
+  return [next, nextHv]
 }
 
 function diffCount(a: Uint8Array, b: Uint8Array): number {
@@ -142,7 +151,7 @@ function stampMethuselah(g: Uint8Array, C: number, R: number) {
 export function GameOfLife() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const grid = useRef<Uint8Array>(new Uint8Array(0))
-  const hues = useRef<Float32Array>(new Float32Array(0))
+  const hueVec = useRef<Float32Array>(new Float32Array(0))
   const cols = useRef(0)
   const rows = useRef(0)
   const painting = useRef(false)
@@ -167,22 +176,32 @@ export function GameOfLife() {
     const C = cols.current
     const R = rows.current
     const g = grid.current
-    const h = hues.current
+    const hv = hueVec.current
     for (let r = 0; r < R; r++) {
       for (let c = 0; c < C; c++) {
         const i = r * C + c
         if (g[i]) {
-          ctx.fillStyle = Number.isNaN(h[i]) ? '#eae3cd' : `hsl(${h[i]}, 65%, 82%)`
+          const hx = hv[2 * i]
+          const hy = hv[2 * i + 1]
+          const s = Math.min(1, Math.hypot(hx, hy))
+          ctx.fillStyle = '#eae3cd'
           ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+          if (s > HUE_FLOOR) {
+            const hue = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
+            ctx.globalAlpha = s
+            ctx.fillStyle = `hsl(${hue}, 65%, 82%)`
+            ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+            ctx.globalAlpha = 1
+          }
         }
       }
     }
   }, [])
 
   const tick = useCallback(() => {
-    ;[grid.current, hues.current] = stepColored(
+    ;[grid.current, hueVec.current] = stepColored(
       grid.current,
-      hues.current,
+      hueVec.current,
       cols.current,
       rows.current,
     )
@@ -201,7 +220,8 @@ export function GameOfLife() {
       if (c >= 0 && c < C && r >= 0 && r < R) {
         const i = r * C + c
         grid.current[i] = 1
-        hues.current[i] = paintHue.current
+        hueVec.current[2 * i] = Math.cos((paintHue.current * Math.PI) / 180)
+        hueVec.current[2 * i + 1] = Math.sin((paintHue.current * Math.PI) / 180)
         // Advance the rainbow only on entering a new cell, not on every mousemove
         if (i !== lastPainted.current) {
           lastPainted.current = i
@@ -258,13 +278,13 @@ export function GameOfLife() {
       }
     }
     grid.current = best
-    hues.current = new Float32Array(cols.current * rows.current).fill(NaN)
+    hueVec.current = new Float32Array(2 * cols.current * rows.current)
     render()
   }, [buildCandidate, render])
 
   const clear = useCallback(() => {
     grid.current = new Uint8Array(cols.current * rows.current)
-    hues.current = new Float32Array(cols.current * rows.current).fill(NaN)
+    hueVec.current = new Float32Array(2 * cols.current * rows.current)
     render()
   }, [render])
 
@@ -290,15 +310,16 @@ export function GameOfLife() {
         const oldGrid = grid.current
         const oldCols = cols.current
         const oldRows = rows.current
-        const oldHues = hues.current
+        const oldHv = hueVec.current
         const newGrid = new Uint8Array(newCols * newRows)
-        const newHues = new Float32Array(newCols * newRows).fill(NaN)
+        const newHv = new Float32Array(2 * newCols * newRows)
         const minR = Math.min(oldRows, newRows)
         const minC = Math.min(oldCols, newCols)
         for (let r = 0; r < minR; r++)
           for (let c = 0; c < minC; c++) {
             newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
-            newHues[r * newCols + c] = oldHues[r * oldCols + c]
+            newHv[2 * (r * newCols + c)] = oldHv[2 * (r * oldCols + c)]
+            newHv[2 * (r * newCols + c) + 1] = oldHv[2 * (r * oldCols + c) + 1]
           }
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
