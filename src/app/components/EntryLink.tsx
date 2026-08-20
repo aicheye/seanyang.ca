@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { FiExternalLink, FiX } from 'react-icons/fi'
+import { withBase } from '@/lib/basePath'
 import { cachedMedia, loadMedia, prefetchMedia } from '@/lib/media'
 
 export interface EntryLinkProps {
@@ -34,11 +35,15 @@ export function EntryLink({
   href,
   description,
   technologies,
-  media,
-  icon,
+  media: mediaProp,
+  icon: iconProp,
   meta,
   className,
 }: EntryLinkProps) {
+  // Data files store root-absolute /assets/... paths; prefix them when the
+  // site is served from a subpath (the linux.student mirror).
+  const media = mediaProp && withBase(mediaProp)
+  const icon = iconProp && withBase(iconProp)
   const [open, setOpen] = useState(false)
   const [src, setSrc] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)

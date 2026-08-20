@@ -45,8 +45,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geist.variable} ${unbounded.variable} ${jetbrainsMono.variable}`}>
       <body>
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {/* Vercel telemetry POSTs to /_vercel/* — dead endpoints on the
+            linux.student static mirror, so the mirror omits the scripts. */}
+        {process.env.STATIC_EXPORT !== '1' && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   )
