@@ -1023,6 +1023,16 @@ footer a {
 }
 
 @media (max-width: 1000px) {
+  .name-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .location {
+    margin-left: 0;
+  }
+
   .about {
     justify-content: flex-start;
     flex-wrap: wrap;
