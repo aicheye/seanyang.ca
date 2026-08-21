@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Build a static copy of the site for the UW student servers, which serve
 # plain files out of ~/public_html at https://<host>/~<watiam>/ where <host>
-# is student.cs.uwaterloo.ca, ece.uwaterloo.ca, or student.math.uwaterloo.ca.
-# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math.
+# is student.cs.uwaterloo.ca, ece.uwaterloo.ca, student.math.uwaterloo.ca,
+# or www.eng.uwaterloo.ca.
+# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math / sftp.eng.
 #
 # Usage:
 #   scripts/build-static.sh <watiam-userid>
@@ -44,6 +45,8 @@ mv src/app/transcript "$BAK/transcript"
 # the exported page bakes in whichever quote the build picks.
 cp src/app/page.tsx "$BAK/page.tsx"
 sed -i "/export const dynamic = 'force-dynamic'/d" src/app/page.tsx
+
+rm -rf .next
 
 # Jobs/projects refresh at runtime from jsDelivr (12h CDN cache over the
 # GitHub repo), so the mirrors track main without a redeploy.

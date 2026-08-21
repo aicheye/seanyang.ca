@@ -10,6 +10,7 @@ const MIRRORS = [
   'https://student.math.uwaterloo.ca/~s532yang/',
   'https://student.cs.uwaterloo.ca/~s532yang/',
   'https://ece.uwaterloo.ca/~s532yang/',
+  'https://www.eng.uwaterloo.ca/~s532yang/',
 ]
 
 export default function MirrorsPage() {
