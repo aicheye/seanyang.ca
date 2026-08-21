@@ -759,7 +759,7 @@ footer a:hover {
   width: 95%;
   height: 95%;
   display: block;
-  background-image: url('/assets/vinyl/record.png');
+  background-image: var(--vinyl-record);
   background-size: 106% 106%;
   background-position: center;
   border-radius: 50%;
@@ -834,7 +834,7 @@ footer a:hover {
   z-index: 10;
   width: 100%;
   height: 100%;
-  background-image: url('/assets/vinyl/cover-tex.jpg');
+  background-image: var(--vinyl-tex1);
   background-size: 100% 100%;
   border-radius: 4px;
   /* overlay (not screen) so the grain shows on light covers too — screen only
@@ -851,7 +851,7 @@ footer a:hover {
   z-index: 20;
   width: 100%;
   height: 100%;
-  background-image: url('/assets/vinyl/cover-tex2.jpg');
+  background-image: var(--vinyl-tex2);
   background-size: 100% 100%;
   border-radius: 4px;
   mix-blend-mode: screen;
