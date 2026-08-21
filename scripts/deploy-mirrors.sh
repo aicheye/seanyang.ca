@@ -15,9 +15,9 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 HOSTS=(
   linux.student.cs.uwaterloo.ca
-  linux.student.math.uwaterloo.ca
   eceubuntu1.uwaterloo.ca
   sftp.eng.uwaterloo.ca
+  linux.student.math.uwaterloo.ca
 )
 
 bash "$ROOT/scripts/build-static.sh" "$WATIAM"

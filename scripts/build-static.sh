@@ -63,6 +63,10 @@ find out -mindepth 1 -type d | while read -r d; do
   [ -f "${d}.html" ] && rm -rf "$d"
 done
 
+# The static site.webmanifest has root-relative icon paths; rewrite them
+# so they resolve under the basePath on the mirrors.
+sed -i "s|\"src\": \"/|\"src\": \"${BASE_PATH}/|g" out/site.webmanifest
+
 # UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
 # serves the PDFs, and serve the exported 404 page.
 cat > out/.htaccess <<EOF

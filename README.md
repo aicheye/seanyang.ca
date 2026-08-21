@@ -34,9 +34,9 @@ Static copies of the site are hosted on UW student servers. They are built with 
 | Mirror | SSH server |
 | --- | --- |
 | https://student.cs.uwaterloo.ca/~s532yang/ | `linux.student.cs.uwaterloo.ca` |
-| https://student.math.uwaterloo.ca/~s532yang/ | `linux.student.math.uwaterloo.ca` |
 | https://ece.uwaterloo.ca/~s532yang/ | `eceubuntu1.uwaterloo.ca` |
 | https://www.eng.uwaterloo.ca/~s532yang/ | `sftp.eng.uwaterloo.ca` |
+| https://student.math.uwaterloo.ca/~s532yang/ | `linux.student.math.uwaterloo.ca` |
 
 ### Deploying mirrors
 

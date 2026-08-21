@@ -3,6 +3,7 @@ import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/data/site'
+import { withBase } from '@/lib/basePath'
 import './globals.css'
 
 const geist = Geist({
@@ -39,13 +40,13 @@ export const metadata: Metadata = {
   description: 'Student and software developer based in Waterloo, ON.',
   icons: {
     icon: [
-      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico' },
+      { url: withBase('/favicon-96x96.png'), sizes: '96x96', type: 'image/png' },
+      { url: withBase('/favicon.svg'), type: 'image/svg+xml' },
+      { url: withBase('/favicon.ico') },
     ],
-    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
+    apple: { url: withBase('/apple-touch-icon.png'), sizes: '180x180' },
   },
-  manifest: '/site.webmanifest',
+  manifest: withBase('/site.webmanifest'),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
