@@ -341,6 +341,9 @@ h2 span {
   width: min(560px, 100%);
   max-height: 100%;
   overflow-y: auto;
+  /* a tall dialog scrolls itself without handing the leftover scroll to the
+     page behind it */
+  overscroll-behavior: contain;
   animation: modal-pop 0.15s ease-out;
 }
 

@@ -143,28 +143,33 @@ export function EntryLink({
       }
     }
     document.addEventListener('keydown', onKey)
-    /* overflow:hidden alone doesn't stop touch scrolling on iOS Safari, so
-       pin the body at the current scroll offset while the dialog is open and
-       restore the position on close. */
-    const { scrollY } = window
+    /* Pinning the body with position:fixed would zero the document scroll for
+       as long as the dialog is open, which un-sticks the sticky section
+       headings behind it. Hiding the overflow keeps the scroll offset — and
+       the headings pinned — but overflow:hidden alone doesn't stop touch
+       scrolling on iOS Safari, so drags outside the dialog are cancelled too. */
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth
     const prev = {
       overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      top: document.body.style.top,
-      width: document.body.style.width,
+      paddingRight: document.body.style.paddingRight,
     }
     document.body.style.overflow = 'hidden'
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${scrollY}px`
-    document.body.style.width = '100%'
+    // Hiding the scrollbar frees its gutter; pad it back so nothing shifts.
+    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`
+    const onTouchMove = (e: TouchEvent) => {
+      // Leave pinch-zoom alone, and let a scrollable dialog scroll itself.
+      if (e.touches.length > 1) return
+      const box = modal.current
+      if (box && box.contains(e.target as Node) && box.scrollHeight > box.clientHeight) return
+      e.preventDefault()
+    }
+    document.addEventListener('touchmove', onTouchMove, { passive: false })
     closeBtn.current?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
+      document.removeEventListener('touchmove', onTouchMove)
       document.body.style.overflow = prev.overflow
-      document.body.style.position = prev.position
-      document.body.style.top = prev.top
-      document.body.style.width = prev.width
-      window.scrollTo(0, scrollY)
+      document.body.style.paddingRight = prev.paddingRight
     }
   }, [open, close])
 
