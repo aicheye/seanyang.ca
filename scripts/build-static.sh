@@ -52,6 +52,14 @@ STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH="$BASE_PATH" \
   NEXT_PUBLIC_DATA_BASE="https://cdn.jsdelivr.net/gh/aicheye/seanyang.ca@main/public/data" \
   npx next build
 
+# Next.js exports metadata directories alongside .html files. When a
+# directory and a .html file share the same name, Apache resolves the
+# directory first (301 to dir/, then 403). Remove the metadata dirs so
+# the .html files win.
+find out -mindepth 1 -type d | while read -r d; do
+  [ -f "${d}.html" ] && rm -rf "$d"
+done
+
 # UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
 # serves the PDFs, and serve the exported 404 page.
 cat > out/.htaccess <<EOF

@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { withBase } from '@/lib/basePath'
 import { SITE_URL } from '@/data/site'
 
@@ -12,7 +13,7 @@ export function Footer() {
       >
         0.05 g CO₂ / view
       </a>
-      <a href="/mirrors">mirrors</a>
+      <Link href="/mirrors">mirrors</Link>
       <div className="webring-wrapper">
         <a
           className="webring"

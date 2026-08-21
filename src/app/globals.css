@@ -590,7 +590,7 @@ h2 span {
 .mirrors-page h1 {
   font-size: 28px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--secondary);
   letter-spacing: -0.5px;
   margin: 0 0 12px;
 }
