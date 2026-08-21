@@ -1,8 +1,12 @@
+'use client'
+
 import { EntryLink } from '@/app/components/EntryLink'
-import jobs from '@/data/jobs'
+import bakedJobs from '@/data/jobs'
 import { formatDateRange } from '@/lib/dates'
+import { useLiveData } from '@/lib/liveData'
 
 export function ExperienceSection() {
+  const jobs = useLiveData('jobs.json', bakedJobs)
   return (
     <section>
       <h2>

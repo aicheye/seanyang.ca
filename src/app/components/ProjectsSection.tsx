@@ -1,7 +1,11 @@
+'use client'
+
 import { EntryLink } from '@/app/components/EntryLink'
-import projects from '@/data/projects'
+import bakedProjects from '@/data/projects'
+import { useLiveData } from '@/lib/liveData'
 
 export function ProjectsSection() {
+  const projects = useLiveData('projects.json', bakedProjects)
   return (
     <section>
       <h2>
