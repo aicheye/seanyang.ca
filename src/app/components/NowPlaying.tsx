@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { withBase } from '@/lib/basePath'
 
 interface Track {
   isPlaying: boolean
@@ -274,7 +275,16 @@ export function NowPlaying() {
       target="_blank"
       rel="noopener noreferrer"
     >
-      <div className="np-album">
+      <div
+        className="np-album"
+        style={
+          {
+            '--vinyl-record': `url(${withBase('/assets/vinyl/record.png')})`,
+            '--vinyl-tex1': `url(${withBase('/assets/vinyl/cover-tex.jpg')})`,
+            '--vinyl-tex2': `url(${withBase('/assets/vinyl/cover-tex2.jpg')})`,
+          } as React.CSSProperties
+        }
+      >
         <div
           className={`np-vinyl${recordOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
         >
