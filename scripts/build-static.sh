@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Build a static copy of the site for linux.student.cs.uwaterloo.ca, which
-# serves plain files out of ~/public_html at https://linux.student.cs.uwaterloo.ca/~<watiam>/.
+# Build a static copy of the site for the UW student servers, which serve
+# plain files out of ~/public_html at https://<host>/~<watiam>/ where <host>
+# is student.cs.uwaterloo.ca, ece.uwaterloo.ca, or student.math.uwaterloo.ca.
+# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math.
 #
 # Usage:
 #   scripts/build-static.sh <watiam-userid>
