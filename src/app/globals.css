@@ -593,6 +593,20 @@ footer a {
   text-decoration: none;
 }
 
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mirrors {
+  font-size: 12px;
+}
+
+.mirror-sep {
+  color: var(--border);
+}
+
 .webring-wrapper {
   display: flex;
   align-items: center;
