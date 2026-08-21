@@ -606,11 +606,12 @@ h2 span {
 }
 
 .mirrors-page li a {
-  color: var(--link);
+  color: var(--text);
   text-decoration: none;
 }
 
 .mirrors-page li a:hover {
+  color: var(--link);
   text-decoration: underline;
 }
 
@@ -630,6 +631,11 @@ footer {
 footer a {
   color: var(--text);
   text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--link);
+  text-decoration: underline;
 }
 
 .webring-wrapper {
