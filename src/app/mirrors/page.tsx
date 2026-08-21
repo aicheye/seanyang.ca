@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Mirrors — Sean Yang',
+  title: 'Sean Yang',
 }
 
 const MIRRORS = [
