@@ -575,6 +575,45 @@ h2 span {
   text-decoration: underline;
 }
 
+/* Mirrors */
+
+.mirrors-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  position: relative;
+  z-index: 2;
+}
+
+.mirrors-page h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+}
+
+.mirrors-page ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.mirrors-page li {
+  margin: 6px 0;
+}
+
+.mirrors-page li a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.mirrors-page li a:hover {
+  text-decoration: underline;
+}
+
 /* Footer */
 
 footer {
@@ -591,20 +630,6 @@ footer {
 footer a {
   color: var(--text);
   text-decoration: none;
-}
-
-.footer-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.mirrors {
-  font-size: 12px;
-}
-
-.mirror-sep {
-  color: var(--border);
 }
 
 .webring-wrapper {
@@ -645,6 +670,11 @@ footer a {
   font-size: 14px;
   color: var(--text);
   margin-bottom: 3px;
+}
+
+.term-label a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .term-bar {

@@ -2,35 +2,17 @@ import Image from 'next/image'
 import { withBase } from '@/lib/basePath'
 import { SITE_URL } from '@/data/site'
 
-const MIRRORS = [
-  { label: 'seanyang.ca', href: 'https://seanyang.ca' },
-  { label: 'math', href: 'https://student.math.uwaterloo.ca/~s345yang' },
-  { label: 'cs', href: 'https://student.cs.uwaterloo.ca/~s345yang' },
-  { label: 'ece', href: 'https://ece.uwaterloo.ca/~s345yang' },
-]
-
 export function Footer() {
   return (
     <footer>
-      <div className="footer-left">
-        <a
-          href="https://websitecarbon.com/website/seanyang-ca/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          0.05 g CO₂ / view
-        </a>
-        <span className="mirrors">
-          {MIRRORS.map((m, i) => (
-            <span key={m.label}>
-              {i > 0 && <span className="mirror-sep"> · </span>}
-              <a href={m.href} target="_blank" rel="noopener noreferrer">
-                {m.label}
-              </a>
-            </span>
-          ))}
-        </span>
-      </div>
+      <a
+        href="https://websitecarbon.com/website/seanyang-ca/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        0.05 g CO₂ / view
+      </a>
+      <a href="/mirrors">mirrors</a>
       <div className="webring-wrapper">
         <a
           className="webring"
