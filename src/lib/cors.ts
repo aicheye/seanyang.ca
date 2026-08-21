@@ -7,7 +7,7 @@
 const ALLOWED_ORIGINS = new Set([
   'https://ece.uwaterloo.ca',
   'https://student.math.uwaterloo.ca',
-  'https://linux.student.cs.uwaterloo.ca',
+  'https://student.cs.uwaterloo.ca',
 ])
 
 export function corsHeaders(req: Request): Record<string, string> {
