@@ -21,9 +21,9 @@ BASE_PATH="/~${WATIAM}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# Route handlers can't exist in an `output: export` build: the API routes
-# (Last.fm/Spotify widget) are dropped, and /resume + /transcript become
-# .htaccess redirects to the PDFs they proxy on prod.
+# Route handlers can't exist in an `output: export` build: the API route
+# sources are dropped (the NowPlaying widget calls prod's routes cross-origin
+# instead), and /resume + /transcript become .htaccess redirects to prod.
 BAK="$(mktemp -d)"
 restore() {
   [[ -e "$BAK/api" ]] && mv "$BAK/api" src/app/api
@@ -43,15 +43,16 @@ mv src/app/transcript "$BAK/transcript"
 cp src/app/page.tsx "$BAK/page.tsx"
 sed -i "/export const dynamic = 'force-dynamic'/d" src/app/page.tsx
 
-STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH="$BASE_PATH" npx next build
+STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH="$BASE_PATH" \
+  NEXT_PUBLIC_API_BASE="https://seanyang.ca" npx next build
 
-# UW's Apache honors .htaccess. Redirect the proxy paths straight to the
-# upstream PDFs and serve the exported 404 page.
+# UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
+# serves the PDFs, and serve the exported 404 page.
 cat > out/.htaccess <<EOF
 Options -Indexes
 ErrorDocument 404 ${BASE_PATH}/404.html
-RedirectMatch 302 ^${BASE_PATH}/resume(\.pdf)?/?$ https://docs.seanyang.ca/Sean_Yang_resume/Sean_Yang_resume.pdf
-RedirectMatch 302 ^${BASE_PATH}/transcript(\.pdf)?/?$ https://docs.seanyang.ca/Sean_Yang_transcript/Sean_Yang_transcript.pdf
+RedirectMatch 302 ^${BASE_PATH}/resume(\.pdf)?/?$ https://seanyang.ca/resume
+RedirectMatch 302 ^${BASE_PATH}/transcript(\.pdf)?/?$ https://seanyang.ca/transcript
 EOF
 
 echo

@@ -1,3 +1,5 @@
+import { corsHeaders } from '@/lib/cors'
+
 // Proxy Last.fm album art so canvas can read pixels without CORS issues
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -15,6 +17,7 @@ export async function GET(req: Request) {
       headers: {
         'Content-Type': res.headers.get('Content-Type') ?? 'image/jpeg',
         'Cache-Control': 'public, max-age=86400',
+        ...corsHeaders(req),
       },
     })
   } catch {
