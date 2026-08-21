@@ -11,6 +11,7 @@ const ALLOWED_ORIGINS = new Set([
   'https://student.math.uwaterloo.ca',
   'https://www.student.math.uwaterloo.ca',
   'https://student.cs.uwaterloo.ca',
+  'https://www.eng.uwaterloo.ca',
 ])
 
 export function corsHeaders(req: Request): Record<string, string> {

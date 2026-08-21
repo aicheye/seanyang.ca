@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the static export and deploy to all three UW mirrors in parallel.
+# Build the static export and deploy to all four UW mirrors in parallel.
 #
 # Usage:
 #   scripts/deploy-mirrors.sh <watiam-userid>
@@ -17,6 +17,7 @@ HOSTS=(
   linux.student.cs.uwaterloo.ca
   linux.student.math.uwaterloo.ca
   eceubuntu1.uwaterloo.ca
+  sftp.eng.uwaterloo.ca
 )
 
 bash "$ROOT/scripts/build-static.sh" "$WATIAM"

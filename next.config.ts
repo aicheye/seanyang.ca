@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
 
-// Set by scripts/build-static.sh for the linux.student.cs.uwaterloo.ca mirror:
+// Set by scripts/build-static.sh for the UW static mirrors:
 // plain HTML export, no image optimizer, served under /~watiam. Redirects
 // don't exist in export mode; the build script emits an .htaccess instead.
 const staticExport = process.env.STATIC_EXPORT === '1'
