@@ -45,8 +45,12 @@ mv src/app/transcript "$BAK/transcript"
 cp src/app/page.tsx "$BAK/page.tsx"
 sed -i "/export const dynamic = 'force-dynamic'/d" src/app/page.tsx
 
+# Jobs/projects refresh at runtime from jsDelivr (12h CDN cache over the
+# GitHub repo), so the mirrors track main without a redeploy.
 STATIC_EXPORT=1 NEXT_PUBLIC_BASE_PATH="$BASE_PATH" \
-  NEXT_PUBLIC_API_BASE="https://seanyang.ca" npx next build
+  NEXT_PUBLIC_API_BASE="https://seanyang.ca" \
+  NEXT_PUBLIC_DATA_BASE="https://cdn.jsdelivr.net/gh/aicheye/seanyang.ca@main/public/data" \
+  npx next build
 
 # UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
 # serves the PDFs, and serve the exported 404 page.
