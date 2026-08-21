@@ -11,6 +11,10 @@ interface Track {
 
 const FALLBACK_COLOR = '#8a5c42'
 
+// The static mirrors have no server, so they call prod's API routes
+// cross-origin (set by scripts/build-static.sh). Empty on prod itself.
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
+
 function rgbToHsl(r: number, g: number, b: number) {
   r /= 255
   g /= 255
@@ -43,9 +47,10 @@ async function freezeFrame(artUrl: string): Promise<string | null> {
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image()
+      el.crossOrigin = 'anonymous' // canvas reads pixels; required cross-origin
       el.onload = () => resolve(el)
       el.onerror = reject
-      el.src = `/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
+      el.src = `${API_BASE}/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
     })
     const max = 320
     const scale = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max))
@@ -71,9 +76,10 @@ async function extractDominantColor(artUrl: string): Promise<string> {
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image()
+      el.crossOrigin = 'anonymous' // canvas reads pixels; required cross-origin
       el.onload = () => resolve(el)
       el.onerror = reject
-      el.src = `/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
+      el.src = `${API_BASE}/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
     })
     const N = 16
     const canvas = document.createElement('canvas')
@@ -120,7 +126,7 @@ export function NowPlaying() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/lastfm')
+        const res = await fetch(`${API_BASE}/api/lastfm`)
         if (res.ok) setTrack(await res.json())
       } catch {
         /* ignore transient fetch errors; the next poll retries */
@@ -264,7 +270,7 @@ export function NowPlaying() {
   return (
     <a
       className={`now-playing${isPlaying ? ' np-playing' : ''}`}
-      href={`/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`}
+      href={`${API_BASE}/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`}
       target="_blank"
       rel="noopener noreferrer"
     >
