@@ -41,7 +41,7 @@ export function TermProgress() {
   return (
     <div className="term-progress">
       <div className="term-label">
-        <span>uwaterloo bse &apos;30</span>
+        <a href="https://uwaterloo.ca/software-engineering/about-software-engineering" target="_blank" rel="noopener noreferrer">uwaterloo bse &apos;30</a>
         <span suppressHydrationWarning style={{ fontFamily: 'var(--font-mono), monospace' }}>
           {progressPct.toFixed(8)}%
         </span>

@@ -6,6 +6,8 @@
  */
 const ALLOWED_ORIGINS = new Set([
   'https://ece.uwaterloo.ca',
+  'https://www.ece.uwaterloo.ca',
+  'https://eceweb.uwaterloo.ca',
   'https://student.math.uwaterloo.ca',
   'https://www.student.math.uwaterloo.ca',
   'https://student.cs.uwaterloo.ca',

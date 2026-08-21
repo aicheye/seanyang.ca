@@ -5,7 +5,6 @@ import { SITE_URL } from '@/data/site'
 export function Footer() {
   return (
     <footer>
-      {/* The slug is the scanned host, so it tracks the canonical domain. */}
       <a
         href="https://websitecarbon.com/website/seanyang-ca/"
         target="_blank"
@@ -13,6 +12,7 @@ export function Footer() {
       >
         0.05 g CO₂ / view
       </a>
+      <a href="/mirrors">mirrors</a>
       <div className="webring-wrapper">
         <a
           className="webring"
