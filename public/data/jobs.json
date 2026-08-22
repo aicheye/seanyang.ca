@@ -32,7 +32,7 @@
         "text": [
           "Developed Ansible playbooks and flashing scripts to provision NVIDIA Jetsons from factory-new to field-ready.",
           "Collaborated on OTA deployment systems to deploy the whole fleet in parallel from a pinned release.",
-          "Also built a hardware test harness to verify each kit: tests cover sensor bringup, end-to-end mission recording, and sensor dropouts."
+          "Also built a hardware test harness to verify each kit, covering sensor bringup, end-to-end mission recording, and sensor dropouts."
         ]
       }
     ],
