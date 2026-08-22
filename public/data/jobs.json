@@ -30,8 +30,8 @@
       {
         "caption": "reliability",
         "text": [
-          "Developed Ansible playbooks to provision every Jetson kit from a fresh flash to field-ready.",
-          "They are idempotent and deploy to the whole fleet in parallel from a pinned release.",
+          "Developed Ansible playbooks and flashing scripts to provision NVIDIA Jetsons from factory-new to field-ready.",
+          "Collaborated on OTA deployment systems to deploy the whole fleet in parallel from a pinned release.",
           "Also built a hardware test harness to verify each kit: tests cover sensor bringup, end-to-end mission recording, and sensor dropouts."
         ]
       }
