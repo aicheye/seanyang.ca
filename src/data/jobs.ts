@@ -1,3 +1,4 @@
+import type { EntryPage } from '@/data/entry'
 import jobs from '@public/data/jobs.json'
 
 export interface Job {
@@ -13,6 +14,10 @@ export interface Job {
   technologies: string[]
   /** Optional demo gif/image shown in the entry dialog. */
   media?: string
+  /** Every page of the entry dialog, in order. When set it replaces `media`,
+      which stays as the first page for clients built before `pages` existed
+      (the mirrors between deploys). */
+  pages?: EntryPage[]
   dates: string[]
   current: boolean
 }

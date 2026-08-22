@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
-import { FiExternalLink, FiX } from 'react-icons/fi'
+import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
+import type { EntryPage } from '@/data/entry'
 import { withBase } from '@/lib/basePath'
 import { cachedMedia, loadMedia, prefetchMedia } from '@/lib/media'
 
@@ -17,8 +18,11 @@ export interface EntryLinkProps {
       array is stored one sentence per line in the data files and joined here. */
   description?: string | string[]
   technologies?: string[]
-  /** Demo gif/image shown inside the dialog. */
+  /** Demo gif/image shown inside the dialog; the only page when `pages` is unset. */
   media?: string
+  /** Every page of the dialog, in order: a demo image and/or a blurb each.
+      Replaces `media` when set. */
+  pages?: EntryPage[]
   /** Small image shown beside the dialog heading (e.g. a company logo). */
   icon?: string
   /** Short facts rendered under the heading, joined with a middot. */
@@ -28,7 +32,10 @@ export interface EntryLinkProps {
 
 /** "Perception Engineering Intern" -> "perception-engineering-intern" */
 export function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 }
 
 /** "https://github.com/aicheye/crustty/" -> "github.com/aicheye/crustty" */
@@ -56,26 +63,38 @@ export function EntryLink({
   description,
   technologies,
   media: mediaProp,
+  pages: pagesProp,
   icon: iconProp,
   meta,
   className,
 }: EntryLinkProps) {
   // Data files store root-absolute /assets/... paths; prefix them when the
   // site is served from a subpath (the linux.student mirror).
-  const media = mediaProp && withBase(mediaProp)
+  const pages = useMemo<EntryPage[]>(() => {
+    const list =
+      pagesProp && pagesProp.length > 0 ? pagesProp : mediaProp ? [{ media: mediaProp }] : []
+    return list.map((p) => (p.media ? { ...p, media: withBase(p.media) } : p))
+  }, [pagesProp, mediaProp])
+  const imageUrls = useMemo(() => pages.flatMap((p) => (p.media ? [p.media] : [])), [pages])
   const icon = iconProp && withBase(iconProp)
   const [open, setOpen] = useState(false)
+  const [page, setPage] = useState(0)
   const [src, setSrc] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
   const trigger = useRef<HTMLAnchorElement>(null)
   const modal = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
   const objectUrl = useRef<string | null>(null)
+  // Which media URL the current object URL was made from, so a page change
+  // knows whether the image on screen is already the right one.
+  const shown = useRef<string | null>(null)
   const iconUrl = useRef<string | null>(null)
   const didInitialFocus = useRef(false)
   const slug = company ? `${slugify(company)}-${slugify(title)}` : slugify(title)
   const titleId = useId()
   const label = company ? `${title} @ ${company}` : title
+  const current = pages[page]
+  const media = current?.media
 
   const close = useCallback(() => {
     setOpen(false)
@@ -83,13 +102,27 @@ export function EntryLink({
     trigger.current?.focus()
   }, [])
 
-  /* A fresh object URL per open so a gif always restarts from frame 0 —
+  /* A fresh object URL per show so a gif always restarts from frame 0 —
      a cached <img> src can resume mid-loop in some browsers. */
-  const showBlob = useCallback((blob: Blob) => {
+  const showBlob = useCallback((url: string, blob: Blob) => {
     if (objectUrl.current) URL.revokeObjectURL(objectUrl.current)
     objectUrl.current = URL.createObjectURL(blob)
+    shown.current = url
     setSrc(objectUrl.current)
   }, [])
+
+  /* Switch pages; an already-warmed image is shown in this same render, with
+     no loading flash. */
+  const goTo = useCallback(
+    (index: number) => {
+      const next = Math.min(Math.max(index, 0), pages.length - 1)
+      setPage(next)
+      const url = pages[next]?.media
+      const blob = url ? cachedMedia(url) : undefined
+      if (url && blob) showBlob(url, blob)
+    },
+    [pages, showBlob],
+  )
 
   /* Let modified clicks (new tab/window, middle click) reach the browser so the
      link still behaves like a link; a plain click opens the dialog instead. */
@@ -97,9 +130,7 @@ export function EntryLink({
     (e: MouseEvent<HTMLAnchorElement>) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
       e.preventDefault()
-      // Already warmed: show it in this same render, with no loading flash.
-      const blob = media ? cachedMedia(media) : undefined
-      if (blob) showBlob(blob)
+      goTo(0)
       if (icon) {
         if (iconUrl.current) URL.revokeObjectURL(iconUrl.current)
         const iconBlob = cachedMedia(icon)
@@ -108,15 +139,15 @@ export function EntryLink({
       setOpen(true)
       setFocusParam(slug)
     },
-    [media, icon, slug, showBlob],
+    [goTo, icon, slug],
   )
 
   /* Hovering or tabbing to the title is a strong hint the demo is about to be
-     opened, so start the download ahead of the click. */
+     opened, so start the downloads ahead of the click. */
   const onIntent = useCallback(() => {
-    if (media) loadMedia(media).catch(() => {})
+    for (const url of imageUrls) loadMedia(url).catch(() => {})
     if (icon) loadMedia(icon).catch(() => {})
-  }, [media, icon])
+  }, [imageUrls, icon])
 
   useEffect(() => {
     if (didInitialFocus.current) return
@@ -129,18 +160,20 @@ export function EntryLink({
     }, 50)
   }, [slug])
 
-  // Warm the demo in the background once the page goes idle.
+  // Warm the demos in the background once the page goes idle.
   useEffect(() => {
-    if (media) prefetchMedia(media)
+    for (const url of imageUrls) prefetchMedia(url)
     if (icon) prefetchMedia(icon)
-  }, [media, icon])
+  }, [imageUrls, icon])
 
   useEffect(() => {
-    if (!open || !media || cachedMedia(media)) return
+    if (!open || !media || shown.current === media) return
+    setSrc(null)
+    setFailed(false)
     let cancelled = false
     loadMedia(media)
       .then((blob) => {
-        if (!cancelled) showBlob(blob)
+        if (!cancelled) showBlob(media, blob)
       })
       .catch(() => {
         if (!cancelled) setFailed(true)
@@ -161,6 +194,7 @@ export function EntryLink({
       URL.revokeObjectURL(iconUrl.current)
       iconUrl.current = null
     }
+    shown.current = null
     setSrc(null)
     setFailed(false)
   }, [open])
@@ -174,7 +208,9 @@ export function EntryLink({
       }
       if (e.key !== 'Tab') return
       // Keep focus inside the dialog.
-      const focusable = modal.current?.querySelectorAll<HTMLElement>('a[href], button')
+      const focusable = modal.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])',
+      )
       if (!focusable || focusable.length === 0) return
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
@@ -216,6 +252,20 @@ export function EntryLink({
       document.body.style.paddingRight = prev.paddingRight
     }
   }, [open, close])
+
+  // Arrow keys page through a multi-page dialog.
+  useEffect(() => {
+    if (!open || pages.length < 2) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') goTo(page + 1)
+      else if (e.key === 'ArrowLeft') goTo(page - 1)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, pages.length, page, goTo])
+
+  // Each page can carry its own blurb; the entry's description is the fallback.
+  const blurb = current?.text ?? description
 
   return (
     <>
@@ -271,16 +321,52 @@ export function EntryLink({
                   <FiX size={14} />
                 </button>
               </div>
-              {media &&
-                (src ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
-                  <img className="modal-media" src={src} alt={`${label} demo`} />
-                ) : (
-                  <div className="modal-loading">{failed ? 'demo unavailable' : 'loading…'}</div>
-                ))}
-              {description && (
+              {current && (media || pages.length > 1) && (
+                <div className="modal-pages">
+                  {media &&
+                    (src ? (
+                      /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
+                      <img
+                        className="modal-media"
+                        src={src}
+                        alt={current.caption ? `${label}: ${current.caption}` : `${label} demo`}
+                      />
+                    ) : (
+                      <div className="modal-loading">
+                        {failed ? 'demo unavailable' : 'loading…'}
+                      </div>
+                    ))}
+                  {pages.length > 1 && (
+                    <div className="modal-pager">
+                      <button
+                        type="button"
+                        className="modal-page-btn"
+                        aria-label="Previous page"
+                        disabled={page === 0}
+                        onClick={() => goTo(page - 1)}
+                      >
+                        <FiChevronLeft size={18} />
+                      </button>
+                      <span className="modal-pager-caption">{current.caption}</span>
+                      <span className="modal-pager-count" aria-live="polite">
+                        {page + 1} / {pages.length}
+                      </span>
+                      <button
+                        type="button"
+                        className="modal-page-btn"
+                        aria-label="Next page"
+                        disabled={page === pages.length - 1}
+                        onClick={() => goTo(page + 1)}
+                      >
+                        <FiChevronRight size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              {blurb && (
                 <p className="modal-description">
-                  {Array.isArray(description) ? description.join(' ') : description}
+                  {Array.isArray(blurb) ? blurb.join(' ') : blurb}
                 </p>
               )}
               {technologies && technologies.length > 0 && (
