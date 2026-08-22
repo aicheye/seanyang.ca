@@ -45,6 +45,10 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Changed data files:"; echo "$files"
 
+      # jsDelivr re-fetches from GitHub when purged, and right after a push
+      # GitHub can still return the previous commit for @main. A purge two
+      # seconds after the #65 merge re-cached the old jobs.json. Purge now,
+      # wait, purge again.
       - name: Purge jsDelivr cache
         if: steps.changed.outputs.files != ''
         env:
@@ -52,14 +56,20 @@ jobs:
         run: |
           set -uo pipefail
           status=0
-          while IFS= read -r f; do
-            [ -z "$f" ] && continue
-            url="https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@main/${f}"
-            echo "Purging ${url}"
-            if ! curl -fsS --retry 3 --retry-delay 2 "$url"; then
-              echo "::warning::purge request failed for ${f}"
-              status=1
-            fi
-            echo
-          done <<< "$FILES"
+          purge_all() {
+            while IFS= read -r f; do
+              [ -z "$f" ] && continue
+              url="https://purge.jsdelivr.net/gh/${GITHUB_REPOSITORY}@main/${f}"
+              echo "Purging ${url}"
+              if ! curl -fsS --retry 3 --retry-delay 2 "$url"; then
+                echo "::warning::purge request failed for ${f}"
+                status=1
+              fi
+              echo
+            done <<< "$FILES"
+          }
+          purge_all
+          echo "Waiting 90s for GitHub to serve the new commit, then purging again"
+          sleep 90
+          purge_all
           exit $status
