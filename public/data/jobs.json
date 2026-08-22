@@ -30,9 +30,9 @@
       {
         "caption": "reliability",
         "text": [
-          "Wrote the Ansible playbook that provisions every Jetson kit from bare flash to field-ready.",
-          "It is idempotent and runs across the whole fleet in parallel from one pinned release.",
-          "Also built the hardware test harness that checks each kit: sensors up, a full mission recorded and processed, and sensor dropouts to confirm the stack fails safe."
+          "Developed Ansible playbooks to provision every Jetson kit from a fresh flash to field-ready.",
+          "They are idempotent and deploy to the whole fleet in parallel from a pinned release.",
+          "Also built a hardware test harness to verify each kit: tests cover sensor bringup, end-to-end mission recording, and sensor dropouts."
         ]
       }
     ],
