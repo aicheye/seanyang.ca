@@ -22,6 +22,7 @@ export function ProjectsSection() {
                   description={p.details ?? p.description}
                   technologies={p.technologies}
                   media={p.media}
+                  pages={p.pages}
                 />
               </strong>
             </div>

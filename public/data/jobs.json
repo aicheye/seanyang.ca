@@ -10,6 +10,32 @@
     ],
     "website": "https://moss.ag",
     "logo": "/assets/logos/moss.jpg",
+    "media": "/assets/demos/moss-autonomy.gif",
+    "pages": [
+      {
+        "media": "/assets/demos/moss-autonomy.gif",
+        "caption": "autonomous row following",
+        "text": [
+          "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
+          "RTK-odometry fusion and microsecond-level sensor sync into real-time SLAM held mean follow error under 20cm over 500m of autonomous tests."
+        ]
+      },
+      {
+        "media": "/assets/demos/moss-synthetic.png",
+        "caption": "synthetic point cloud pipeline",
+        "text": [
+          "Built Rust synthetic point cloud pipelines at 4M+ points per second, rendering labelled tree-row scenes like this one for computer vision training."
+        ]
+      },
+      {
+        "caption": "reliability",
+        "text": [
+          "Wrote the Ansible playbook that provisions every Jetson kit from bare flash to field-ready.",
+          "It is idempotent and runs across the whole fleet in parallel from one pinned release.",
+          "Also built the hardware test harness that checks each kit: sensors up, a full mission recorded and processed, and sensor dropouts to confirm the stack fails safe."
+        ]
+      }
+    ],
     "location": "San Francisco, CA",
     "technologies": [
       "ROS 2",

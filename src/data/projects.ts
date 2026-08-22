@@ -1,3 +1,4 @@
+import type { EntryPage } from '@/data/entry'
 import projects from '@public/data/projects.json'
 
 export interface Project {
@@ -9,6 +10,10 @@ export interface Project {
   github: string
   technologies: string[]
   media?: string
+  /** Every page of the entry dialog, in order. When set it replaces `media`,
+      which stays as the first page for clients built before `pages` existed
+      (the mirrors between deploys). */
+  pages?: EntryPage[]
 }
 
 export default projects as Project[]

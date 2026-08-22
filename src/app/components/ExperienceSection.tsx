@@ -31,6 +31,7 @@ export function ExperienceSection() {
                       description={job.details ?? job.description}
                       technologies={job.technologies}
                       media={job.media}
+                      pages={job.pages}
                       icon={job.logo}
                       meta={[dates, job.location].filter(Boolean)}
                     />
