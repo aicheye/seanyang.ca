@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
@@ -27,9 +26,27 @@ export interface EntryLinkProps {
   className?: string
 }
 
+/** "Perception Engineering Intern" -> "perception-engineering-intern" */
+export function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
 /** "https://github.com/aicheye/crustty/" -> "github.com/aicheye/crustty" */
 function linkLabel(href: string): string {
   return href.replace(/^https?:\/\//, '').replace(/\/$/, '')
+}
+
+function setFocusParam(slug: string) {
+  const url = new URL(window.location.href)
+  url.searchParams.set('focus', slug)
+  history.replaceState(null, '', url)
+}
+
+function clearFocusParam() {
+  const url = new URL(window.location.href)
+  if (!url.searchParams.has('focus')) return
+  url.searchParams.delete('focus')
+  history.replaceState(null, '', url)
 }
 
 export function EntryLink({
@@ -54,11 +71,15 @@ export function EntryLink({
   const modal = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
   const objectUrl = useRef<string | null>(null)
+  const iconUrl = useRef<string | null>(null)
+  const didInitialFocus = useRef(false)
+  const slug = company ? `${slugify(company)}-${slugify(title)}` : slugify(title)
   const titleId = useId()
   const label = company ? `${title} @ ${company}` : title
 
   const close = useCallback(() => {
     setOpen(false)
+    clearFocusParam()
     trigger.current?.focus()
   }, [])
 
@@ -79,21 +100,40 @@ export function EntryLink({
       // Already warmed: show it in this same render, with no loading flash.
       const blob = media ? cachedMedia(media) : undefined
       if (blob) showBlob(blob)
+      if (icon) {
+        if (iconUrl.current) URL.revokeObjectURL(iconUrl.current)
+        const iconBlob = cachedMedia(icon)
+        iconUrl.current = iconBlob ? URL.createObjectURL(iconBlob) : null
+      }
       setOpen(true)
+      setFocusParam(slug)
     },
-    [media, showBlob],
+    [media, icon, slug, showBlob],
   )
 
   /* Hovering or tabbing to the title is a strong hint the demo is about to be
      opened, so start the download ahead of the click. */
   const onIntent = useCallback(() => {
     if (media) loadMedia(media).catch(() => {})
-  }, [media])
+    if (icon) loadMedia(icon).catch(() => {})
+  }, [media, icon])
+
+  useEffect(() => {
+    if (didInitialFocus.current) return
+    didInitialFocus.current = true
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('focus') !== slug) return
+    setOpen(true)
+    setTimeout(() => {
+      trigger.current?.scrollIntoView({ block: 'center' })
+    }, 50)
+  }, [slug])
 
   // Warm the demo in the background once the page goes idle.
   useEffect(() => {
     if (media) prefetchMedia(media)
-  }, [media])
+    if (icon) prefetchMedia(icon)
+  }, [media, icon])
 
   useEffect(() => {
     if (!open || !media || cachedMedia(media)) return
@@ -116,6 +156,10 @@ export function EntryLink({
     if (objectUrl.current) {
       URL.revokeObjectURL(objectUrl.current)
       objectUrl.current = null
+    }
+    if (iconUrl.current) {
+      URL.revokeObjectURL(iconUrl.current)
+      iconUrl.current = null
     }
     setSrc(null)
     setFailed(false)
@@ -202,7 +246,8 @@ export function EntryLink({
               <div className="modal-header">
                 {icon && (
                   <span className="modal-icon">
-                    <Image src={icon} alt="" width={64} height={64} />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- blob URL from prefetch cache */}
+                    <img src={iconUrl.current ?? icon} alt="" width={64} height={64} />
                   </span>
                 )}
                 <div className="modal-heading">
