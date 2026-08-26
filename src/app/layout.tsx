@@ -3,6 +3,7 @@ import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/data/site'
+import { location } from '@/data/adjectives'
 import { withBase } from '@/lib/basePath'
 import './globals.css'
 
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: './' },
   title: 'Sean Yang',
-  description: 'Student and software developer based in Waterloo, ON.',
+  description: `Student and software developer based in ${location}.`,
   icons: {
     icon: [
       { url: withBase('/favicon-96x96.png'), sizes: '96x96', type: 'image/png' },
