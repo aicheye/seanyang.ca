@@ -1,4 +1,4 @@
-import adjectives from '@/data/adjectives'
+import adjectives, { location } from '@/data/adjectives'
 import { SITE_URL } from '@/data/site'
 import { primaryEmail } from '@/data/socials'
 import { FiMapPin } from 'react-icons/fi'
@@ -18,7 +18,7 @@ export function Header() {
       <div className="name-row">
         <h1>Sean Yang</h1>
         <span className="location">
-          San Francisco, CA
+          {location}
           <FiMapPin size={12} />
         </span>
       </div>
