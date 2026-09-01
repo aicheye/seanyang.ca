@@ -12,6 +12,8 @@ const ALLOWED_ORIGINS = new Set([
   'https://www.student.math.uwaterloo.ca',
   'https://student.cs.uwaterloo.ca',
   'https://www.eng.uwaterloo.ca',
+  'https://tilde.club',
+  'https://www.tilde.club',
 ])
 
 export function corsHeaders(req: Request): Record<string, string> {
