@@ -7,7 +7,7 @@
 # sftp.eng / tilde.club.
 #
 # Usage:
-#   scripts/build-static.sh <watiam-userid>
+#   scripts/build-static.sh <userid>
 #   scp -r out/. <watiam>@linux.student.cs.uwaterloo.ca:~/public_html/
 #
 # The production (Vercel) build is untouched: everything server-side is

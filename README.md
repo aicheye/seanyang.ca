@@ -42,7 +42,7 @@ Static copies of the site are hosted on UW student servers and tilde.club. They 
 ### Deploying mirrors
 
 ```bash
-scripts/deploy-mirrors.sh s532yang
+scripts/deploy-mirrors.sh
 ```
 
-This builds the static export and deploys to every mirror over SSH (UW hosts in parallel from one build, then a second build for tilde.club, where the username differs). The build strips API routes (the mirrors call prod's routes cross-origin instead), replaces `/resume` and `/transcript` with `.htaccess` redirects to prod, and pulls jobs/projects data from jsDelivr so the mirrors stay current without redeploying.
+This deploys to every mirror over SSH, resolving each host's username from `~/.ssh/config` (each host needs a `User` entry). Hosts sharing a user share one static build; a separate build runs per distinct user since the username sets the basePath. The build strips API routes (the mirrors call prod's routes cross-origin instead), replaces `/resume` and `/transcript` with `.htaccess` redirects to prod, and pulls jobs/projects data from jsDelivr so the mirrors stay current without redeploying.
