@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Build a static copy of the site for the UW student servers, which serve
-# plain files out of ~/public_html at https://<host>/~<watiam>/ where <host>
-# is student.cs.uwaterloo.ca, ece.uwaterloo.ca, student.math.uwaterloo.ca,
-# or www.eng.uwaterloo.ca.
-# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math / sftp.eng.
+# Build a static copy of the site for the UW student servers and tilde.club,
+# which serve plain files out of ~/public_html at https://<host>/~<user>/
+# where <host> is student.cs.uwaterloo.ca, ece.uwaterloo.ca,
+# student.math.uwaterloo.ca, www.eng.uwaterloo.ca, or tilde.club.
+# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math /
+# sftp.eng / tilde.club.
 #
 # Usage:
-#   scripts/build-static.sh <watiam-userid>
+#   scripts/build-static.sh <userid>
 #   scp -r out/. <watiam>@linux.student.cs.uwaterloo.ca:~/public_html/
 #
 # The production (Vercel) build is untouched: everything server-side is
