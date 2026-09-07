@@ -14,17 +14,17 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "next": "^16.3.3",
+    "next": "^16.3.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-icons": "^5.7.0"
   },
   "devDependencies": {
-    "@types/node": "^26.4.0",
+    "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
-    "oxfmt": "^0.65.0",
-    "oxlint": "^1.80.0",
+    "@types/react-dom": "^19.2.7",
+    "oxfmt": "^0.66.0",
+    "oxlint": "^1.81.0",
     "typescript": "~7.0.2"
   },
   "overrides": {
