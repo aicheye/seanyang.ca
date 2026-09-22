@@ -1,17 +1,17 @@
 [
   {
-    "title": "Undergraduate Research Assistant",
-    "company": "University of Waterloo",
+    "title": "Research Assistant",
+    "company": "UWaterloo",
     "description": "distributed coordination for mobile robot networks",
     "details": [
-      "Research assistant at CAMS-Lab, working on distributed mobile robotics under the Department of Mechanical and Mechatronics Engineering.",
-      "Motion planning and coordination across networks of mobile robots, rather than one robot solving the problem alone."
+      "Research assistant at CAMS-Lab, working on distributed mobile robotics under the Department of Mechanical and Mechatronics Engineering."
     ],
     "website": "https://uwaterloo.ca/cooperative-adaptive-mechatronic-systems-lab/",
     "logo": "/assets/logos/uwaterloo.png",
     "location": "Waterloo, ON",
     "technologies": [
       "ROS 2",
+      "C++",
       "Python"
     ],
     "dates": [
@@ -25,8 +25,7 @@
     "company": "WATonomous",
     "description": "reinforcement learning for humanoid control",
     "details": [
-      "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window.",
-      "Simulation-first reinforcement learning, with the same stack carried through to hardware."
+      "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window."
     ],
     "website": "https://watonomous.ca",
     "logo": "/assets/logos/watonomous.jpg",
@@ -34,7 +33,7 @@
     "technologies": [
       "Python",
       "PyTorch",
-      "Isaac Lab"
+      "mjlab"
     ],
     "dates": [
       "2026.8",
