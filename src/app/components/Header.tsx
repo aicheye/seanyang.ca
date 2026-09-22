@@ -1,7 +1,6 @@
-import adjectives, { location } from '@/data/adjectives'
 import { SITE_URL } from '@/data/site'
 import { primaryEmail } from '@/data/socials'
-import { FiMapPin } from 'react-icons/fi'
+import { HeaderAdjectives, HeaderLocation } from './HeaderBio'
 import { NowPlaying } from './NowPlaying'
 import { SSHCopyButton } from './SSHCopyButton'
 import { TermProgress } from './TermProgress'
@@ -17,10 +16,7 @@ export function Header() {
     <header>
       <div className="name-row">
         <h1>Sean Yang</h1>
-        <span className="location">
-          {location}
-          <FiMapPin size={12} />
-        </span>
+        <HeaderLocation />
       </div>
       <div className="tagline">
         <a href={primaryEmail.url}>{primaryEmail.label}</a>
@@ -30,20 +26,7 @@ export function Header() {
         </a>
       </div>
       <NowPlaying />
-      <div className="about">
-        <span className="sep">&#91;</span>
-        {adjectives.flatMap((w, i) =>
-          i === 0
-            ? [<span key={w}>{w}</span>]
-            : [
-                <span key={`sep-${i}`} className="sep">
-                  ·
-                </span>,
-                <span key={w}>{w}</span>,
-              ],
-        )}
-        <span className="sep">&#93;</span>
-      </div>
+      <HeaderAdjectives />
       <TermProgress />
       <SSHCopyButton />
     </header>
