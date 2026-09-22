@@ -27,6 +27,9 @@ export interface EntryLinkProps {
   icon?: string
   /** Short facts rendered under the heading, joined with a middot. */
   meta?: string[]
+  /** Overrides the `?focus=` id derived from company + title. Needed when two
+      entries share both — e.g. the same title held twice at one company. */
+  slug?: string
   className?: string
 }
 
@@ -66,6 +69,7 @@ export function EntryLink({
   pages: pagesProp,
   icon: iconProp,
   meta,
+  slug: slugProp,
   className,
 }: EntryLinkProps) {
   // Data files store root-absolute /assets/... paths; prefix them when the
@@ -90,7 +94,7 @@ export function EntryLink({
   const shown = useRef<string | null>(null)
   const iconUrl = useRef<string | null>(null)
   const didInitialFocus = useRef(false)
-  const slug = company ? `${slugify(company)}-${slugify(title)}` : slugify(title)
+  const slug = slugProp ?? (company ? `${slugify(company)}-${slugify(title)}` : slugify(title))
   const titleId = useId()
   const label = company ? `${title} @ ${company}` : title
   const current = pages[page]
