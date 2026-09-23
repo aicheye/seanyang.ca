@@ -24,7 +24,7 @@
       "Research assistant at CAMS-Lab, working on distributed mobile robotics under the Department of Mechanical and Mechatronics Engineering."
     ],
     "website": "https://uwaterloo.ca/cooperative-adaptive-mechatronic-systems-lab/",
-    "logo": "/assets/logos/uwaterloo.png",
+    "logo": "/assets/logos/uwaterloo.webp",
     "location": "Waterloo, ON",
     "technologies": [
       "ROS 2",
@@ -47,10 +47,10 @@
     ],
     "website": "https://watonomous.ca",
     "logo": "/assets/logos/watonomous.jpg",
-    "media": "/assets/demos/watonomous-humanoid.gif",
+    "media": "/assets/demos/watonomous-humanoid.mp4",
     "pages": [
       {
-        "media": "/assets/demos/watonomous-humanoid.gif",
+        "media": "/assets/demos/watonomous-humanoid.mp4",
         "caption": "badminton receive policy",
         "text": [
           "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, an EKF-tracked shuttle, and the same arm URDF the hardware runs.",
@@ -58,7 +58,7 @@
         ]
       },
       {
-        "media": "/assets/demos/watonomous.gif",
+        "media": "/assets/demos/watonomous.mp4",
         "caption": "eve prediction pipelines",
         "text": [
           "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
@@ -91,11 +91,11 @@
       "Also built Rust synthetic point cloud pipelines at 4M+ points per second for computer vision training."
     ],
     "website": "https://moss.ag",
-    "logo": "/assets/logos/moss.jpg",
-    "media": "/assets/demos/moss-autonomy.gif",
+    "logo": "/assets/logos/moss.webp",
+    "media": "/assets/demos/moss-autonomy.mp4",
     "pages": [
       {
-        "media": "/assets/demos/moss-autonomy.gif",
+        "media": "/assets/demos/moss-autonomy.mp4",
         "caption": "autonomous row following",
         "text": [
           "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
@@ -103,7 +103,7 @@
         ]
       },
       {
-        "media": "/assets/demos/moss-synthetic.png",
+        "media": "/assets/demos/moss-synthetic.webp",
         "caption": "synthetic point cloud pipeline",
         "text": [
           "Built Rust synthetic point cloud pipelines at 4M+ points per second, rendering labelled tree-row scenes like this one for computer vision training."
