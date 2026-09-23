@@ -54,8 +54,7 @@
         "caption": "badminton receive policy",
         "text": [
           "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, an EKF-tracked shuttle, and the same arm URDF the hardware runs.",
-          "Trained a privileged-state PPO teacher, distilled it into a student on noisy perception, then fine-tuned the student with an asymmetric actor-critic, taking hits from 76.6% to 98.8% of serves with 78% returned over the net.",
-          "Constrained the policy to the real actuators' operating envelope (joint-speed caps, rated torque, smoothness costs), halving distal joint speeds."
+          "Trained a privileged-state PPO teacher, distilled it into a student on noisy perception, then fine-tuned the student with an asymmetric actor-critic, taking hits from 76.6% to 98.8% of serves with 78% returned over the net."
         ]
       },
       {
