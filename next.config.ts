@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
     basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   }),
   images: {
-    remotePatterns: [{ hostname: 'se30webring.com' }],
     ...(staticExport && { unoptimized: true }),
   },
   ...(!staticExport && {
