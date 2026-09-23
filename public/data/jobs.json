@@ -40,20 +40,51 @@
   {
     "title": "Robotics SWE",
     "company": "WATonomous",
-    "description": "reinforcement learning for humanoid control",
+    "description": "humanoid rl and autonomous vehicle prediction",
     "details": [
-      "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window."
+      "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window.",
+      "Previously wrote concurrent C++/ROS 2 prediction software for EVE, the autonomous vehicle built by Waterloo's student design team, cutting safety incidents by 3x."
     ],
     "website": "https://watonomous.ca",
     "logo": "/assets/logos/watonomous.jpg",
+    "media": "/assets/demos/watonomous-humanoid.gif",
+    "pages": [
+      {
+        "media": "/assets/demos/watonomous-humanoid.gif",
+        "caption": "badminton receive policy",
+        "text": [
+          "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window.",
+          "The deployed policy hits 98.8% of serves from a randomized launcher bank on perception-grade observations, returning 78% over the net."
+        ]
+      },
+      {
+        "caption": "badminton rl environment",
+        "text": [
+          "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, an EKF-tracked shuttle, and the same arm URDF the hardware runs.",
+          "Trained a privileged-state PPO teacher to 99.7% hits, distilled it into a student on noisy perception, then fine-tuned the student with an asymmetric actor-critic to recover 98.2% from a 76.6% distillation baseline.",
+          "Constrained the policy to the real actuators' operating envelope (joint-speed caps, rated torque, smoothness costs) and halved distal joint speeds while holding a 98.2% hit rate."
+        ]
+      },
+      {
+        "media": "/assets/demos/watonomous.gif",
+        "caption": "eve prediction pipelines",
+        "text": [
+          "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
+          "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
+          "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained Docker environments to keep the stack reproducible."
+        ]
+      }
+    ],
     "location": "Waterloo, ON",
     "technologies": [
       "Python",
       "PyTorch",
-      "mjlab"
+      "mjlab",
+      "C++",
+      "ROS 2"
     ],
     "dates": [
-      "2026.8",
+      "2025.9",
       "Present"
     ],
     "current": true
@@ -105,31 +136,6 @@
     "dates": [
       "2026.5",
       "2026.8"
-    ],
-    "current": false
-  },
-  {
-    "title": "Robotics SWE",
-    "company": "WATonomous",
-    "description": "prediction pipelines for autonomous vehicles",
-    "details": [
-      "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
-      "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
-      "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained Docker environments to keep the stack reproducible."
-    ],
-    "website": "https://watonomous.ca/projects/eve",
-    "logo": "/assets/logos/watonomous.jpg",
-    "media": "/assets/demos/watonomous.gif",
-    "location": "Waterloo, ON",
-    "technologies": [
-      "C++",
-      "ROS 2",
-      "Docker",
-      "Foxglove"
-    ],
-    "dates": [
-      "2025.9",
-      "2026.4"
     ],
     "current": false
   }
