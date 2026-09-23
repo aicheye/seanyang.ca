@@ -1,5 +1,22 @@
 [
   {
+    "title": "Member of Technical Staff Intern",
+    "company": "Medra",
+    "description": "incoming: autonomous biology labs",
+    "details": [
+      "Incoming Member of Technical Staff intern for Winter 2027, building robots that run biology experiments end to end so scientists can spend less time pipetting and more time on discovery."
+    ],
+    "website": "https://medra.ai",
+    "logo": "/assets/logos/medra.png",
+    "location": "San Francisco, CA",
+    "technologies": [],
+    "dates": [
+      "2027.1",
+      "2027.4"
+    ],
+    "current": false
+  },
+  {
     "title": "Research Assistant",
     "company": "UWaterloo",
     "description": "distributed coordination for mobile robot networks",
