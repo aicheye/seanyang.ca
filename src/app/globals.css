@@ -433,12 +433,28 @@ h2 span {
 }
 
 .modal-loading {
+  /* same box as .modal-media (aspect-ratio set inline from the demo's size),
+     so the dialog doesn't resize when the demo arrives */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: 60vh;
+  overflow: hidden;
+  box-sizing: border-box;
   font-size: 14px;
   color: var(--text);
-  padding: 48px 0;
-  text-align: center;
-  box-sizing: border-box;
+  background: var(--badge-bg);
   border: 1px solid var(--border);
+}
+
+/* react-loading-skeleton: a highlight sweeps across the empty slot */
+.modal-skeleton {
+  display: block;
+  align-self: stretch;
+  flex: 1;
+  line-height: 0;
+  --skeleton-highlight: color-mix(in srgb, var(--accent) 14%, var(--bg));
 }
 
 /* Multi-page dialogs: the demo slot holds one page at a time, with a

@@ -4,7 +4,10 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 import type { EntryPage } from '@/data/entry'
+import mediaSizes from '@/data/mediaSizes.json'
 import { withBase } from '@/lib/basePath'
 import { cachedMedia, loadMedia } from '@/lib/media'
 
@@ -51,6 +54,14 @@ function isVideo(url: string): boolean {
   return /\.mp4$/i.test(url)
 }
 
+/* Width / height of a demo, recorded by scripts/media-sizes.mjs, so the demo
+   slot is sized before the file arrives. Media added through the mirrors'
+   live data since the last build isn't listed; 16:9 is a close guess. */
+function aspectRatio(url: string): string {
+  const size = (mediaSizes as Record<string, number[]>)[url]
+  return size ? `${size[0]} / ${size[1]}` : '16 / 9'
+}
+
 function setFocusParam(slug: string) {
   const url = new URL(window.location.href)
   url.searchParams.set('focus', slug)
@@ -84,6 +95,13 @@ export function EntryLink({
       pagesProp && pagesProp.length > 0 ? pagesProp : mediaProp ? [{ media: mediaProp }] : []
     return list.map((p) => (p.media ? { ...p, media: withBase(p.media) } : p))
   }, [pagesProp, mediaProp])
+  const ratios = useMemo(
+    () =>
+      (pagesProp && pagesProp.length > 0 ? pagesProp : [{ media: mediaProp }]).map((p) =>
+        p.media ? aspectRatio(p.media) : undefined,
+      ),
+    [pagesProp, mediaProp],
+  )
   const imageUrls = useMemo(() => pages.flatMap((p) => (p.media ? [p.media] : [])), [pages])
   const icon = iconProp && withBase(iconProp)
   const [open, setOpen] = useState(false)
@@ -104,6 +122,7 @@ export function EntryLink({
   const label = company ? `${title} @ ${company}` : title
   const current = pages[page]
   const media = current?.media
+  const ratio = ratios[page]
 
   const close = useCallback(() => {
     setOpen(false)
@@ -332,6 +351,7 @@ export function EntryLink({
                       isVideo(media) ? (
                         <video
                           className="modal-media"
+                          style={{ aspectRatio: ratio }}
                           src={src}
                           aria-label={demoAlt}
                           autoPlay
@@ -341,11 +361,32 @@ export function EntryLink({
                         />
                       ) : (
                         /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
-                        <img className="modal-media" src={src} alt={demoAlt} />
+                        <img
+                          className="modal-media"
+                          style={{ aspectRatio: ratio }}
+                          src={src}
+                          alt={demoAlt}
+                        />
                       )
                     ) : (
-                      <div className="modal-loading">
-                        {failed ? 'demo unavailable' : 'loading…'}
+                      <div
+                        className="modal-loading"
+                        style={{ aspectRatio: ratio }}
+                        role="status"
+                        aria-label={failed ? undefined : 'Loading demo'}
+                      >
+                        {failed ? (
+                          'demo unavailable'
+                        ) : (
+                          <Skeleton
+                            height="100%"
+                            baseColor="var(--badge-bg)"
+                            highlightColor="var(--skeleton-highlight)"
+                            borderRadius={0}
+                            duration={1.4}
+                            containerClassName="modal-skeleton"
+                          />
+                        )}
                       </div>
                     ))}
                   {pages.length > 1 && (
