@@ -354,6 +354,7 @@ h2 span {
 }
 
 .modal-icon {
+  position: relative;
   /* 48px squares up with the title + meta block beside it. Stretching to that
      block instead would feed back: a wider icon wraps the title, which grows
      the block, which grows the icon. */
@@ -369,9 +370,18 @@ h2 span {
 
 .modal-icon img {
   display: block;
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* sits under the logo, which covers it once it has loaded */
+.modal-icon-skel,
+.np-cover-skel {
+  position: absolute;
+  inset: 0;
+  line-height: 0;
 }
 
 .modal-heading {

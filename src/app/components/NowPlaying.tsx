@@ -24,6 +24,18 @@ const skel = {
   containerClassName: 'np-skel',
 }
 
+// Fills a cover face until its art has loaded.
+const coverSkel = (
+  <Skeleton
+    height="100%"
+    borderRadius={4}
+    duration={1.4}
+    baseColor="var(--badge-bg)"
+    highlightColor="var(--bg)"
+    containerClassName="np-cover-skel"
+  />
+)
+
 // The static mirrors have no server, so they call prod's API routes
 // cross-origin (set by scripts/build-static.sh). Empty on prod itself.
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
@@ -131,6 +143,8 @@ export function NowPlaying() {
   const [frontOnTop, setFrontOnTop] = useState(true)
   const [frontArt, setFrontArt] = useState<string | null>(null)
   const [backArt, setBackArt] = useState<string | null>(null)
+  // Art URLs the browser has finished downloading; data URLs are always ready.
+  const [loadedArt, setLoadedArt] = useState<ReadonlySet<string>>(() => new Set())
   const prevArtRef = useRef<string | null>(null)
   const prevKeyRef = useRef<string | null>(null)
   const wasPlayingRef = useRef(false)
@@ -244,6 +258,17 @@ export function NowPlaying() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackKey, isPlaying, albumArt])
 
+  const frontFill = frontArt ?? albumArt
+  useEffect(() => {
+    for (const url of [frontFill, backArt]) {
+      if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
+      const img = new Image()
+      img.onload = img.onerror = () => setLoadedArt((prev) => new Set(prev).add(url))
+      img.src = url
+    }
+  }, [frontFill, backArt, loadedArt])
+  const artReady = (url: string | null) => !url || url.startsWith('data:') || loadedArt.has(url)
+
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
     if (!awaitingFirst) return null
@@ -252,7 +277,7 @@ export function NowPlaying() {
     return (
       <div className="now-playing np-loading" aria-hidden="true">
         <div className="np-album">
-          <div className="np-cover" />
+          <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
           <span className="np-title">
@@ -269,7 +294,6 @@ export function NowPlaying() {
   }
 
   const { title, artist } = track
-  const frontFill = frontArt ?? albumArt
   const frontStyle = {
     backgroundImage: frontFill ? `url(${frontFill})` : undefined,
     zIndex: frontOnTop ? 2 : 1,
@@ -302,8 +326,12 @@ export function NowPlaying() {
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
-          <div className="np-cover np-cover-front" style={frontStyle} />
-          <div className="np-cover np-cover-back" style={backStyle} />
+          <div className="np-cover np-cover-front" style={frontStyle}>
+            {!artReady(frontFill) && coverSkel}
+          </div>
+          <div className="np-cover np-cover-back" style={backStyle}>
+            {!artReady(backArt) && coverSkel}
+          </div>
         </div>
       </div>
       <div className="np-info">

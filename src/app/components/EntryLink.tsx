@@ -108,6 +108,7 @@ export function EntryLink({
   const [page, setPage] = useState(0)
   const [src, setSrc] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
+  const [iconLoaded, setIconLoaded] = useState(false)
   const trigger = useRef<HTMLAnchorElement>(null)
   const modal = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
@@ -159,6 +160,7 @@ export function EntryLink({
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
       e.preventDefault()
       goTo(0)
+      setIconLoaded(false)
       if (icon) {
         if (iconUrl.current) URL.revokeObjectURL(iconUrl.current)
         const iconBlob = cachedMedia(icon)
@@ -319,8 +321,25 @@ export function EntryLink({
               <div className="modal-header">
                 {icon && (
                   <span className="modal-icon">
+                    {!iconLoaded && (
+                      <Skeleton
+                        height="100%"
+                        borderRadius={0}
+                        duration={1.4}
+                        baseColor="var(--badge-bg)"
+                        highlightColor="var(--bg)"
+                        containerClassName="modal-icon-skel"
+                      />
+                    )}
                     {/* eslint-disable-next-line @next/next/no-img-element -- blob URL from prefetch cache */}
-                    <img src={iconUrl.current ?? icon} alt="" width={64} height={64} />
+                    <img
+                      src={iconUrl.current ?? icon}
+                      alt=""
+                      width={64}
+                      height={64}
+                      onLoad={() => setIconLoaded(true)}
+                      onError={() => setIconLoaded(true)}
+                    />
                   </span>
                 )}
                 <div className="modal-heading">
