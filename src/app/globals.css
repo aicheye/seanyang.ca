@@ -354,6 +354,7 @@ h2 span {
 }
 
 .modal-icon {
+  position: relative;
   /* 48px squares up with the title + meta block beside it. Stretching to that
      block instead would feed back: a wider icon wraps the title, which grows
      the block, which grows the icon. */
@@ -369,9 +370,18 @@ h2 span {
 
 .modal-icon img {
   display: block;
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* sits under the logo, which covers it once it has loaded */
+.modal-icon-skel,
+.np-cover-skel {
+  position: absolute;
+  inset: 0;
+  line-height: 0;
 }
 
 .modal-heading {
@@ -433,12 +443,27 @@ h2 span {
 }
 
 .modal-loading {
+  /* same box as .modal-media (aspect-ratio set inline from the demo's size),
+     so the dialog doesn't resize when the demo arrives */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: 60vh;
+  overflow: hidden;
+  box-sizing: border-box;
   font-size: 14px;
   color: var(--text);
-  padding: 48px 0;
-  text-align: center;
-  box-sizing: border-box;
+  background: var(--badge-bg);
   border: 1px solid var(--border);
+}
+
+/* react-loading-skeleton: a highlight sweeps across the empty slot */
+.modal-skeleton {
+  display: block;
+  align-self: stretch;
+  flex: 1;
+  line-height: 0;
 }
 
 /* Multi-page dialogs: the demo slot holds one page at a time, with a
@@ -1022,36 +1047,7 @@ footer a:hover {
 .np-skel {
   display: inline-block;
   vertical-align: middle;
-  height: 0.65em;
-  border-radius: 2px;
-  background: var(--border);
-  animation: np-skel-pulse 1.8s ease-in-out infinite;
-}
-
-.np-skel-title {
-  width: 110px;
-}
-
-.np-skel-artist {
-  width: 72px;
-}
-
-@keyframes np-skel-pulse {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 0.35;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .np-skel {
-    animation: none;
-    opacity: 0.55;
-  }
+  line-height: 0;
 }
 
 /* Game of Life controls */

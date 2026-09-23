@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 import { withBase } from '@/lib/basePath'
 
 interface Track {
@@ -11,6 +13,28 @@ interface Track {
 }
 
 const FALLBACK_COLOR = '#8a5c42'
+
+// Placeholder bars while the first track loads; same sweep as the demo dialog.
+const skel = {
+  height: '0.65em',
+  borderRadius: 2,
+  duration: 1.4,
+  baseColor: 'var(--border)',
+  highlightColor: 'var(--badge-bg)',
+  containerClassName: 'np-skel',
+}
+
+// Fills a cover face until its art has loaded.
+const coverSkel = (
+  <Skeleton
+    height="100%"
+    borderRadius={4}
+    duration={1.4}
+    baseColor="var(--badge-bg)"
+    highlightColor="var(--bg)"
+    containerClassName="np-cover-skel"
+  />
+)
 
 // The static mirrors have no server, so they call prod's API routes
 // cross-origin (set by scripts/build-static.sh). Empty on prod itself.
@@ -119,6 +143,8 @@ export function NowPlaying() {
   const [frontOnTop, setFrontOnTop] = useState(true)
   const [frontArt, setFrontArt] = useState<string | null>(null)
   const [backArt, setBackArt] = useState<string | null>(null)
+  // Art URLs the browser has finished downloading; data URLs are always ready.
+  const [loadedArt, setLoadedArt] = useState<ReadonlySet<string>>(() => new Set())
   const prevArtRef = useRef<string | null>(null)
   const prevKeyRef = useRef<string | null>(null)
   const wasPlayingRef = useRef(false)
@@ -179,8 +205,7 @@ export function NowPlaying() {
         const color = colorPromise ? await colorPromise.catch(() => null) : null
         if (cancelled) return
         if (color) setLabelColor(color) //    change the disk colour…
-        if (frontVisible)
-          setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
+        if (frontVisible) setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
         else setFrontArt(frame ?? albumArt)
         setFlipHide(true) //    hide the record through the whole flip
         angleRef.current += 180
@@ -233,6 +258,17 @@ export function NowPlaying() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackKey, isPlaying, albumArt])
 
+  const frontFill = frontArt ?? albumArt
+  useEffect(() => {
+    for (const url of [frontFill, backArt]) {
+      if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
+      const img = new Image()
+      img.onload = img.onerror = () => setLoadedArt((prev) => new Set(prev).add(url))
+      img.src = url
+    }
+  }, [frontFill, backArt, loadedArt])
+  const artReady = (url: string | null) => !url || url.startsWith('data:') || loadedArt.has(url)
+
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
     if (!awaitingFirst) return null
@@ -241,16 +277,16 @@ export function NowPlaying() {
     return (
       <div className="now-playing np-loading" aria-hidden="true">
         <div className="np-album">
-          <div className="np-cover" />
+          <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
           <span className="np-title">
             <span className="np-title-text">
-              <span className="np-skel np-skel-title" />
+              <Skeleton width={110} {...skel} />
             </span>
           </span>
           <span className="np-artist">
-            <span className="np-skel np-skel-artist" />
+            <Skeleton width={72} {...skel} />
           </span>
         </div>
       </div>
@@ -258,7 +294,6 @@ export function NowPlaying() {
   }
 
   const { title, artist } = track
-  const frontFill = frontArt ?? albumArt
   const frontStyle = {
     backgroundImage: frontFill ? `url(${frontFill})` : undefined,
     zIndex: frontOnTop ? 2 : 1,
@@ -291,8 +326,12 @@ export function NowPlaying() {
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
-          <div className="np-cover np-cover-front" style={frontStyle} />
-          <div className="np-cover np-cover-back" style={backStyle} />
+          <div className="np-cover np-cover-front" style={frontStyle}>
+            {!artReady(frontFill) && coverSkel}
+          </div>
+          <div className="np-cover np-cover-back" style={backStyle}>
+            {!artReady(backArt) && coverSkel}
+          </div>
         </div>
       </div>
       <div className="np-info">
