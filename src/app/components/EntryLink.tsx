@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
 import type { EntryPage } from '@/data/entry'
 import { withBase } from '@/lib/basePath'
-import { cachedMedia, loadMedia, prefetchMedia } from '@/lib/media'
+import { cachedMedia, loadMedia } from '@/lib/media'
 
 export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
@@ -18,7 +18,7 @@ export interface EntryLinkProps {
       array is stored one sentence per line in the data files and joined here. */
   description?: string | string[]
   technologies?: string[]
-  /** Demo gif/image shown inside the dialog; the only page when `pages` is unset. */
+  /** Demo video/image shown inside the dialog; the only page when `pages` is unset. */
   media?: string
   /** Every page of the dialog, in order: a demo image and/or a blurb each.
       Replaces `media` when set. */
@@ -44,6 +44,11 @@ export function slugify(text: string): string {
 /** "https://github.com/aicheye/crustty/" -> "github.com/aicheye/crustty" */
 function linkLabel(href: string): string {
   return href.replace(/^https?:\/\//, '').replace(/\/$/, '')
+}
+
+/** Animated demos ship as mp4, which is several times smaller than a gif. */
+function isVideo(url: string): boolean {
+  return /\.mp4$/i.test(url)
 }
 
 function setFocusParam(slug: string) {
@@ -164,12 +169,6 @@ export function EntryLink({
     }, 50)
   }, [slug])
 
-  // Warm the demos in the background once the page goes idle.
-  useEffect(() => {
-    for (const url of imageUrls) prefetchMedia(url)
-    if (icon) prefetchMedia(icon)
-  }, [imageUrls, icon])
-
   useEffect(() => {
     if (!open || !media || shown.current === media) return
     setSrc(null)
@@ -270,6 +269,7 @@ export function EntryLink({
 
   // Each page can carry its own blurb; the entry's description is the fallback.
   const blurb = current?.text ?? description
+  const demoAlt = current?.caption ? `${label}: ${current.caption}` : `${label} demo`
 
   return (
     <>
@@ -329,12 +329,20 @@ export function EntryLink({
                 <div className="modal-pages">
                   {media &&
                     (src ? (
-                      /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
-                      <img
-                        className="modal-media"
-                        src={src}
-                        alt={current.caption ? `${label}: ${current.caption}` : `${label} demo`}
-                      />
+                      isVideo(media) ? (
+                        <video
+                          className="modal-media"
+                          src={src}
+                          aria-label={demoAlt}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element -- blob URL, next/image can't optimize it */
+                        <img className="modal-media" src={src} alt={demoAlt} />
+                      )
                     ) : (
                       <div className="modal-loading">
                         {failed ? 'demo unavailable' : 'loading…'}
