@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 import { withBase } from '@/lib/basePath'
 
 interface Track {
@@ -11,6 +13,16 @@ interface Track {
 }
 
 const FALLBACK_COLOR = '#8a5c42'
+
+// Placeholder bars while the first track loads; same sweep as the demo dialog.
+const skel = {
+  height: '0.65em',
+  borderRadius: 2,
+  duration: 1.4,
+  baseColor: 'var(--border)',
+  highlightColor: 'var(--badge-bg)',
+  containerClassName: 'np-skel',
+}
 
 // The static mirrors have no server, so they call prod's API routes
 // cross-origin (set by scripts/build-static.sh). Empty on prod itself.
@@ -179,8 +191,7 @@ export function NowPlaying() {
         const color = colorPromise ? await colorPromise.catch(() => null) : null
         if (cancelled) return
         if (color) setLabelColor(color) //    change the disk colour…
-        if (frontVisible)
-          setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
+        if (frontVisible) setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
         else setFrontArt(frame ?? albumArt)
         setFlipHide(true) //    hide the record through the whole flip
         angleRef.current += 180
@@ -246,11 +257,11 @@ export function NowPlaying() {
         <div className="np-info">
           <span className="np-title">
             <span className="np-title-text">
-              <span className="np-skel np-skel-title" />
+              <Skeleton width={110} {...skel} />
             </span>
           </span>
           <span className="np-artist">
-            <span className="np-skel np-skel-artist" />
+            <Skeleton width={72} {...skel} />
           </span>
         </div>
       </div>

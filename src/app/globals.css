@@ -454,7 +454,6 @@ h2 span {
   align-self: stretch;
   flex: 1;
   line-height: 0;
-  --skeleton-highlight: color-mix(in srgb, var(--accent) 14%, var(--bg));
 }
 
 /* Multi-page dialogs: the demo slot holds one page at a time, with a
@@ -1038,36 +1037,7 @@ footer a:hover {
 .np-skel {
   display: inline-block;
   vertical-align: middle;
-  height: 0.65em;
-  border-radius: 2px;
-  background: var(--border);
-  animation: np-skel-pulse 1.8s ease-in-out infinite;
-}
-
-.np-skel-title {
-  width: 110px;
-}
-
-.np-skel-artist {
-  width: 72px;
-}
-
-@keyframes np-skel-pulse {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 0.35;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .np-skel {
-    animation: none;
-    opacity: 0.55;
-  }
+  line-height: 0;
 }
 
 /* Game of Life controls */

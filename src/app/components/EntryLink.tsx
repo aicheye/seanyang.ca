@@ -381,7 +381,7 @@ export function EntryLink({
                           <Skeleton
                             height="100%"
                             baseColor="var(--badge-bg)"
-                            highlightColor="var(--skeleton-highlight)"
+                            highlightColor="var(--bg)"
                             borderRadius={0}
                             duration={1.4}
                             containerClassName="modal-skeleton"
