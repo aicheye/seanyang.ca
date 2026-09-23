@@ -736,13 +736,15 @@ footer a:hover {
   gap: 6px;
 }
 
-.webring img {
+.webring img,
+.webring svg {
   height: 22px;
   display: block;
   filter: invert(35%) sepia(20%) saturate(300%) hue-rotate(345deg);
 }
 
-.webring img:hover {
+.webring img:hover,
+.webring svg:hover {
   filter: invert(53%) sepia(26%) saturate(3066%) hue-rotate(180deg) brightness(90%) contrast(87%);
 }
 
