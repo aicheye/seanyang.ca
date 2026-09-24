@@ -126,6 +126,22 @@ function activityScore(start: Uint8Array, C: number, R: number): number {
   return diffCount(cur, a)
 }
 
+// Enough ongoing change to read as "alive" — roughly two gliders' worth on desktop
+function seedThreshold(C: number, R: number): number {
+  return Math.max(15, Math.floor(C * R * 0.002))
+}
+
+// Runs cb when the browser is idle (or after 500ms at most); Safari has no
+// requestIdleCallback, so it falls back to the next task. Returns a canceller.
+function whenIdle(cb: () => void): () => void {
+  if ('requestIdleCallback' in window) {
+    const id = requestIdleCallback(cb, { timeout: 500 })
+    return () => cancelIdleCallback(id)
+  }
+  const id = setTimeout(cb, 0)
+  return () => clearTimeout(id)
+}
+
 function stampMethuselah(g: Uint8Array, C: number, R: number) {
   const pattern = METHUSELAHS[Math.floor(Math.random() * METHUSELAHS.length)]
   const t = Math.floor(Math.random() * 8) // one of the 8 grid symmetries
@@ -159,6 +175,9 @@ export function GameOfLife() {
   const lastPainted = useRef(-1)
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
 
+  // The board is decorative, so the canvas stays transparent until its first
+  // board is drawn and then fades in; the page's text never waits on it.
+  const [shown, setShown] = useState(false)
   const [density, setDensity] = useState(5) // 1–10: sparse → dense
   const sparsityRef = useRef(6) // derived: 11 - density
   const densityRef = useRef(5)
@@ -258,8 +277,7 @@ export function GameOfLife() {
   const seed = useCallback(() => {
     const C = cols.current
     const R = rows.current
-    // Enough ongoing change to read as "alive" — roughly two gliders' worth on desktop
-    const threshold = Math.max(15, Math.floor(C * R * 0.002))
+    const threshold = seedThreshold(C, R)
     const deadline = performance.now() + SEED_BUDGET_MS
     let best = buildCandidate(C, R)
     let bestScore = activityScore(best, C, R)
@@ -285,14 +303,45 @@ export function GameOfLife() {
   useEffect(() => {
     const canvas = canvasRef.current!
 
-    // Initial setup: size canvas and seed
+    // Initial setup: size the canvas, then pick the first board in idle time,
+    // one candidate per callback, so hydration and input are never blocked
+    // for the whole search. The board starts ticking once it is drawn.
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     cols.current = Math.ceil(canvas.width / CELL)
     rows.current = Math.ceil(canvas.height / CELL)
-    seed()
 
-    timer.current = setInterval(tick, TICK)
+    const deadline = performance.now() + SEED_BUDGET_MS
+    let best: Uint8Array | null = null
+    let bestScore = -1
+    let seededFor = ''
+    let cancelIdle = () => {}
+    const searchStep = () => {
+      const C = cols.current
+      const R = rows.current
+      // A resize during the search changes the grid size; start over.
+      if (seededFor !== `${C}x${R}`) {
+        seededFor = `${C}x${R}`
+        best = null
+        bestScore = -1
+      }
+      const candidate = buildCandidate(C, R)
+      const score = activityScore(candidate, C, R)
+      if (score > bestScore) {
+        best = candidate
+        bestScore = score
+      }
+      if (bestScore < seedThreshold(C, R) && performance.now() < deadline) {
+        cancelIdle = whenIdle(searchStep)
+        return
+      }
+      grid.current = best!
+      hueVec.current = new Float32Array(2 * C * R)
+      render()
+      setShown(true)
+      timer.current = setInterval(tick, TICK)
+    }
+    cancelIdle = whenIdle(searchStep)
 
     // On resize: preserve existing grid, copy cells into new dimensions
     let resizeTimer: ReturnType<typeof setTimeout>
@@ -341,6 +390,7 @@ export function GameOfLife() {
     window.addEventListener('mouseup', up)
 
     return () => {
+      cancelIdle()
       clearTimeout(resizeTimer)
       window.removeEventListener('resize', resize)
       clearInterval(timer.current)
@@ -348,13 +398,20 @@ export function GameOfLife() {
       window.removeEventListener('mousemove', move)
       window.removeEventListener('mouseup', up)
     }
-  }, [tick, paint, render, seed])
+  }, [tick, paint, render, buildCandidate])
 
   return (
     <>
       <canvas
         ref={canvasRef}
-        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          opacity: shown ? 1 : 0,
+          transition: 'opacity 0.6s ease-out',
+        }}
       />
       <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
         <a
