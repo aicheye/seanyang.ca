@@ -4,12 +4,11 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 import type { EntryPage } from '@/data/entry'
 import mediaSizes from '@/data/mediaSizes.json'
 import { withBase } from '@/lib/basePath'
 import { cachedMedia, loadMedia } from '@/lib/media'
+import { LoadingSkeleton } from './LoadingSkeleton'
 
 export interface EntryLinkProps {
   /** Text shown in the list and as the dialog heading. */
@@ -322,12 +321,9 @@ export function EntryLink({
                 {icon && (
                   <span className="modal-icon">
                     {!iconLoaded && (
-                      <Skeleton
+                      <LoadingSkeleton
                         height="100%"
                         borderRadius={0}
-                        duration={1.4}
-                        baseColor="var(--badge-bg)"
-                        highlightColor="var(--bg)"
                         containerClassName="modal-icon-skel"
                       />
                     )}
@@ -397,12 +393,9 @@ export function EntryLink({
                         {failed ? (
                           'demo unavailable'
                         ) : (
-                          <Skeleton
+                          <LoadingSkeleton
                             height="100%"
-                            baseColor="var(--badge-bg)"
-                            highlightColor="var(--bg)"
                             borderRadius={0}
-                            duration={1.4}
                             containerClassName="modal-skeleton"
                           />
                         )}

@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 import { withBase } from '@/lib/basePath'
+import { LoadingSkeleton } from './LoadingSkeleton'
 
 interface Track {
   isPlaying: boolean
@@ -19,27 +18,22 @@ const PENDING_COLOR = '#fff'
 
 type Face = 'front' | 'back'
 
-// Placeholder bars while the first track loads; same sweep as the demo dialog.
-const skel = {
-  height: '0.65em',
-  borderRadius: 2,
-  duration: 1.4,
-  baseColor: 'var(--border)',
-  highlightColor: 'var(--badge-bg)',
-  containerClassName: 'np-skel',
-}
+// Placeholder bars while the first track loads.
+const skel = { height: '0.65em', borderRadius: 2, containerClassName: 'np-skel' }
 
 // Fills a cover face until its art has loaded.
 const coverSkel = (
-  <Skeleton
-    height="100%"
-    borderRadius={4}
-    duration={1.4}
-    baseColor="var(--badge-bg)"
-    highlightColor="var(--bg)"
-    containerClassName="np-cover-skel"
-  />
+  <LoadingSkeleton height="100%" borderRadius={4} containerClassName="np-cover-skel" />
 )
+
+// The record image behind the cover (.np-vinyl).
+const RECORD = withBase('/assets/vinyl/record.png')
+
+// Grain textures drawn over each cover by .np-cover::before/::after.
+const COVER_TEX = [
+  withBase('/assets/vinyl/cover-tex.jpg'),
+  withBase('/assets/vinyl/cover-tex2.jpg'),
+]
 
 // The static mirrors have no server, so they call prod's API routes
 // cross-origin (set by scripts/build-static.sh). Empty on prod itself.
@@ -148,7 +142,7 @@ export function NowPlaying() {
   const [frontOnTop, setFrontOnTop] = useState(true)
   const [frontArt, setFrontArt] = useState<string | null>(null)
   const [backArt, setBackArt] = useState<string | null>(null)
-  // Art URLs the browser has finished downloading; data URLs are always ready.
+  // Image URLs (art, frozen frames, grain textures) the browser has decoded.
   const [loadedArt, setLoadedArt] = useState<ReadonlySet<string>>(() => new Set())
   // Face whose frozen frame is still being fetched; it shows the skeleton until then.
   const [loadingFace, setLoadingFace] = useState<Face | null>(null)
@@ -194,6 +188,13 @@ export function NowPlaying() {
     // Static frame for display (keeps the blend-mode texture working on animated
     // covers); resolves to the raw URL if freezing fails.
     const framePromise = albumArt ? freezeFrame(albumArt).then((f) => f ?? albumArt) : null
+    // Applies the extracted colour unless the art has changed again since. It is
+    // not tied to a flip's cancellation: a cancelled flip must not leave the label
+    // on PENDING_COLOR, which would keep the record tucked in.
+    const applyColor = (p: Promise<string>) =>
+      p.then((c) => {
+        if (prevArtRef.current === albumArt) setLabelColor(c)
+      })
 
     const wasPlaying = wasPlayingRef.current
     wasPlayingRef.current = isPlaying
@@ -205,6 +206,7 @@ export function NowPlaying() {
       const timers: ReturnType<typeof setTimeout>[] = []
       const wait = (ms: number) => new Promise<void>((r) => timers.push(setTimeout(r, ms)))
       const incoming: Face = frontVisible ? 'back' : 'front'
+      let colorStarted = false
 
       ;(async () => {
         setRecordOut(false) // 1. record slides in behind the cover
@@ -214,10 +216,9 @@ export function NowPlaying() {
         // 2. flip now; the incoming face shows the skeleton and the label stays white
         //    until the frame and colour resolve (either may already have).
         if (colorPromise) {
+          colorStarted = true
           setLabelColor(PENDING_COLOR)
-          colorPromise.then((c) => {
-            if (!cancelled) setLabelColor(c)
-          })
+          applyColor(colorPromise)
         }
         setFaceArt(incoming, null)
         if (framePromise) {
@@ -246,6 +247,8 @@ export function NowPlaying() {
         setFlipHide(false)
         setLoadingFace(null)
         timers.forEach(clearTimeout)
+        // Cancelled before the flip: still give the new art its colour.
+        if (colorPromise && !colorStarted) applyColor(colorPromise)
       }
     }
 
@@ -259,7 +262,7 @@ export function NowPlaying() {
       setFrontOnTop(frontVisible)
       if (colorPromise) {
         setLabelColor(PENDING_COLOR)
-        colorPromise.then(setLabelColor)
+        applyColor(colorPromise)
       }
     }
 
@@ -298,14 +301,29 @@ export function NowPlaying() {
   // No raw-URL fallback while the front face is loading, so the skeleton shows.
   const frontFill = loadingFace === 'front' ? null : (frontArt ?? albumArt)
   useEffect(() => {
-    for (const url of [frontFill, backArt]) {
-      if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
+    for (const url of [frontFill, backArt, RECORD, ...COVER_TEX]) {
+      if (!url || loadedArt.has(url)) continue
       const img = new Image()
-      img.onload = img.onerror = () => setLoadedArt((prev) => new Set(prev).add(url))
       img.src = url
+      // decode() resolves once the image is decoded, not only downloaded, so a
+      // face is not revealed while one of its layers is still decoding.
+      const done = () => setLoadedArt((prev) => new Set(prev).add(url))
+      img.decode().then(done, done)
     }
   }, [frontFill, backArt, loadedArt])
-  const artReady = (url: string | null) => !url || url.startsWith('data:') || loadedArt.has(url)
+  const artReady = (url: string | null) => !url || loadedArt.has(url)
+  // The art and grain overlays paint under the skeleton from the start; the
+  // skeleton is removed once both textures and the face's art have loaded, so
+  // all three appear in the same frame.
+  const faceReady = (face: Face, url: string | null) =>
+    loadingFace !== face && artReady(url) && COVER_TEX.every((t) => loadedArt.has(t))
+  const frontReady = faceReady('front', frontFill)
+  const backReady = faceReady('back', backArt)
+  // The record only slides out once it is fully ready (record.png decoded and
+  // the label's colour extracted) and the cover in front of it shows its art;
+  // on a slow network it waits tucked in.
+  const vinylReady = loadedArt.has(RECORD) && labelColor !== PENDING_COLOR
+  const vinylOut = recordOut && vinylReady && (frontOnTop ? frontReady : backReady)
 
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
@@ -320,11 +338,11 @@ export function NowPlaying() {
         <div className="np-info">
           <span className="np-title">
             <span className="np-title-text">
-              <Skeleton width={110} {...skel} />
+              <LoadingSkeleton width={110} {...skel} />
             </span>
           </span>
           <span className="np-artist">
-            <Skeleton width={72} {...skel} />
+            <LoadingSkeleton width={72} {...skel} />
           </span>
         </div>
       </div>
@@ -355,23 +373,23 @@ export function NowPlaying() {
         className="np-album"
         style={
           {
-            '--vinyl-record': `url(${withBase('/assets/vinyl/record.png')})`,
-            '--vinyl-tex1': `url(${withBase('/assets/vinyl/cover-tex.jpg')})`,
-            '--vinyl-tex2': `url(${withBase('/assets/vinyl/cover-tex2.jpg')})`,
+            '--vinyl-record': `url(${RECORD})`,
+            '--vinyl-tex1': `url(${COVER_TEX[0]})`,
+            '--vinyl-tex2': `url(${COVER_TEX[1]})`,
           } as React.CSSProperties
         }
       >
         <div
-          className={`np-vinyl${recordOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
+          className={`np-vinyl${vinylOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
         >
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
           <div className="np-cover np-cover-front" style={frontStyle}>
-            {(loadingFace === 'front' || !artReady(frontFill)) && coverSkel}
+            {!frontReady && coverSkel}
           </div>
           <div className="np-cover np-cover-back" style={backStyle}>
-            {(loadingFace === 'back' || !artReady(backArt)) && coverSkel}
+            {!backReady && coverSkel}
           </div>
         </div>
       </div>

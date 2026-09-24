@@ -69,12 +69,19 @@ done
 sed -i "s|\"src\": \"/|\"src\": \"${BASE_PATH}/|g" out/site.webmanifest
 
 # UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
-# serves the PDFs, and serve the exported 404 page.
+# serves the PDFs, and serve the exported 404 page. Images get the same
+# Cache-Control as prod (IMAGE_CACHE_CONTROL in src/lib/cache.ts); the
+# IfModule keeps the file valid if mod_headers is off.
 cat > out/.htaccess <<EOF
 Options -Indexes
 ErrorDocument 404 ${BASE_PATH}/404.html
 RedirectMatch 302 ^${BASE_PATH}/resume(\.pdf)?/?$ https://seanyang.ca/resume
 RedirectMatch 302 ^${BASE_PATH}/transcript(\.pdf)?/?$ https://seanyang.ca/transcript
+<IfModule mod_headers.c>
+  <FilesMatch "\.(png|jpe?g|gif|webp|svg|ico|mp4|webm)\$">
+    Header set Cache-Control "public, max-age=86400, stale-while-revalidate=604800"
+  </FilesMatch>
+</IfModule>
 EOF
 
 echo
