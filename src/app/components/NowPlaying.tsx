@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { withBase } from '@/lib/basePath'
 import { LoadingSkeleton } from './LoadingSkeleton'
 
@@ -10,6 +10,11 @@ interface Track {
   artist: string
   albumArt: string | null
   url: string | null
+  progressMs: number | null
+  durationMs: number | null
+  asOf: number | null
+  // performance.now() when this response arrived.
+  receivedAt: number
 }
 
 const FALLBACK_COLOR = '#8a5c42'
@@ -17,6 +22,77 @@ const FALLBACK_COLOR = '#8a5c42'
 const PENDING_COLOR = '#fff'
 
 type Face = 'front' | 'back'
+
+// A response can be up to ~3s old (the route's cache) plus network time. The
+// client's clock is only trusted for this much, so a skewed clock can shift
+// the bar by at most this amount.
+const MAX_RESPONSE_AGE_MS = 5_000
+
+// Reserves the progress bar's space in the loading card.
+const PLACEHOLDER_TRACK: Track = {
+  isPlaying: false,
+  title: '',
+  artist: '',
+  albumArt: null,
+  url: null,
+  progressMs: null,
+  durationMs: null,
+  asOf: null,
+  receivedAt: 0,
+}
+
+// m:ss, as Spotify shows it.
+function formatTime(ms: number): string {
+  const total = Math.floor(ms / 1000)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+// Read-only progress bar (fill, elapsed and total time) above the track title.
+// Between polls it advances locally from the last reported position. Each
+// frame it writes --np-progress and the elapsed text directly, so React
+// doesn't re-render at 60fps; useLayoutEffect draws before the first paint so
+// a new poll never shows a stale position for a frame.
+function ProgressBar({ track }: { track: Track }) {
+  const bar = useRef<HTMLSpanElement>(null)
+  const elapsed = useRef<HTMLSpanElement>(null)
+  const { progressMs, durationMs, asOf, receivedAt, isPlaying } = track
+  useLayoutEffect(() => {
+    if (progressMs === null || !durationMs || asOf === null) return
+    const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
+    let raf = 0
+    let shown = ''
+    const draw = () => {
+      const pos = Math.min(
+        progressMs + (isPlaying ? age + performance.now() - receivedAt : 0),
+        durationMs,
+      )
+      bar.current?.style.setProperty('--np-progress', String(pos / durationMs))
+      const text = formatTime(pos)
+      if (text !== shown && elapsed.current) elapsed.current.textContent = shown = text
+      if (isPlaying) raf = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => cancelAnimationFrame(raf)
+  }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
+
+  // Shown only while playing. When playback pauses or stops, the bar slides up
+  // toward the art, fades and collapses its row (CSS transition), keeping the
+  // last drawn position while it goes.
+  const shown = isPlaying && progressMs !== null
+  return (
+    <span className={`np-progress${shown ? '' : ' np-progress-hidden'}`} aria-hidden="true">
+      <span className="np-progress-inner">
+        <span ref={bar} className="np-progress-bar">
+          <span className="np-progress-fill" />
+        </span>
+        <span className="np-progress-times">
+          <span ref={elapsed} />
+          <span>{durationMs ? formatTime(durationMs) : ''}</span>
+        </span>
+      </span>
+    </span>
+  )
+}
 
 // Placeholder bars while the first track loads.
 const skel = { height: '0.65em', borderRadius: 2, containerClassName: 'np-skel' }
@@ -155,7 +231,7 @@ export function NowPlaying() {
     const load = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/spotify/now-playing`)
-        if (res.ok) setTrack(await res.json())
+        if (res.ok) setTrack({ ...(await res.json()), receivedAt: performance.now() })
       } catch {
         /* ignore transient fetch errors; the next poll retries */
       } finally {
@@ -336,6 +412,7 @@ export function NowPlaying() {
           <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
+          <ProgressBar track={PLACEHOLDER_TRACK} />
           <span className="np-title">
             <span className="np-title-text">
               <LoadingSkeleton width={110} {...skel} />
@@ -361,7 +438,7 @@ export function NowPlaying() {
 
   return (
     <a
-      className={`now-playing${isPlaying ? ' np-playing' : ''}`}
+      className={`now-playing${vinylOut ? ' np-record-out' : ''}`}
       href={
         track.url ??
         `${API_BASE}/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`
@@ -394,6 +471,7 @@ export function NowPlaying() {
         </div>
       </div>
       <div className="np-info">
+        <ProgressBar track={track} />
         <span className="np-title">
           {isPlaying && (
             <span className="np-eq" aria-label="Now playing">

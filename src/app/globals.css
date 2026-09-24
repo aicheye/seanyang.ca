@@ -805,6 +805,9 @@ footer a:hover {
 /* Now Playing */
 
 .now-playing {
+  /* Album art size; the progress bar matches it */
+  --np-album: 100px;
+
   position: fixed;
   top: 20px;
   left: 24px;
@@ -835,8 +838,8 @@ footer a:hover {
 
 .np-album {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: var(--np-album);
+  height: var(--np-album);
   flex-shrink: 0;
   perspective: 600px;
 }
@@ -1043,6 +1046,66 @@ footer a:hover {
   text-overflow: ellipsis;
 }
 
+/* Playback position of the current track (see ProgressBar in NowPlaying).
+   --np-progress (0–1) is set from JS each frame. */
+/* As wide as the album art. The one-row grid lets the row collapse smoothly
+   (1fr → 0fr) when playback pauses, while the contents slide up and fade. */
+.np-progress {
+  display: grid;
+  grid-template-rows: 1fr;
+  width: var(--np-album);
+  margin-bottom: 4px;
+  transition:
+    grid-template-rows 0.5s ease,
+    margin-bottom 0.5s ease;
+}
+
+.np-progress-inner {
+  min-height: 0;
+  overflow: hidden;
+  transition:
+    transform 0.5s ease,
+    opacity 0.4s ease;
+}
+
+.np-progress-hidden {
+  grid-template-rows: 0fr;
+  margin-bottom: 0;
+}
+
+.np-progress-hidden .np-progress-inner {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.np-progress-bar {
+  position: relative;
+  display: block;
+  height: 4px;
+  margin: 3px 0;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.np-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--np-progress, 0) * 100%);
+  border-radius: 2px;
+  background: var(--secondary);
+}
+
+.np-progress-times {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Loading skeleton — reserves the card's footprint while the track loads, so
    the header doesn't jump on mobile where the card sits in the page flow. The
    bare .np-cover already reads as an empty sleeve (badge bg + grain), so only
@@ -1228,6 +1291,8 @@ footer a:hover {
   }
 
   .now-playing {
+    --np-album: 84px;
+
     position: static;
     flex-direction: row;
     align-items: center;
@@ -1236,15 +1301,32 @@ footer a:hover {
     box-shadow: none;
     padding: 0;
     margin-top: 10px;
+    /* Follows the record (see .np-record-out), with the same 1s ease-out as
+       .np-vinyl's left, so the text moves with it. */
+    transition: gap 1s ease-out;
   }
 
-  .now-playing.np-playing {
+  /* Beside the art on mobile, so the bar sits under the title and artist and
+     uses the text column's full width (.np-info's 160px max); max-width lets
+     it shrink on narrow screens. */
+  .np-progress {
+    order: 1;
+    width: 160px;
+    max-width: 100%;
+    margin-top: 4px;
+    margin-bottom: 0;
+    transition:
+      grid-template-rows 0.5s ease,
+      margin-top 0.5s ease;
+  }
+
+  .np-progress-hidden {
+    margin-top: 0;
+  }
+
+  /* Room for the record beside the art while it is out */
+  .now-playing.np-record-out {
     gap: 50px;
-  }
-
-  .np-album {
-    width: 84px;
-    height: 84px;
   }
 
   .np-info {
