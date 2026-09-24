@@ -9,7 +9,7 @@ export function Footer() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        0.05 g CO₂ / view
+        0.06 g CO₂ / view
       </a>
       <Link href="/mirrors">mirrors</Link>
       <div className="webring-wrapper">
