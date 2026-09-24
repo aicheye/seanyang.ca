@@ -1057,7 +1057,7 @@ footer a:hover {
 .np-progress {
   display: block;
   width: var(--np-album);
-  margin-bottom: 4px;
+  margin-top: 4px;
 }
 
 .np-progress-hidden {
@@ -1069,7 +1069,6 @@ footer a:hover {
   display: block;
   height: 4px;
   margin: 3px 0;
-  border-radius: 2px;
   background: var(--border);
 }
 
@@ -1077,19 +1076,82 @@ footer a:hover {
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--np-progress, 0) * 100%);
-  border-radius: 2px;
   background: var(--secondary);
 }
 
-.np-progress-times {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-family: var(--font-mono), monospace;
+/* Current lyric line (see Lyric in NowPlaying), up to three rows of text.
+   The width is set because the lines are absolutely positioned and so don't
+   size .np-info. The card's text column (12px padding each side, 24px from
+   the window's left edge) keeps 16px from the site column's heading at
+   (100vw - 699px) / 2 + 32px, which gives width ≤ 50vw - 382px: 180px on
+   wide windows, shrinking toward the 1000px mobile breakpoint. */
+.now-playing {
+  --np-lyric-width: clamp(120px, calc(50vw - 382px), 180px);
+}
+
+@media (min-width: 1001px) {
+  .np-info:has(> .np-lyric) {
+    max-width: var(--np-lyric-width);
+  }
+}
+
+.np-lyric {
+  --np-lyric-height: calc(3 * 1.4em);
+
+  position: relative;
+  display: block;
+  width: var(--np-lyric-width);
+  height: var(--np-lyric-height);
+  /* Set apart from the title and artist, and dimmed, so it reads as its own
+     block rather than a third line of song info */
+  margin-top: 10px;
+  opacity: 0.7;
+  overflow: hidden;
   font-size: 12px;
+  font-style: italic;
   line-height: 1.4;
   color: var(--text);
-  font-variant-numeric: tabular-nums;
+}
+
+.np-lyric-line {
+  position: absolute;
+  inset: 0 0 auto;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.np-lyric-in {
+  animation: np-lyric-in 0.35s ease-out both;
+}
+
+.np-lyric-out {
+  animation: np-lyric-out 0.35s ease-in both;
+}
+
+@keyframes np-lyric-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--np-lyric-height));
+  }
+}
+
+@keyframes np-lyric-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--np-lyric-height)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .np-lyric-in {
+    animation: none;
+  }
+
+  .np-lyric-out {
+    display: none;
+  }
 }
 
 /* Loading skeleton — reserves the card's footprint while the track loads, so
@@ -1292,15 +1354,16 @@ footer a:hover {
     transition: gap 1s ease-out;
   }
 
-  /* Beside the art on mobile, so the bar sits under the title and artist and
-     uses the text column's full width (.np-info's 160px max); max-width lets
-     it shrink on narrow screens. */
+  /* Beside the art on mobile, so the bar uses the text column's full width
+     (.np-info's 160px max); max-width lets it shrink on narrow screens. */
   .np-progress {
-    order: 1;
     width: 160px;
     max-width: 100%;
-    margin-top: 4px;
-    margin-bottom: 0;
+  }
+
+  /* Desktop only */
+  .np-lyric {
+    display: none;
   }
 
   /* Room for the record beside the art while it is out */

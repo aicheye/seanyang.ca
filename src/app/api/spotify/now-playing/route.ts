@@ -2,7 +2,8 @@ import { corsHeaders } from '@/lib/cors'
 
 // Every open tab polls this route every 3s. The response is cached for 3s both
 // in this instance's memory and on Vercel's CDN (s-maxage), so Spotify sees at
-// most one request per 3s per instance no matter how many visitors there are.
+// most one request per 3s per instance no matter how many visitors there are,
+// plus one when a song ends (see endedSinceFetch).
 const CACHE_MS = 3_000
 
 interface NowPlaying {
@@ -128,9 +129,21 @@ async function fetchNowPlaying(): Promise<NowPlaying> {
   )
 }
 
+// True when the cached response was fetched before its playing track should
+// have ended and that time has passed. The client fetches again just after a
+// song ends, so this makes that request reach Spotify. It only applies to a
+// response fetched before the end, so if Spotify still reports the old track,
+// the result is cached as usual.
+function endedSinceFetch({ data, at }: { data: NowPlaying; at: number }, now: number): boolean {
+  if (!data.isPlaying || data.progressMs === null || data.durationMs === null || data.asOf === null)
+    return false
+  const endsAt = data.asOf + data.durationMs - data.progressMs
+  return at < endsAt && now >= endsAt
+}
+
 async function getNowPlaying(): Promise<NowPlaying | null> {
   const now = Date.now()
-  if (cached && now - cached.at < CACHE_MS) return cached.data
+  if (cached && now - cached.at < CACHE_MS && !endedSinceFetch(cached, now)) return cached.data
   if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
