@@ -438,7 +438,7 @@ export function NowPlaying() {
 
   return (
     <a
-      className={`now-playing${isPlaying ? ' np-playing' : ''}`}
+      className={`now-playing${vinylOut ? ' np-record-out' : ''}`}
       href={
         track.url ??
         `${API_BASE}/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`
