@@ -1306,6 +1306,13 @@ footer a:hover {
     transition: gap 1s ease-out;
   }
 
+  /* Beside the art on mobile, so the bar can use the text column's full
+     width (.np-info's 160px max); max-width lets it shrink on narrow screens. */
+  .np-progress {
+    width: 160px;
+    max-width: 100%;
+  }
+
   /* Room for the record beside the art while it is out */
   .now-playing.np-record-out {
     gap: 50px;
