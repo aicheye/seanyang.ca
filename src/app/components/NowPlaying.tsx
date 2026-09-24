@@ -28,6 +28,10 @@ type Face = 'front' | 'back'
 // the bar by at most this amount.
 const MAX_RESPONSE_AGE_MS = 5_000
 
+// Time after a song's predicted end before fetching the next one, which gives
+// Spotify time to report the new track.
+const SONG_END_DELAY_MS = 1_000
+
 // Reserves the progress bar's space in the loading card.
 const PLACEHOLDER_TRACK: Track = {
   isPlaying: false,
@@ -41,51 +45,118 @@ const PLACEHOLDER_TRACK: Track = {
   receivedAt: 0,
 }
 
-// m:ss, as Spotify shows it.
-function formatTime(ms: number): string {
-  const total = Math.floor(ms / 1000)
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+type Playback = Pick<Track, 'progressMs' | 'durationMs' | 'asOf' | 'receivedAt' | 'isPlaying'>
+
+// Returns a function giving the current playback position in ms, or null when
+// the track has no position. Between polls the position advances locally
+// from the last reported one.
+function playbackClock({ progressMs, durationMs, asOf, receivedAt, isPlaying }: Playback) {
+  if (progressMs === null || !durationMs || asOf === null) return null
+  const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
+  return () =>
+    Math.min(progressMs + (isPlaying ? age + performance.now() - receivedAt : 0), durationMs)
 }
 
-// Read-only progress bar (fill, elapsed and total time) above the track title.
-// Between polls it advances locally from the last reported position. Each
-// frame it writes --np-progress and the elapsed text directly, so React
+// Read-only progress bar under the artist. Each frame it writes
+// --np-progress directly, so React
 // doesn't re-render at 60fps; useLayoutEffect draws before the first paint so
 // a new poll never shows a stale position for a frame.
 function ProgressBar({ track, shown }: { track: Track; shown: boolean }) {
   const bar = useRef<HTMLSpanElement>(null)
-  const elapsed = useRef<HTMLSpanElement>(null)
   const { progressMs, durationMs, asOf, receivedAt, isPlaying } = track
   useLayoutEffect(() => {
-    if (progressMs === null || !durationMs || asOf === null) return
-    const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
+    const clock = playbackClock({ progressMs, durationMs, asOf, receivedAt, isPlaying })
+    if (!clock || !durationMs) return
     let raf = 0
-    let shownText = ''
     const draw = () => {
-      const pos = Math.min(
-        progressMs + (isPlaying ? age + performance.now() - receivedAt : 0),
-        durationMs,
-      )
+      const pos = clock()
       bar.current?.style.setProperty('--np-progress', String(pos / durationMs))
-      const text = formatTime(pos)
-      if (text !== shownText && elapsed.current) elapsed.current.textContent = shownText = text
       if (isPlaying) raf = requestAnimationFrame(draw)
     }
     draw()
     return () => cancelAnimationFrame(raf)
   }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
 
-  // Shown whenever the track has a position, like the title and artist, with
-  // no transition.
+  // Shown while the track is playing and has a position, with no transition.
+  // Hidden while paused, along with the lyric.
   return (
     <span className={`np-progress${shown ? '' : ' np-progress-hidden'}`} aria-hidden="true">
       <span ref={bar} className="np-progress-bar">
         <span className="np-progress-fill" />
       </span>
-      <span className="np-progress-times">
-        <span ref={elapsed} />
-        <span>{durationMs ? formatTime(durationMs) : ''}</span>
-      </span>
+    </span>
+  )
+}
+
+interface LyricLine {
+  timeMs: number
+  text: string
+}
+
+// False until the page has shown its first lyric line. That line appears
+// without the slide-in; later lines, including the first of each new song,
+// slide in.
+let lyricShown = false
+
+// The lyric line at the current playback position, under the artist (desktop
+// only; hidden by CSS on mobile). When the line changes, the new one slides
+// up from below while the previous one slides out the top. Rendered with
+// key={trackKey}, and only while playing, so its state starts fresh for each
+// song and after a pause. Nothing shows until the lyrics load, or at all
+// when LRCLIB has no synced lyrics for the song.
+function Lyric({ track }: { track: Track }) {
+  const [lines, setLines] = useState<LyricLine[] | null>(null)
+  const [line, setLine] = useState({ index: -1, prev: -1, animate: false })
+  const { title, artist, progressMs, durationMs, asOf, receivedAt, isPlaying } = track
+
+  useEffect(() => {
+    if (!durationMs) return
+    const ctrl = new AbortController()
+    const params = new URLSearchParams({ title, artist, durationMs: String(durationMs) })
+    fetch(`${API_BASE}/api/spotify/lyrics?${params}`, { signal: ctrl.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => setLines(json?.lines ?? null))
+      .catch(() => {
+        /* aborted, or no lyrics; the card shows without them */
+      })
+    return () => ctrl.abort()
+  }, [title, artist, durationMs])
+
+  // Checks the position each frame and re-renders only when the line changes.
+  useLayoutEffect(() => {
+    const clock = playbackClock({ progressMs, durationMs, asOf, receivedAt, isPlaying })
+    if (!lines?.length || !clock) return
+    let raf = 0
+    const tick = () => {
+      const pos = clock()
+      let i = -1
+      while (i + 1 < lines.length && lines[i + 1].timeMs <= pos) i++
+      const animate = lyricShown
+      setLine((cur) => (cur.index === i ? cur : { index: i, prev: cur.index, animate }))
+      if (i >= 0) lyricShown = true
+      if (isPlaying) raf = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(raf)
+  }, [lines, progressMs, durationMs, asOf, receivedAt, isPlaying])
+
+  if (!lines?.length) return null
+  // Empty rows in the LRC mark instrumental breaks.
+  const text = (i: number) => lines[i].text || '♪'
+  // Keyed by line index, so the outgoing line keeps its element and only its
+  // class (and animation) changes.
+  return (
+    <span className="np-lyric" aria-hidden="true">
+      {line.prev >= 0 && line.prev !== line.index && (
+        <span key={line.prev} className="np-lyric-line np-lyric-out">
+          {text(line.prev)}
+        </span>
+      )}
+      {line.index >= 0 && (
+        <span key={line.index} className={`np-lyric-line${line.animate ? ' np-lyric-in' : ''}`}>
+          {text(line.index)}
+        </span>
+      )}
     </span>
   )
 }
@@ -222,11 +293,14 @@ export function NowPlaying() {
   const prevKeyRef = useRef<string | null>(null)
   const wasPlayingRef = useRef(false)
   const angleRef = useRef(0)
+  const loadRef = useRef<(bust?: boolean) => void>(() => {})
 
   useEffect(() => {
-    const load = async () => {
+    // bust adds a unique query string, so the CDN's cached response is skipped.
+    const load = async (bust = false) => {
       try {
-        const res = await fetch(`${API_BASE}/api/spotify/now-playing`)
+        const query = bust ? `?t=${Date.now()}` : ''
+        const res = await fetch(`${API_BASE}/api/spotify/now-playing${query}`)
         if (res.ok) setTrack({ ...(await res.json()), receivedAt: performance.now() })
       } catch {
         /* ignore transient fetch errors; the next poll retries */
@@ -234,10 +308,26 @@ export function NowPlaying() {
         setAwaitingFirst(false)
       }
     }
+    loadRef.current = load
     load()
     const poll = setInterval(load, 3_000)
     return () => clearInterval(poll)
   }, [])
+
+  // Fetches again SONG_END_DELAY_MS after the song should end, so the next
+  // song shows then instead of on the next 3s poll. The server also skips its
+  // own cache for this request (see the now-playing route). Reset on every
+  // poll, which also corrects for seeking. Not scheduled once the reported
+  // position is at the end, so a server that still reports the finished song
+  // doesn't cause a CDN-skipping fetch after every poll.
+  useEffect(() => {
+    const clock = track?.isPlaying ? playbackClock(track) : null
+    if (!clock || !track?.durationMs) return
+    const remaining = track.durationMs - clock()
+    if (remaining <= 0) return
+    const timer = setTimeout(() => loadRef.current(true), remaining + SONG_END_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [track])
 
   // On a track change while playing: record in → flip → record out. The flip
   // does not wait for the new art or colour; they fill in when they arrive.
@@ -408,7 +498,6 @@ export function NowPlaying() {
           <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
-          <ProgressBar track={PLACEHOLDER_TRACK} shown={false} />
           <span className="np-title">
             <span className="np-title-text">
               <LoadingSkeleton width={110} {...skel} />
@@ -417,6 +506,7 @@ export function NowPlaying() {
           <span className="np-artist">
             <LoadingSkeleton width={72} {...skel} />
           </span>
+          <ProgressBar track={PLACEHOLDER_TRACK} shown={false} />
         </div>
       </div>
     )
@@ -467,7 +557,6 @@ export function NowPlaying() {
         </div>
       </div>
       <div className="np-info">
-        <ProgressBar track={track} shown={track.progressMs !== null} />
         <span className="np-title">
           {isPlaying && (
             <span className="np-eq" aria-label="Now playing">
@@ -479,6 +568,8 @@ export function NowPlaying() {
           <span className="np-title-text">{title}</span>
         </span>
         <span className="np-artist">{artist}</span>
+        <ProgressBar track={track} shown={isPlaying && track.progressMs !== null} />
+        {isPlaying && <Lyric key={trackKey} track={track} />}
       </div>
     </a>
   )
