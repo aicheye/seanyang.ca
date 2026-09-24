@@ -381,10 +381,13 @@ h2 span {
 .np-cover-skel {
   position: absolute;
   inset: 0;
-  /* Above the cover's grain overlays (::before 10, ::after 20), so the art and
-     grain can paint underneath until the skeleton is removed. */
-  z-index: 30;
   line-height: 0;
+}
+
+/* Above the cover's grain overlays (::before 10, ::after 20), so the art and
+   grain can paint underneath until the skeleton is removed. */
+.np-cover-skel {
+  z-index: 30;
 }
 
 .modal-heading {

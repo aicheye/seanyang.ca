@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 import { withBase } from '@/lib/basePath'
+import { LoadingSkeleton } from './LoadingSkeleton'
 
 interface Track {
   isPlaying: boolean
@@ -19,26 +18,12 @@ const PENDING_COLOR = '#fff'
 
 type Face = 'front' | 'back'
 
-// Placeholder bars while the first track loads; same sweep as the demo dialog.
-const skel = {
-  height: '0.65em',
-  borderRadius: 2,
-  duration: 1.4,
-  baseColor: 'var(--border)',
-  highlightColor: 'var(--badge-bg)',
-  containerClassName: 'np-skel',
-}
+// Placeholder bars while the first track loads.
+const skel = { height: '0.65em', borderRadius: 2, containerClassName: 'np-skel' }
 
 // Fills a cover face until its art has loaded.
 const coverSkel = (
-  <Skeleton
-    height="100%"
-    borderRadius={4}
-    duration={1.4}
-    baseColor="var(--badge-bg)"
-    highlightColor="var(--bg)"
-    containerClassName="np-cover-skel"
-  />
+  <LoadingSkeleton height="100%" borderRadius={4} containerClassName="np-cover-skel" />
 )
 
 // Grain textures drawn over each cover by .np-cover::before/::after.
@@ -336,11 +321,11 @@ export function NowPlaying() {
         <div className="np-info">
           <span className="np-title">
             <span className="np-title-text">
-              <Skeleton width={110} {...skel} />
+              <LoadingSkeleton width={110} {...skel} />
             </span>
           </span>
           <span className="np-artist">
-            <Skeleton width={72} {...skel} />
+            <LoadingSkeleton width={72} {...skel} />
           </span>
         </div>
       </div>
