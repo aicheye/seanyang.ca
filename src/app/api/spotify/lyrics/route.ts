@@ -75,7 +75,8 @@ export async function GET(req: Request) {
   if (!lines) {
     try {
       lines = await fetchLyrics(title, artist, durationS)
-    } catch {
+    } catch (err) {
+      console.error('lyrics: LRCLIB request failed', err)
       return Response.json({ error: 'lrclib error' }, { status: 502, headers })
     }
     // Map keeps insertion order, so the first key is the oldest entry.

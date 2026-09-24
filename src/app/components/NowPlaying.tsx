@@ -93,6 +93,10 @@ interface LyricLine {
   text: string
 }
 
+// A failed lyrics request is retried this many times, this far apart.
+const LYRICS_RETRIES = 3
+const LYRICS_RETRY_MS = 5_000
+
 // False until the page has shown its first lyric line. That line appears
 // without the slide-in; later lines, including the first of each new song,
 // slide in.
@@ -112,14 +116,27 @@ function Lyric({ track }: { track: Track }) {
   useEffect(() => {
     if (!durationMs) return
     const ctrl = new AbortController()
+    let retry: ReturnType<typeof setTimeout> | undefined
     const params = new URLSearchParams({ title, artist, durationMs: String(durationMs) })
-    fetch(`${API_BASE}/api/spotify/lyrics?${params}`, { signal: ctrl.signal })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => setLines(json?.lines ?? null))
-      .catch(() => {
-        /* aborted, or no lyrics; the card shows without them */
-      })
-    return () => ctrl.abort()
+    const load = (attempt: number) =>
+      fetch(`${API_BASE}/api/spotify/lyrics?${params}`, { signal: ctrl.signal })
+        .then((res) => {
+          if (res.status >= 500) throw new Error(`lyrics ${res.status}`)
+          return res.ok ? res.json() : null
+        })
+        .then((json) => setLines(json?.lines ?? null))
+        .catch(() => {
+          // A network error or a 5xx (the route returns 502 when LRCLIB
+          // fails) is retried; an abort is not. The card shows without
+          // lyrics until a retry succeeds.
+          if (ctrl.signal.aborted || attempt >= LYRICS_RETRIES) return
+          retry = setTimeout(() => load(attempt + 1), LYRICS_RETRY_MS)
+        })
+    load(0)
+    return () => {
+      ctrl.abort()
+      clearTimeout(retry)
+    }
   }, [title, artist, durationMs])
 
   // Checks the position each frame and re-renders only when the line changes.

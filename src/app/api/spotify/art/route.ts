@@ -21,7 +21,8 @@ export async function GET(req: Request) {
         ...corsHeaders(req),
       },
     })
-  } catch {
+  } catch (err) {
+    console.error('art: album art request failed', err)
     return new Response('', { status: 502 })
   }
 }
