@@ -963,8 +963,6 @@ footer a:hover {
 .np-info {
   display: flex;
   flex-direction: column;
-  /* Full card width on desktop, so the progress bar spans at least the art */
-  align-self: stretch;
   gap: 2px;
   min-width: 0;
   max-width: 160px;
@@ -1047,10 +1045,10 @@ footer a:hover {
 
 /* Playback position of the current track (see ProgressBar in NowPlaying).
    --np-progress (0–1) is set from JS each frame. */
+/* As wide as the title/artist block, like the text it sits over */
 .np-progress {
   display: block;
   width: 100%;
-  min-width: 120px;
   margin-bottom: 4px;
 }
 
@@ -1074,8 +1072,9 @@ footer a:hover {
 .np-progress-times {
   display: flex;
   justify-content: space-between;
+  gap: 8px;
   font-family: var(--font-mono), monospace;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -1286,7 +1285,6 @@ footer a:hover {
   }
 
   .np-info {
-    align-self: center;
     background: none;
     box-shadow: none;
     padding: 0;
