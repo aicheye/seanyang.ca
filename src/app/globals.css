@@ -1296,7 +1296,7 @@ footer a:hover {
   }
 
   .now-playing {
-    --np-album: 84px;
+    --np-album: 92px;
 
     position: static;
     flex-direction: row;
