@@ -1,6 +1,6 @@
 import { corsHeaders } from '@/lib/cors'
 
-// Proxy Last.fm album art so canvas can read pixels without CORS issues
+// Proxy Spotify album art so canvas can read pixels without CORS issues
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const imgUrl = searchParams.get('url')
@@ -8,7 +8,7 @@ export async function GET(req: Request) {
 
   try {
     const parsed = new URL(imgUrl)
-    if (!parsed.hostname.endsWith('fastly.net') && !parsed.hostname.endsWith('last.fm')) {
+    if (!parsed.hostname.endsWith('.scdn.co') && !parsed.hostname.endsWith('.spotifycdn.com')) {
       return new Response('', { status: 403 })
     }
     const res = await fetch(imgUrl)

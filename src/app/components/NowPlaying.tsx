@@ -10,9 +10,14 @@ interface Track {
   title: string
   artist: string
   albumArt: string | null
+  url: string | null
 }
 
 const FALLBACK_COLOR = '#8a5c42'
+// Label colour while the new cover's colour is still being extracted.
+const PENDING_COLOR = '#fff'
+
+type Face = 'front' | 'back'
 
 // Placeholder bars while the first track loads; same sweep as the demo dialog.
 const skel = {
@@ -75,7 +80,7 @@ async function freezeFrame(artUrl: string): Promise<string | null> {
       el.crossOrigin = 'anonymous' // canvas reads pixels; required cross-origin
       el.onload = () => resolve(el)
       el.onerror = reject
-      el.src = `${API_BASE}/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
+      el.src = `${API_BASE}/api/spotify/art?url=${encodeURIComponent(artUrl)}`
     })
     const max = 320
     const scale = Math.min(1, max / Math.max(img.naturalWidth || max, img.naturalHeight || max))
@@ -104,7 +109,7 @@ async function extractDominantColor(artUrl: string): Promise<string> {
       el.crossOrigin = 'anonymous' // canvas reads pixels; required cross-origin
       el.onload = () => resolve(el)
       el.onerror = reject
-      el.src = `${API_BASE}/api/lastfm/art?url=${encodeURIComponent(artUrl)}`
+      el.src = `${API_BASE}/api/spotify/art?url=${encodeURIComponent(artUrl)}`
     })
     const N = 16
     const canvas = document.createElement('canvas')
@@ -145,6 +150,8 @@ export function NowPlaying() {
   const [backArt, setBackArt] = useState<string | null>(null)
   // Art URLs the browser has finished downloading; data URLs are always ready.
   const [loadedArt, setLoadedArt] = useState<ReadonlySet<string>>(() => new Set())
+  // Face whose frozen frame is still being fetched; it shows the skeleton until then.
+  const [loadingFace, setLoadingFace] = useState<Face | null>(null)
   const prevArtRef = useRef<string | null>(null)
   const prevKeyRef = useRef<string | null>(null)
   const wasPlayingRef = useRef(false)
@@ -153,7 +160,7 @@ export function NowPlaying() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/lastfm`)
+        const res = await fetch(`${API_BASE}/api/spotify/now-playing`)
         if (res.ok) setTrack(await res.json())
       } catch {
         /* ignore transient fetch errors; the next poll retries */
@@ -166,7 +173,8 @@ export function NowPlaying() {
     return () => clearInterval(poll)
   }, [])
 
-  // On a track change while playing: record in → (disk colour + flip, together) → record out.
+  // On a track change while playing: record in → flip → record out. The flip
+  // does not wait for the new art or colour; they fill in when they arrive.
   const trackKey = `${track?.title ?? ''}__${track?.artist ?? ''}`
   const isPlaying = track?.isPlaying ?? false
   const albumArt = track?.albumArt ?? null
@@ -175,8 +183,9 @@ export function NowPlaying() {
 
     // Which face currently shows: front when the angle is an even multiple of 180°, else back.
     const frontVisible = Math.round(angleRef.current / 180) % 2 === 0
-    const setVisibleArt = (art: string | null) =>
-      frontVisible ? setFrontArt(art) : setBackArt(art)
+    const setFaceArt = (face: Face, art: string | null) =>
+      face === 'front' ? setFrontArt(art) : setBackArt(art)
+    const setVisibleArt = (art: string | null) => setFaceArt(frontVisible ? 'front' : 'back', art)
 
     // Kick off colour extraction as soon as the art changes (runs in parallel with everything).
     const artChanged = albumArt !== prevArtRef.current
@@ -189,24 +198,36 @@ export function NowPlaying() {
     const wasPlaying = wasPlayingRef.current
     wasPlayingRef.current = isPlaying
 
-    // Record in → (disk colour + flip, together) → optionally back out.
+    // Record in → flip → optionally back out.
     // slideOutAtEnd=false leaves the record tucked in (used when playback stops).
     const runFlip = (slideOutAtEnd: boolean) => {
       let cancelled = false
       const timers: ReturnType<typeof setTimeout>[] = []
       const wait = (ms: number) => new Promise<void>((r) => timers.push(setTimeout(r, ms)))
+      const incoming: Face = frontVisible ? 'back' : 'front'
 
       ;(async () => {
         setRecordOut(false) // 1. record slides in behind the cover
-        const [, frame] = await Promise.all([wait(1000), framePromise]) // slide-in AND the frozen frame
+        await wait(1000)
         if (cancelled) return
 
-        // 2. disk colour + flip, in parallel
-        const color = colorPromise ? await colorPromise.catch(() => null) : null
-        if (cancelled) return
-        if (color) setLabelColor(color) //    change the disk colour…
-        if (frontVisible) setBackArt(frame ?? albumArt) // …and put the new art on the hidden face
-        else setFrontArt(frame ?? albumArt)
+        // 2. flip now; the incoming face shows the skeleton and the label stays white
+        //    until the frame and colour resolve (either may already have).
+        if (colorPromise) {
+          setLabelColor(PENDING_COLOR)
+          colorPromise.then((c) => {
+            if (!cancelled) setLabelColor(c)
+          })
+        }
+        setFaceArt(incoming, null)
+        if (framePromise) {
+          setLoadingFace(incoming)
+          framePromise.then((f) => {
+            if (cancelled) return
+            setFaceArt(incoming, f)
+            setLoadingFace(null)
+          })
+        }
         setFlipHide(true) //    hide the record through the whole flip
         angleRef.current += 180
         setCoverAngle(angleRef.current) //    …and start the flip
@@ -223,18 +244,23 @@ export function NowPlaying() {
       return () => {
         cancelled = true
         setFlipHide(false)
+        setLoadingFace(null)
         timers.forEach(clearTimeout)
       }
     }
 
     const settle = (out: boolean) => {
       setRecordOut(out)
+      setLoadingFace(null)
       setVisibleArt(albumArt) // paint something immediately…
       framePromise?.then((f) => {
         if (f) setVisibleArt(f)
       }) // …then upgrade to the static frame
       setFrontOnTop(frontVisible)
-      colorPromise?.then(setLabelColor).catch(() => {})
+      if (colorPromise) {
+        setLabelColor(PENDING_COLOR)
+        colorPromise.then(setLabelColor)
+      }
     }
 
     if (!isPlaying) {
@@ -258,7 +284,8 @@ export function NowPlaying() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackKey, isPlaying, albumArt])
 
-  const frontFill = frontArt ?? albumArt
+  // No raw-URL fallback while the front face is loading, so the skeleton shows.
+  const frontFill = loadingFace === 'front' ? null : (frontArt ?? albumArt)
   useEffect(() => {
     for (const url of [frontFill, backArt]) {
       if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
@@ -306,7 +333,10 @@ export function NowPlaying() {
   return (
     <a
       className={`now-playing${isPlaying ? ' np-playing' : ''}`}
-      href={`${API_BASE}/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`}
+      href={
+        track.url ??
+        `${API_BASE}/api/spotify?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`
+      }
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -327,10 +357,10 @@ export function NowPlaying() {
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
           <div className="np-cover np-cover-front" style={frontStyle}>
-            {!artReady(frontFill) && coverSkel}
+            {(loadingFace === 'front' || !artReady(frontFill)) && coverSkel}
           </div>
           <div className="np-cover np-cover-back" style={backStyle}>
-            {!artReady(backArt) && coverSkel}
+            {(loadingFace === 'back' || !artReady(backArt)) && coverSkel}
           </div>
         </div>
       </div>

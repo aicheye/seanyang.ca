@@ -1,5 +1,10 @@
 let cachedToken: { token: string; expiresAt: number } | null = null
 
+// Search results for a title/artist pair don't change, so found URLs are kept
+// for the instance's lifetime. Misses are not cached so a failed search retries.
+const LINK_CACHE_MAX = 500
+const linkCache = new Map<string, string>()
+
 async function getSpotifyToken(): Promise<string | null> {
   const clientId = process.env.SPOTIFY_CLIENT_ID
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
@@ -22,6 +27,10 @@ async function getSpotifyToken(): Promise<string | null> {
 }
 
 async function findSpotifyTrackUrl(title: string, artist: string): Promise<string | null> {
+  const key = `${title}\n${artist}`.toLowerCase()
+  const hit = linkCache.get(key)
+  if (hit) return hit
+
   try {
     const token = await getSpotifyToken()
     if (!token) return null
@@ -36,7 +45,12 @@ async function findSpotifyTrackUrl(title: string, artist: string): Promise<strin
     if (!res.ok) return null
 
     const json = await res.json()
-    return json.tracks?.items?.[0]?.external_urls?.spotify ?? null
+    const url: string | undefined = json.tracks?.items?.[0]?.external_urls?.spotify
+    if (!url) return null
+    // Map keeps insertion order, so the first key is the oldest entry.
+    if (linkCache.size >= LINK_CACHE_MAX) linkCache.delete(linkCache.keys().next().value!)
+    linkCache.set(key, url)
+    return url
   } catch {
     return null
   }
@@ -51,6 +65,14 @@ export async function GET(request: Request) {
     ? `https://open.spotify.com/search/${encodeURIComponent(`${title} ${artist}`)}`
     : 'https://open.spotify.com/user/apexblu'
 
-  const url = title ? ((await findSpotifyTrackUrl(title, artist)) ?? fallback) : fallback
-  return Response.redirect(url, 302)
+  const found = title ? await findSpotifyTrackUrl(title, artist) : null
+  // Found links are cached on the CDN for a day; the search fallback is not,
+  // so a failed lookup is retried on the next click.
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: found ?? fallback,
+      'Cache-Control': found ? 'public, max-age=0, s-maxage=86400' : 'no-store',
+    },
+  })
 }

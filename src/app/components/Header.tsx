@@ -6,7 +6,7 @@ import { SSHCopyButton } from './SSHCopyButton'
 import { TermProgress } from './TermProgress'
 
 // The static mirrors have no server: /resume proxies through a route handler
-// on prod, so the mirrors link to prod's /resume. The Last.fm/Spotify widget
+// on prod, so the mirrors link to prod's /resume. The Spotify widget
 // calls prod's API routes cross-origin (see NowPlaying's API_BASE).
 const staticExport = process.env.STATIC_EXPORT === '1'
 const resumeHref = staticExport ? `${SITE_URL}/resume` : '/resume'
