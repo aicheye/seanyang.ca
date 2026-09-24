@@ -75,20 +75,16 @@ function ProgressBar({ track, shown }: { track: Track; shown: boolean }) {
     return () => cancelAnimationFrame(raf)
   }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
 
-  // Shown while the record is out (the caller passes that), so the bar comes
-  // in with the record and goes when it tucks in: on pause, on a track change
-  // and before the first load is ready. It slides up toward the art, fades and
-  // collapses its row, keeping the last drawn position while it goes.
+  // Shown whenever the track has a position, like the title and artist, with
+  // no transition.
   return (
     <span className={`np-progress${shown ? '' : ' np-progress-hidden'}`} aria-hidden="true">
-      <span className="np-progress-inner">
-        <span ref={bar} className="np-progress-bar">
-          <span className="np-progress-fill" />
-        </span>
-        <span className="np-progress-times">
-          <span ref={elapsed} />
-          <span>{durationMs ? formatTime(durationMs) : ''}</span>
-        </span>
+      <span ref={bar} className="np-progress-bar">
+        <span className="np-progress-fill" />
+      </span>
+      <span className="np-progress-times">
+        <span ref={elapsed} />
+        <span>{durationMs ? formatTime(durationMs) : ''}</span>
       </span>
     </span>
   )
@@ -471,7 +467,7 @@ export function NowPlaying() {
         </div>
       </div>
       <div className="np-info">
-        <ProgressBar track={track} shown={vinylOut && track.progressMs !== null} />
+        <ProgressBar track={track} shown={track.progressMs !== null} />
         <span className="np-title">
           {isPlaying && (
             <span className="np-eq" aria-label="Now playing">
