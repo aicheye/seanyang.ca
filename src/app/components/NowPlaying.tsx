@@ -10,6 +10,11 @@ interface Track {
   artist: string
   albumArt: string | null
   url: string | null
+  progressMs: number | null
+  durationMs: number | null
+  asOf: number | null
+  // performance.now() when this response arrived.
+  receivedAt: number
 }
 
 const FALLBACK_COLOR = '#8a5c42'
@@ -17,6 +22,43 @@ const FALLBACK_COLOR = '#8a5c42'
 const PENDING_COLOR = '#fff'
 
 type Face = 'front' | 'back'
+
+// A response can be up to ~3s old (the route's cache) plus network time. The
+// client's clock is only trusted for this much, so a skewed clock can shift
+// the bar by at most this amount.
+const MAX_RESPONSE_AGE_MS = 5_000
+
+// Thin bar under the artist showing the current track's position. Between polls
+// it advances locally from the last reported position; it writes the fill's
+// transform directly each frame so React doesn't re-render at 60fps.
+function ProgressBar({ track }: { track: Track }) {
+  const fill = useRef<HTMLSpanElement>(null)
+  const { progressMs, durationMs, asOf, receivedAt, isPlaying } = track
+  useEffect(() => {
+    if (progressMs === null || !durationMs || asOf === null) return
+    const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
+    let raf = 0
+    const draw = () => {
+      const pos = progressMs + (isPlaying ? age + performance.now() - receivedAt : 0)
+      if (fill.current) fill.current.style.transform = `scaleX(${Math.min(pos / durationMs, 1)})`
+      if (isPlaying) raf = requestAnimationFrame(draw)
+    }
+    draw()
+    return () => cancelAnimationFrame(raf)
+  }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
+
+  // Always rendered so the card keeps its height; hidden for the last played
+  // track, which has no position.
+  return (
+    <span
+      className="np-progress"
+      aria-hidden="true"
+      style={progressMs === null ? { visibility: 'hidden' } : undefined}
+    >
+      <span ref={fill} className="np-progress-fill" />
+    </span>
+  )
+}
 
 // Placeholder bars while the first track loads.
 const skel = { height: '0.65em', borderRadius: 2, containerClassName: 'np-skel' }
@@ -155,7 +197,7 @@ export function NowPlaying() {
     const load = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/spotify/now-playing`)
-        if (res.ok) setTrack(await res.json())
+        if (res.ok) setTrack({ ...(await res.json()), receivedAt: performance.now() })
       } catch {
         /* ignore transient fetch errors; the next poll retries */
       } finally {
@@ -344,6 +386,7 @@ export function NowPlaying() {
           <span className="np-artist">
             <LoadingSkeleton width={72} {...skel} />
           </span>
+          <span className="np-progress" style={{ visibility: 'hidden' }} />
         </div>
       </div>
     )
@@ -405,6 +448,7 @@ export function NowPlaying() {
           <span className="np-title-text">{title}</span>
         </span>
         <span className="np-artist">{artist}</span>
+        <ProgressBar track={track} />
       </div>
     </a>
   )

@@ -12,10 +12,16 @@ interface NowPlaying {
   timestamp: number | null
   albumArt: string | null
   url: string | null
+  // Playback position of the current track, measured at asOf (epoch ms).
+  // null for the last played track.
+  progressMs: number | null
+  durationMs: number | null
+  asOf: number | null
 }
 
 interface SpotifyTrack {
   name: string
+  duration_ms: number
   artists: { name: string }[]
   album: { images: { url: string }[] }
   external_urls: { spotify?: string }
@@ -28,6 +34,9 @@ const EMPTY: NowPlaying = {
   timestamp: null,
   albumArt: null,
   url: null,
+  progressMs: null,
+  durationMs: null,
+  asOf: null,
 }
 
 let accessToken: { token: string; expiresAt: number } | null = null
@@ -76,7 +85,12 @@ async function spotifyGet(path: string): Promise<Response> {
   return res
 }
 
-function toNowPlaying(track: SpotifyTrack, isPlaying: boolean, timestamp: number | null) {
+function toNowPlaying(
+  track: SpotifyTrack,
+  isPlaying: boolean,
+  timestamp: number | null,
+  progressMs: number | null,
+): NowPlaying {
   return {
     isPlaying,
     title: track.name,
@@ -84,6 +98,9 @@ function toNowPlaying(track: SpotifyTrack, isPlaying: boolean, timestamp: number
     timestamp,
     albumArt: track.album.images[0]?.url ?? null,
     url: track.external_urls.spotify ?? null,
+    progressMs,
+    durationMs: progressMs === null ? null : track.duration_ms,
+    asOf: progressMs === null ? null : Date.now(),
   }
 }
 
@@ -94,7 +111,7 @@ async function fetchNowPlaying(): Promise<NowPlaying> {
   if (current.status === 200) {
     const json = await current.json()
     if (json.currently_playing_type === 'track' && json.item)
-      return toNowPlaying(json.item, json.is_playing === true, null)
+      return toNowPlaying(json.item, json.is_playing === true, null, json.progress_ms ?? null)
   } else if (current.status !== 204) {
     throw new Error(`spotify currently-playing ${current.status}`)
   }
@@ -103,7 +120,12 @@ async function fetchNowPlaying(): Promise<NowPlaying> {
   if (!recent.ok) throw new Error(`spotify recently-played ${recent.status}`)
   const item = (await recent.json()).items?.[0]
   if (!item) return EMPTY
-  return toNowPlaying(item.track, false, Math.floor(Date.parse(item.played_at) / 1000) || null)
+  return toNowPlaying(
+    item.track,
+    false,
+    Math.floor(Date.parse(item.played_at) / 1000) || null,
+    null,
+  )
 }
 
 async function getNowPlaying(): Promise<NowPlaying | null> {
