@@ -1053,34 +1053,15 @@ footer a:hover {
 
 /* Playback position of the current track (see ProgressBar in NowPlaying).
    --np-progress (0–1) is set from JS each frame. */
-/* As wide as the album art. The one-row grid lets the row collapse smoothly
-   (1fr → 0fr) when playback pauses, while the contents slide up and fade. */
+/* As wide as the album art */
 .np-progress {
-  display: grid;
-  grid-template-rows: 1fr;
+  display: block;
   width: var(--np-album);
   margin-bottom: 4px;
-  transition:
-    grid-template-rows 1s ease-out,
-    margin-bottom 1s ease-out;
-}
-
-.np-progress-inner {
-  min-height: 0;
-  overflow: hidden;
-  transition:
-    transform 1s ease-out,
-    opacity 0.8s ease-out;
 }
 
 .np-progress-hidden {
-  grid-template-rows: 0fr;
-  margin-bottom: 0;
-}
-
-.np-progress-hidden .np-progress-inner {
-  opacity: 0;
-  transform: translateY(-100%);
+  display: none;
 }
 
 .np-progress-bar {
@@ -1320,13 +1301,6 @@ footer a:hover {
     max-width: 100%;
     margin-top: 4px;
     margin-bottom: 0;
-    transition:
-      grid-template-rows 1s ease-out,
-      margin-top 1s ease-out;
-  }
-
-  .np-progress-hidden {
-    margin-top: 0;
   }
 
   /* Room for the record beside the art while it is out */
