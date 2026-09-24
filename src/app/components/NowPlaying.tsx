@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { withBase } from '@/lib/basePath'
 import { LoadingSkeleton } from './LoadingSkeleton'
 
@@ -28,19 +28,47 @@ type Face = 'front' | 'back'
 // the bar by at most this amount.
 const MAX_RESPONSE_AGE_MS = 5_000
 
-// Thin bar under the artist showing the current track's position. Between polls
-// it advances locally from the last reported position; it writes the fill's
-// transform directly each frame so React doesn't re-render at 60fps.
+// Reserves the progress bar's space in the loading card.
+const PLACEHOLDER_TRACK: Track = {
+  isPlaying: false,
+  title: '',
+  artist: '',
+  albumArt: null,
+  url: null,
+  progressMs: null,
+  durationMs: null,
+  asOf: null,
+  receivedAt: 0,
+}
+
+// m:ss, as Spotify shows it.
+function formatTime(ms: number): string {
+  const total = Math.floor(ms / 1000)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+// Read-only progress bar (fill, elapsed and total time) above the track title.
+// Between polls it advances locally from the last reported position. Each
+// frame it writes --np-progress and the elapsed text directly, so React
+// doesn't re-render at 60fps; useLayoutEffect draws before the first paint so
+// a new poll never shows a stale position for a frame.
 function ProgressBar({ track }: { track: Track }) {
-  const fill = useRef<HTMLSpanElement>(null)
+  const bar = useRef<HTMLSpanElement>(null)
+  const elapsed = useRef<HTMLSpanElement>(null)
   const { progressMs, durationMs, asOf, receivedAt, isPlaying } = track
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (progressMs === null || !durationMs || asOf === null) return
     const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
     let raf = 0
+    let shown = ''
     const draw = () => {
-      const pos = progressMs + (isPlaying ? age + performance.now() - receivedAt : 0)
-      if (fill.current) fill.current.style.transform = `scaleX(${Math.min(pos / durationMs, 1)})`
+      const pos = Math.min(
+        progressMs + (isPlaying ? age + performance.now() - receivedAt : 0),
+        durationMs,
+      )
+      bar.current?.style.setProperty('--np-progress', String(pos / durationMs))
+      const text = formatTime(pos)
+      if (text !== shown && elapsed.current) elapsed.current.textContent = shown = text
       if (isPlaying) raf = requestAnimationFrame(draw)
     }
     draw()
@@ -55,7 +83,13 @@ function ProgressBar({ track }: { track: Track }) {
       aria-hidden="true"
       style={progressMs === null ? { visibility: 'hidden' } : undefined}
     >
-      <span ref={fill} className="np-progress-fill" />
+      <span ref={bar} className="np-progress-bar">
+        <span className="np-progress-fill" />
+      </span>
+      <span className="np-progress-times">
+        <span ref={elapsed} />
+        <span>{durationMs ? formatTime(durationMs) : ''}</span>
+      </span>
     </span>
   )
 }
@@ -378,6 +412,7 @@ export function NowPlaying() {
           <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
+          <ProgressBar track={PLACEHOLDER_TRACK} />
           <span className="np-title">
             <span className="np-title-text">
               <LoadingSkeleton width={110} {...skel} />
@@ -386,7 +421,6 @@ export function NowPlaying() {
           <span className="np-artist">
             <LoadingSkeleton width={72} {...skel} />
           </span>
-          <span className="np-progress" style={{ visibility: 'hidden' }} />
         </div>
       </div>
     )
@@ -437,6 +471,7 @@ export function NowPlaying() {
         </div>
       </div>
       <div className="np-info">
+        <ProgressBar track={track} />
         <span className="np-title">
           {isPlaying && (
             <span className="np-eq" aria-label="Now playing">
@@ -448,7 +483,6 @@ export function NowPlaying() {
           <span className="np-title-text">{title}</span>
         </span>
         <span className="np-artist">{artist}</span>
-        <ProgressBar track={track} />
       </div>
     </a>
   )
