@@ -273,10 +273,21 @@ export function NowPlaying() {
 
     const prev = prevKeyRef.current
     prevKeyRef.current = trackKey
-    // First appearance or same song: show immediately with the record out — no flip.
-    if (prev === null || prev === trackKey) {
+    // Same song (e.g. resumed): the record slides out from where it is — no flip.
+    if (prev === trackKey) {
       settle(true)
       return
+    }
+
+    // First appearance: the record element was just mounted, so setting it out
+    // in the same frame skips the transition. Mount it in, then slide it out
+    // after the browser has painted that position (two frames).
+    if (prev === null) {
+      settle(false)
+      let raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(() => setRecordOut(true))
+      })
+      return () => cancelAnimationFrame(raf)
     }
 
     // Song changed while playing: in → flip → out.
