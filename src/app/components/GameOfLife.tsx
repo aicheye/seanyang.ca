@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 const CELL = 14
 const TICK = 80
@@ -158,12 +158,6 @@ export function GameOfLife() {
   const paintHue = useRef(Math.random() * 360)
   const lastPainted = useRef(-1)
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
-
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  )
 
   const [density, setDensity] = useState(5) // 1–10: sparse → dense
   const sparsityRef = useRef(6) // derived: 11 - density
@@ -362,43 +356,41 @@ export function GameOfLife() {
         ref={canvasRef}
         style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
       />
-      {mounted && (
-        <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
-          <a
-            href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="gol-link"
-          >
-            Conway&apos;s Game of Life ↗
-          </a>
-          <label className="gol-slider-row">
-            <span>density</span>
-            <input
-              type="range"
-              min={1}
-              max={10}
-              step={1}
-              value={density}
-              onChange={(e) => {
-                const v = Number(e.target.value)
-                setDensity(v)
-                densityRef.current = v
-                sparsityRef.current = 11 - v
-                seed()
-              }}
-            />
-          </label>
-          <div className="gol-btn-row">
-            <button className="gol-btn" onClick={clear}>
-              clear
-            </button>
-            <button className="gol-btn" onClick={seed}>
-              regenerate
-            </button>
-          </div>
+      <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
+        <a
+          href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="gol-link"
+        >
+          Conway&apos;s Game of Life ↗
+        </a>
+        <label className="gol-slider-row">
+          <span>density</span>
+          <input
+            type="range"
+            min={1}
+            max={10}
+            step={1}
+            value={density}
+            onChange={(e) => {
+              const v = Number(e.target.value)
+              setDensity(v)
+              densityRef.current = v
+              sparsityRef.current = 11 - v
+              seed()
+            }}
+          />
+        </label>
+        <div className="gol-btn-row">
+          <button className="gol-btn" onClick={clear}>
+            clear
+          </button>
+          <button className="gol-btn" onClick={seed}>
+            regenerate
+          </button>
         </div>
-      )}
+      </div>
     </>
   )
 }
