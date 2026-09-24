@@ -1,3 +1,4 @@
+import { IMAGE_CACHE_CONTROL } from '@/lib/cache'
 import { corsHeaders } from '@/lib/cors'
 
 // Proxy Spotify album art so canvas can read pixels without CORS issues
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
     return new Response(data, {
       headers: {
         'Content-Type': res.headers.get('Content-Type') ?? 'image/jpeg',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': IMAGE_CACHE_CONTROL,
         ...corsHeaders(req),
       },
     })

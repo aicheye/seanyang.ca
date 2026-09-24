@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { IMAGE_CACHE_CONTROL, IMAGE_EXTENSIONS } from './src/lib/cache'
 
 // Set by scripts/build-static.sh for the UW static mirrors:
 // plain HTML export, no image optimizer, served under /~watiam. Redirects
@@ -20,6 +21,12 @@ const nextConfig: NextConfig = {
     ...(staticExport && { unoptimized: true }),
   },
   ...(!staticExport && {
+    headers: async () => [
+      {
+        source: `/:all*(${IMAGE_EXTENSIONS.join('|')})`,
+        headers: [{ key: 'Cache-Control', value: IMAGE_CACHE_CONTROL }],
+      },
+    ],
     redirects: async () => [
       {
         source: '/resume.pdf',
