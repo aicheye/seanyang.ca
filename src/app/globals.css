@@ -805,8 +805,13 @@ footer a:hover {
 /* Now Playing */
 
 .now-playing {
-  /* Album art size; the progress bar matches it */
-  --np-album: 112px;
+  /* Album art size; the progress bar matches it. The card is fixed at the
+     top left, and with the record out its right edge is about
+     36px + 1.45 × size; the site column's heading starts at
+     (100vw - 699px) / 2 + 32px. Keeping 16px between them gives
+     size ≤ (100vw - 739px) / 2.9, so the art is 128px on wide windows and
+     shrinks toward the 1000px mobile breakpoint. */
+  --np-album: clamp(96px, calc((100vw - 739px) / 2.9), 128px);
 
   position: fixed;
   top: 20px;
