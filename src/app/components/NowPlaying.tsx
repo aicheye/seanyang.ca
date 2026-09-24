@@ -188,6 +188,13 @@ export function NowPlaying() {
     // Static frame for display (keeps the blend-mode texture working on animated
     // covers); resolves to the raw URL if freezing fails.
     const framePromise = albumArt ? freezeFrame(albumArt).then((f) => f ?? albumArt) : null
+    // Applies the extracted colour unless the art has changed again since. It is
+    // not tied to a flip's cancellation: a cancelled flip must not leave the label
+    // on PENDING_COLOR, which would keep the record tucked in.
+    const applyColor = (p: Promise<string>) =>
+      p.then((c) => {
+        if (prevArtRef.current === albumArt) setLabelColor(c)
+      })
 
     const wasPlaying = wasPlayingRef.current
     wasPlayingRef.current = isPlaying
@@ -199,6 +206,7 @@ export function NowPlaying() {
       const timers: ReturnType<typeof setTimeout>[] = []
       const wait = (ms: number) => new Promise<void>((r) => timers.push(setTimeout(r, ms)))
       const incoming: Face = frontVisible ? 'back' : 'front'
+      let colorStarted = false
 
       ;(async () => {
         setRecordOut(false) // 1. record slides in behind the cover
@@ -208,10 +216,9 @@ export function NowPlaying() {
         // 2. flip now; the incoming face shows the skeleton and the label stays white
         //    until the frame and colour resolve (either may already have).
         if (colorPromise) {
+          colorStarted = true
           setLabelColor(PENDING_COLOR)
-          colorPromise.then((c) => {
-            if (!cancelled) setLabelColor(c)
-          })
+          applyColor(colorPromise)
         }
         setFaceArt(incoming, null)
         if (framePromise) {
@@ -240,6 +247,8 @@ export function NowPlaying() {
         setFlipHide(false)
         setLoadingFace(null)
         timers.forEach(clearTimeout)
+        // Cancelled before the flip: still give the new art its colour.
+        if (colorPromise && !colorStarted) applyColor(colorPromise)
       }
     }
 
@@ -253,7 +262,7 @@ export function NowPlaying() {
       setFrontOnTop(frontVisible)
       if (colorPromise) {
         setLabelColor(PENDING_COLOR)
-        colorPromise.then(setLabelColor)
+        applyColor(colorPromise)
       }
     }
 
@@ -310,9 +319,11 @@ export function NowPlaying() {
     loadingFace !== face && artReady(url) && COVER_TEX.every((t) => loadedArt.has(t))
   const frontReady = faceReady('front', frontFill)
   const backReady = faceReady('back', backArt)
-  // The record only slides out once it has decoded and the cover in front of
-  // it is showing its art; on a slow network it waits tucked in.
-  const vinylOut = recordOut && loadedArt.has(RECORD) && (frontOnTop ? frontReady : backReady)
+  // The record only slides out once it is fully ready (record.png decoded and
+  // the label's colour extracted) and the cover in front of it shows its art;
+  // on a slow network it waits tucked in.
+  const vinylReady = loadedArt.has(RECORD) && labelColor !== PENDING_COLOR
+  const vinylOut = recordOut && vinylReady && (frontOnTop ? frontReady : backReady)
 
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
