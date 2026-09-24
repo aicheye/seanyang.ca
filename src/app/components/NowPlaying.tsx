@@ -154,7 +154,7 @@ export function NowPlaying() {
   const [frontOnTop, setFrontOnTop] = useState(true)
   const [frontArt, setFrontArt] = useState<string | null>(null)
   const [backArt, setBackArt] = useState<string | null>(null)
-  // Art URLs the browser has finished downloading; data URLs are always ready.
+  // Image URLs (art, frozen frames, grain textures) the browser has decoded.
   const [loadedArt, setLoadedArt] = useState<ReadonlySet<string>>(() => new Set())
   // Face whose frozen frame is still being fetched; it shows the skeleton until then.
   const [loadingFace, setLoadingFace] = useState<Face | null>(null)
@@ -305,15 +305,19 @@ export function NowPlaying() {
   const frontFill = loadingFace === 'front' ? null : (frontArt ?? albumArt)
   useEffect(() => {
     for (const url of [frontFill, backArt, ...COVER_TEX]) {
-      if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
+      if (!url || loadedArt.has(url)) continue
       const img = new Image()
-      img.onload = img.onerror = () => setLoadedArt((prev) => new Set(prev).add(url))
       img.src = url
+      // decode() resolves once the image is decoded, not only downloaded, so a
+      // face is not revealed while one of its layers is still decoding.
+      const done = () => setLoadedArt((prev) => new Set(prev).add(url))
+      img.decode().then(done, done)
     }
   }, [frontFill, backArt, loadedArt])
-  const artReady = (url: string | null) => !url || url.startsWith('data:') || loadedArt.has(url)
-  // A face shows its art and the grain overlays together, once both textures
-  // and its art have loaded; until then it shows only the skeleton.
+  const artReady = (url: string | null) => !url || loadedArt.has(url)
+  // The art and grain overlays paint under the skeleton from the start; the
+  // skeleton is removed once both textures and the face's art have loaded, so
+  // all three appear in the same frame.
   const faceReady = (face: Face, url: string | null) =>
     loadingFace !== face && artReady(url) && COVER_TEX.every((t) => loadedArt.has(t))
   const frontReady = faceReady('front', frontFill)
@@ -345,11 +349,11 @@ export function NowPlaying() {
 
   const { title, artist } = track
   const frontStyle = {
-    backgroundImage: frontReady && frontFill ? `url(${frontFill})` : undefined,
+    backgroundImage: frontFill ? `url(${frontFill})` : undefined,
     zIndex: frontOnTop ? 2 : 1,
   }
   const backStyle = {
-    backgroundImage: backReady && backArt ? `url(${backArt})` : undefined,
+    backgroundImage: backArt ? `url(${backArt})` : undefined,
     zIndex: frontOnTop ? 1 : 2,
   }
 
@@ -379,16 +383,10 @@ export function NowPlaying() {
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
-          <div
-            className={`np-cover np-cover-front${frontReady ? '' : ' np-cover-pending'}`}
-            style={frontStyle}
-          >
+          <div className="np-cover np-cover-front" style={frontStyle}>
             {!frontReady && coverSkel}
           </div>
-          <div
-            className={`np-cover np-cover-back${backReady ? '' : ' np-cover-pending'}`}
-            style={backStyle}
-          >
+          <div className="np-cover np-cover-back" style={backStyle}>
             {!backReady && coverSkel}
           </div>
         </div>

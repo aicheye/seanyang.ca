@@ -381,6 +381,9 @@ h2 span {
 .np-cover-skel {
   position: absolute;
   inset: 0;
+  /* Above the cover's grain overlays (::before 10, ::after 20), so the art and
+     grain can paint underneath until the skeleton is removed. */
+  z-index: 30;
   line-height: 0;
 }
 
@@ -942,12 +945,6 @@ footer a:hover {
   mix-blend-mode: screen;
   opacity: 0.08;
   content: '';
-}
-
-/* No grain over the skeleton; it appears with the art (see NowPlaying faceReady) */
-.np-cover-pending::before,
-.np-cover-pending::after {
-  content: none;
 }
 
 @keyframes np-spin {
