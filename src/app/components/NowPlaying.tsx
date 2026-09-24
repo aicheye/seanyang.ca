@@ -26,6 +26,9 @@ const coverSkel = (
   <LoadingSkeleton height="100%" borderRadius={4} containerClassName="np-cover-skel" />
 )
 
+// The record image behind the cover (.np-vinyl).
+const RECORD = withBase('/assets/vinyl/record.png')
+
 // Grain textures drawn over each cover by .np-cover::before/::after.
 const COVER_TEX = [
   withBase('/assets/vinyl/cover-tex.jpg'),
@@ -289,7 +292,7 @@ export function NowPlaying() {
   // No raw-URL fallback while the front face is loading, so the skeleton shows.
   const frontFill = loadingFace === 'front' ? null : (frontArt ?? albumArt)
   useEffect(() => {
-    for (const url of [frontFill, backArt, ...COVER_TEX]) {
+    for (const url of [frontFill, backArt, RECORD, ...COVER_TEX]) {
       if (!url || loadedArt.has(url)) continue
       const img = new Image()
       img.src = url
@@ -307,6 +310,9 @@ export function NowPlaying() {
     loadingFace !== face && artReady(url) && COVER_TEX.every((t) => loadedArt.has(t))
   const frontReady = faceReady('front', frontFill)
   const backReady = faceReady('back', backArt)
+  // The record only slides out once it has decoded and the cover in front of
+  // it is showing its art; on a slow network it waits tucked in.
+  const vinylOut = recordOut && loadedArt.has(RECORD) && (frontOnTop ? frontReady : backReady)
 
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
@@ -356,14 +362,14 @@ export function NowPlaying() {
         className="np-album"
         style={
           {
-            '--vinyl-record': `url(${withBase('/assets/vinyl/record.png')})`,
+            '--vinyl-record': `url(${RECORD})`,
             '--vinyl-tex1': `url(${COVER_TEX[0]})`,
             '--vinyl-tex2': `url(${COVER_TEX[1]})`,
           } as React.CSSProperties
         }
       >
         <div
-          className={`np-vinyl${recordOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
+          className={`np-vinyl${vinylOut ? ' np-vinyl-out' : ''}${flipHide ? ' np-vinyl-hidden' : ''}`}
         >
           <div className="np-print" style={{ background: labelColor }} />
         </div>
