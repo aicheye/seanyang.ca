@@ -944,6 +944,12 @@ footer a:hover {
   content: '';
 }
 
+/* No grain over the skeleton; it appears with the art (see NowPlaying faceReady) */
+.np-cover-pending::before,
+.np-cover-pending::after {
+  content: none;
+}
+
 @keyframes np-spin {
   from {
     transform: rotate(0deg);

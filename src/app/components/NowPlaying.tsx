@@ -41,6 +41,12 @@ const coverSkel = (
   />
 )
 
+// Grain textures drawn over each cover by .np-cover::before/::after.
+const COVER_TEX = [
+  withBase('/assets/vinyl/cover-tex.jpg'),
+  withBase('/assets/vinyl/cover-tex2.jpg'),
+]
+
 // The static mirrors have no server, so they call prod's API routes
 // cross-origin (set by scripts/build-static.sh). Empty on prod itself.
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
@@ -298,7 +304,7 @@ export function NowPlaying() {
   // No raw-URL fallback while the front face is loading, so the skeleton shows.
   const frontFill = loadingFace === 'front' ? null : (frontArt ?? albumArt)
   useEffect(() => {
-    for (const url of [frontFill, backArt]) {
+    for (const url of [frontFill, backArt, ...COVER_TEX]) {
       if (!url || url.startsWith('data:') || loadedArt.has(url)) continue
       const img = new Image()
       img.onload = img.onerror = () => setLoadedArt((prev) => new Set(prev).add(url))
@@ -306,6 +312,12 @@ export function NowPlaying() {
     }
   }, [frontFill, backArt, loadedArt])
   const artReady = (url: string | null) => !url || url.startsWith('data:') || loadedArt.has(url)
+  // A face shows its art and the grain overlays together, once both textures
+  // and its art have loaded; until then it shows only the skeleton.
+  const faceReady = (face: Face, url: string | null) =>
+    loadingFace !== face && artReady(url) && COVER_TEX.every((t) => loadedArt.has(t))
+  const frontReady = faceReady('front', frontFill)
+  const backReady = faceReady('back', backArt)
 
   if (!track || !track.title) {
     // Nothing to show after the first response — give the space back.
@@ -333,11 +345,11 @@ export function NowPlaying() {
 
   const { title, artist } = track
   const frontStyle = {
-    backgroundImage: frontFill ? `url(${frontFill})` : undefined,
+    backgroundImage: frontReady && frontFill ? `url(${frontFill})` : undefined,
     zIndex: frontOnTop ? 2 : 1,
   }
   const backStyle = {
-    backgroundImage: backArt ? `url(${backArt})` : undefined,
+    backgroundImage: backReady && backArt ? `url(${backArt})` : undefined,
     zIndex: frontOnTop ? 1 : 2,
   }
 
@@ -356,8 +368,8 @@ export function NowPlaying() {
         style={
           {
             '--vinyl-record': `url(${withBase('/assets/vinyl/record.png')})`,
-            '--vinyl-tex1': `url(${withBase('/assets/vinyl/cover-tex.jpg')})`,
-            '--vinyl-tex2': `url(${withBase('/assets/vinyl/cover-tex2.jpg')})`,
+            '--vinyl-tex1': `url(${COVER_TEX[0]})`,
+            '--vinyl-tex2': `url(${COVER_TEX[1]})`,
           } as React.CSSProperties
         }
       >
@@ -367,11 +379,17 @@ export function NowPlaying() {
           <div className="np-print" style={{ background: labelColor }} />
         </div>
         <div className="np-cover-flip" style={{ transform: `rotateY(${coverAngle}deg)` }}>
-          <div className="np-cover np-cover-front" style={frontStyle}>
-            {(loadingFace === 'front' || !artReady(frontFill)) && coverSkel}
+          <div
+            className={`np-cover np-cover-front${frontReady ? '' : ' np-cover-pending'}`}
+            style={frontStyle}
+          >
+            {!frontReady && coverSkel}
           </div>
-          <div className="np-cover np-cover-back" style={backStyle}>
-            {(loadingFace === 'back' || !artReady(backArt)) && coverSkel}
+          <div
+            className={`np-cover np-cover-back${backReady ? '' : ' np-cover-pending'}`}
+            style={backStyle}
+          >
+            {!backReady && coverSkel}
           </div>
         </div>
       </div>
