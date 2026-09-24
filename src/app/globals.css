@@ -805,8 +805,13 @@ footer a:hover {
 /* Now Playing */
 
 .now-playing {
-  /* Album art size; the progress bar matches it */
-  --np-album: 100px;
+  /* Album art size; the progress bar matches it. The card is fixed at the
+     top left, and with the record out its right edge is about
+     36px + 1.45 × size; the site column's heading starts at
+     (100vw - 699px) / 2 + 32px. Keeping 16px between them gives
+     size ≤ (100vw - 739px) / 2.9, so the art is 120px on wide windows and
+     shrinks toward the 1000px mobile breakpoint. */
+  --np-album: clamp(96px, calc((100vw - 739px) / 2.9), 120px);
 
   position: fixed;
   top: 20px;
@@ -1056,16 +1061,16 @@ footer a:hover {
   width: var(--np-album);
   margin-bottom: 4px;
   transition:
-    grid-template-rows 0.5s ease,
-    margin-bottom 0.5s ease;
+    grid-template-rows 1s ease-out,
+    margin-bottom 1s ease-out;
 }
 
 .np-progress-inner {
   min-height: 0;
   overflow: hidden;
   transition:
-    transform 0.5s ease,
-    opacity 0.4s ease;
+    transform 1s ease-out,
+    opacity 0.8s ease-out;
 }
 
 .np-progress-hidden {
@@ -1291,7 +1296,7 @@ footer a:hover {
   }
 
   .now-playing {
-    --np-album: 84px;
+    --np-album: 92px;
 
     position: static;
     flex-direction: row;
@@ -1316,8 +1321,8 @@ footer a:hover {
     margin-top: 4px;
     margin-bottom: 0;
     transition:
-      grid-template-rows 0.5s ease,
-      margin-top 0.5s ease;
+      grid-template-rows 1s ease-out,
+      margin-top 1s ease-out;
   }
 
   .np-progress-hidden {
