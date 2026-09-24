@@ -1048,11 +1048,34 @@ footer a:hover {
 
 /* Playback position of the current track (see ProgressBar in NowPlaying).
    --np-progress (0–1) is set from JS each frame. */
-/* As wide as the album art */
+/* As wide as the album art. The one-row grid lets the row collapse smoothly
+   (1fr → 0fr) when playback pauses, while the contents slide up and fade. */
 .np-progress {
-  display: block;
+  display: grid;
+  grid-template-rows: 1fr;
   width: var(--np-album);
   margin-bottom: 4px;
+  transition:
+    grid-template-rows 0.5s ease,
+    margin-bottom 0.5s ease;
+}
+
+.np-progress-inner {
+  min-height: 0;
+  overflow: hidden;
+  transition:
+    transform 0.5s ease,
+    opacity 0.4s ease;
+}
+
+.np-progress-hidden {
+  grid-template-rows: 0fr;
+  margin-bottom: 0;
+}
+
+.np-progress-hidden .np-progress-inner {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 
 .np-progress-bar {

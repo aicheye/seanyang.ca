@@ -75,20 +75,20 @@ function ProgressBar({ track }: { track: Track }) {
     return () => cancelAnimationFrame(raf)
   }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
 
-  // Always rendered so the card keeps its height; hidden for the last played
-  // track, which has no position.
+  // Shown only while playing. When playback pauses or stops, the bar slides up
+  // toward the art, fades and collapses its row (CSS transition), keeping the
+  // last drawn position while it goes.
+  const shown = isPlaying && progressMs !== null
   return (
-    <span
-      className="np-progress"
-      aria-hidden="true"
-      style={progressMs === null ? { visibility: 'hidden' } : undefined}
-    >
-      <span ref={bar} className="np-progress-bar">
-        <span className="np-progress-fill" />
-      </span>
-      <span className="np-progress-times">
-        <span ref={elapsed} />
-        <span>{durationMs ? formatTime(durationMs) : ''}</span>
+    <span className={`np-progress${shown ? '' : ' np-progress-hidden'}`} aria-hidden="true">
+      <span className="np-progress-inner">
+        <span ref={bar} className="np-progress-bar">
+          <span className="np-progress-fill" />
+        </span>
+        <span className="np-progress-times">
+          <span ref={elapsed} />
+          <span>{durationMs ? formatTime(durationMs) : ''}</span>
+        </span>
       </span>
     </span>
   )
