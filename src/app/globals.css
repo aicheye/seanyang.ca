@@ -805,6 +805,9 @@ footer a:hover {
 /* Now Playing */
 
 .now-playing {
+  /* Album art size; the progress bar matches it */
+  --np-album: 100px;
+
   position: fixed;
   top: 20px;
   left: 24px;
@@ -835,8 +838,8 @@ footer a:hover {
 
 .np-album {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: var(--np-album);
+  height: var(--np-album);
   flex-shrink: 0;
   perspective: 600px;
 }
@@ -1045,10 +1048,10 @@ footer a:hover {
 
 /* Playback position of the current track (see ProgressBar in NowPlaying).
    --np-progress (0–1) is set from JS each frame. */
-/* As wide as the title/artist block, like the text it sits over */
+/* As wide as the album art */
 .np-progress {
   display: block;
-  width: 100%;
+  width: var(--np-album);
   margin-bottom: 4px;
 }
 
@@ -1279,9 +1282,8 @@ footer a:hover {
     gap: 50px;
   }
 
-  .np-album {
-    width: 84px;
-    height: 84px;
+  .now-playing {
+    --np-album: 84px;
   }
 
   .np-info {
