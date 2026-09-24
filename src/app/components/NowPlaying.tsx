@@ -52,7 +52,7 @@ function formatTime(ms: number): string {
 // frame it writes --np-progress and the elapsed text directly, so React
 // doesn't re-render at 60fps; useLayoutEffect draws before the first paint so
 // a new poll never shows a stale position for a frame.
-function ProgressBar({ track }: { track: Track }) {
+function ProgressBar({ track, shown }: { track: Track; shown: boolean }) {
   const bar = useRef<HTMLSpanElement>(null)
   const elapsed = useRef<HTMLSpanElement>(null)
   const { progressMs, durationMs, asOf, receivedAt, isPlaying } = track
@@ -60,7 +60,7 @@ function ProgressBar({ track }: { track: Track }) {
     if (progressMs === null || !durationMs || asOf === null) return
     const age = Math.min(Math.max(Date.now() - asOf, 0), MAX_RESPONSE_AGE_MS)
     let raf = 0
-    let shown = ''
+    let shownText = ''
     const draw = () => {
       const pos = Math.min(
         progressMs + (isPlaying ? age + performance.now() - receivedAt : 0),
@@ -68,17 +68,17 @@ function ProgressBar({ track }: { track: Track }) {
       )
       bar.current?.style.setProperty('--np-progress', String(pos / durationMs))
       const text = formatTime(pos)
-      if (text !== shown && elapsed.current) elapsed.current.textContent = shown = text
+      if (text !== shownText && elapsed.current) elapsed.current.textContent = shownText = text
       if (isPlaying) raf = requestAnimationFrame(draw)
     }
     draw()
     return () => cancelAnimationFrame(raf)
   }, [progressMs, durationMs, asOf, receivedAt, isPlaying])
 
-  // Shown only while playing. When playback pauses or stops, the bar slides up
-  // toward the art, fades and collapses its row (CSS transition), keeping the
-  // last drawn position while it goes.
-  const shown = isPlaying && progressMs !== null
+  // Shown while the record is out (the caller passes that), so the bar comes
+  // in with the record and goes when it tucks in: on pause, on a track change
+  // and before the first load is ready. It slides up toward the art, fades and
+  // collapses its row, keeping the last drawn position while it goes.
   return (
     <span className={`np-progress${shown ? '' : ' np-progress-hidden'}`} aria-hidden="true">
       <span className="np-progress-inner">
@@ -412,7 +412,7 @@ export function NowPlaying() {
           <div className="np-cover">{coverSkel}</div>
         </div>
         <div className="np-info">
-          <ProgressBar track={PLACEHOLDER_TRACK} />
+          <ProgressBar track={PLACEHOLDER_TRACK} shown={false} />
           <span className="np-title">
             <span className="np-title-text">
               <LoadingSkeleton width={110} {...skel} />
@@ -471,7 +471,7 @@ export function NowPlaying() {
         </div>
       </div>
       <div className="np-info">
-        <ProgressBar track={track} />
+        <ProgressBar track={track} shown={vinylOut && track.progressMs !== null} />
         <span className="np-title">
           {isPlaying && (
             <span className="np-eq" aria-label="Now playing">
