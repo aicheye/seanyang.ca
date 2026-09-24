@@ -1306,11 +1306,22 @@ footer a:hover {
     transition: gap 1s ease-out;
   }
 
-  /* Beside the art on mobile, so the bar can use the text column's full
-     width (.np-info's 160px max); max-width lets it shrink on narrow screens. */
+  /* Beside the art on mobile, so the bar sits under the title and artist and
+     uses the text column's full width (.np-info's 160px max); max-width lets
+     it shrink on narrow screens. */
   .np-progress {
+    order: 1;
     width: 160px;
     max-width: 100%;
+    margin-top: 4px;
+    margin-bottom: 0;
+    transition:
+      grid-template-rows 0.5s ease,
+      margin-top 0.5s ease;
+  }
+
+  .np-progress-hidden {
+    margin-top: 0;
   }
 
   /* Room for the record beside the art while it is out */
