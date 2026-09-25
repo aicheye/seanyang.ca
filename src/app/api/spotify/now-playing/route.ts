@@ -225,7 +225,16 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
 export async function GET(req: Request) {
   const headers = corsHeaders(req)
   const data = await getNowPlaying()
-  if (!data) return Response.json({ error: 'spotify error' }, { status: 502, headers })
+  if (!data) {
+    const retryAfterSec = Math.ceil((blockedUntil - Date.now()) / 1000)
+    if (retryAfterSec > 0) {
+      return Response.json(
+        { error: 'spotify rate limited' },
+        { status: 503, headers: { ...headers, 'Retry-After': String(retryAfterSec) } },
+      )
+    }
+    return Response.json({ error: 'spotify error' }, { status: 502, headers })
+  }
   return Response.json(data, {
     headers: { ...headers, 'Cache-Control': `public, max-age=0, s-maxage=${cacheMs(data) / 1000}` },
   })
