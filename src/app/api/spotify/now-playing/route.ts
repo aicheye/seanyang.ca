@@ -56,6 +56,9 @@ interface Cached {
 let cached: Cached | null = null
 let inFlight: Promise<NowPlaying> | null = null
 // Set from Retry-After on a 429; Spotify is not called again until then.
+// Capped at MAX_BLOCK_MS: Spotify has sent Retry-After values of several
+// hours for limits that it lifted within minutes.
+const MAX_BLOCK_MS = 5 * 60_000
 let blockedUntil = 0
 
 // Runtime Cache keys. Without the shared copies, each new instance calls
@@ -208,8 +211,9 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   } catch (err) {
     console.error('now-playing: spotify request failed', err)
     if (err instanceof RateLimited) {
-      blockedUntil = Date.now() + err.retryAfterSec * 1000
-      await writeShared(BLOCKED_KEY, blockedUntil, err.retryAfterSec * 1000)
+      const blockMs = Math.min(err.retryAfterSec * 1000, MAX_BLOCK_MS)
+      blockedUntil = Date.now() + blockMs
+      await writeShared(BLOCKED_KEY, blockedUntil, blockMs)
     }
     return cached?.data ?? null
   }
