@@ -315,6 +315,10 @@ export function NowPlaying() {
   useEffect(() => {
     // bust adds a unique query string, so the CDN's cached response is skipped.
     const load = async (bust = false) => {
+      // A hidden tab doesn't fetch. Each song change adds 180° to the cover
+      // angle, and a hidden tab doesn't paint, so on return the cover would
+      // spin through every song that played in the meantime.
+      if (document.hidden) return
       try {
         const query = bust ? `?t=${Date.now()}` : ''
         const res = await fetch(`${API_BASE}/api/spotify/now-playing${query}`)
@@ -328,7 +332,13 @@ export function NowPlaying() {
     loadRef.current = load
     load()
     const poll = setInterval(load, 3_000)
-    return () => clearInterval(poll)
+    // Fetch as soon as the tab is shown again, instead of on the next poll.
+    const onVisibility = () => load()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      clearInterval(poll)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [])
 
   // Fetches again SONG_END_DELAY_MS after the song should end, so the next
