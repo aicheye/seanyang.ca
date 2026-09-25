@@ -55,16 +55,27 @@ interface Cached {
 
 let cached: Cached | null = null
 let inFlight: Promise<NowPlaying> | null = null
-// Set from Retry-After on a 429; Spotify is not called again until then.
-// Capped at MAX_BLOCK_MS: Spotify has sent Retry-After values of several
-// hours for limits that it lifted within minutes.
-const MAX_BLOCK_MS = 5 * 60_000
-let blockedUntil = 0
+
+// The last track seen in currently-playing, shown while nothing is playing.
+// Its timestamp is when it was last seen playing. Kept in memory and, for
+// LAST_TRACK_TTL_MS, in the Runtime Cache.
+const LAST_TRACK_TTL_MS = 30 * 86_400_000
+let lastTrack: NowPlaying | null = null
+let lastTrackWrittenAt = 0
+
+type Endpoint = 'currently-playing' | 'recently-played'
+
+// Spotify rate limits each endpoint separately, with a Retry-After of up to
+// several hours (13161s has been seen on recently-played while
+// currently-playing still worked). An endpoint is not called again until
+// its Retry-After has passed.
+const blockedUntil = new Map<Endpoint, number>()
 
 // Runtime Cache keys. Without the shared copies, each new instance calls
 // Spotify on its first request, and after a 429 gets another 429.
 const CACHED_KEY = 'spotify-now-playing'
-const BLOCKED_KEY = 'spotify-now-playing-blocked-until'
+const LAST_TRACK_KEY = 'spotify-last-track'
+const blockedKey = (endpoint: Endpoint) => `spotify-blocked-until:${endpoint}`
 
 // A failed read counts as a miss, so the route still works without the cache.
 async function readShared<T>(key: string): Promise<T | null> {
@@ -85,9 +96,23 @@ async function writeShared(key: string, value: unknown, ttlMs: number): Promise<
 }
 
 class RateLimited extends Error {
-  constructor(readonly retryAfterSec: number) {
-    super('spotify rate limited')
+  constructor(
+    readonly endpoint: Endpoint,
+    readonly retryAfterMs: number,
+  ) {
+    super(`spotify ${endpoint} rate limited`)
   }
+}
+
+// Remaining block on an endpoint in ms, or 0. Checks the Runtime Cache once
+// this instance's own block has passed.
+async function blockedFor(endpoint: Endpoint): Promise<number> {
+  let until = blockedUntil.get(endpoint) ?? 0
+  if (until <= Date.now()) {
+    until = Number(await readShared<number>(blockedKey(endpoint))) || 0
+    blockedUntil.set(endpoint, until)
+  }
+  return Math.max(0, until - Date.now())
 }
 
 async function getAccessToken(): Promise<string> {
@@ -114,12 +139,21 @@ async function getAccessToken(): Promise<string> {
   return accessToken.token
 }
 
-async function spotifyGet(path: string): Promise<Response> {
-  const res = await fetch(`https://api.spotify.com/v1${path}`, {
+async function spotifyGet(endpoint: Endpoint, query = ''): Promise<Response> {
+  const waitMs = await blockedFor(endpoint)
+  if (waitMs) throw new RateLimited(endpoint, waitMs)
+
+  const res = await fetch(`https://api.spotify.com/v1/me/player/${endpoint}${query}`, {
     headers: { Authorization: `Bearer ${await getAccessToken()}` },
     cache: 'no-store',
   })
-  if (res.status === 429) throw new RateLimited(Number(res.headers.get('Retry-After')) || 30)
+  if (res.status === 429) {
+    const retryAfterMs = (Number(res.headers.get('Retry-After')) || 30) * 1000
+    console.error(`now-playing: spotify ${endpoint} returned 429, retry after ${retryAfterMs}ms`)
+    blockedUntil.set(endpoint, Date.now() + retryAfterMs)
+    await writeShared(blockedKey(endpoint), Date.now() + retryAfterMs, retryAfterMs)
+    throw new RateLimited(endpoint, retryAfterMs)
+  }
   if (res.status === 401) accessToken = null // revoked or expired early; refresh next call
   return res
 }
@@ -146,25 +180,61 @@ function toNowPlaying(
 async function fetchNowPlaying(): Promise<NowPlaying> {
   // 204 means no active device. item is null during ads and is an episode
   // for podcasts; all of those fall through to the last played track.
-  const current = await spotifyGet('/me/player/currently-playing')
+  const current = await spotifyGet('currently-playing')
   if (current.status === 200) {
     const json = await current.json()
-    if (json.currently_playing_type === 'track' && json.item)
-      return toNowPlaying(json.item, json.is_playing === true, null, json.progress_ms ?? null)
+    if (json.currently_playing_type === 'track' && json.item) {
+      const isPlaying = json.is_playing === true
+      await rememberTrack(json.item, isPlaying)
+      return toNowPlaying(json.item, isPlaying, null, json.progress_ms ?? null)
+    }
   } else if (current.status !== 204) {
     throw new Error(`spotify currently-playing ${current.status}`)
   }
 
-  const recent = await spotifyGet('/me/player/recently-played?limit=1')
-  if (!recent.ok) throw new Error(`spotify recently-played ${recent.status}`)
-  const item = (await recent.json()).items?.[0]
-  if (!item) return EMPTY
-  return toNowPlaying(
-    item.track,
-    false,
-    Math.floor(Date.parse(item.played_at) / 1000) || null,
-    null,
-  )
+  return lastPlayed()
+}
+
+async function rememberTrack(track: SpotifyTrack, isPlaying: boolean): Promise<void> {
+  const url = track.external_urls.spotify ?? null
+  const sameTrack = lastTrack?.title === track.name && lastTrack.url === url
+  // A paused track keeps the time it was last seen playing.
+  if (sameTrack && !isPlaying) return
+  const now = Date.now()
+  lastTrack = toNowPlaying(track, false, Math.floor(now / 1000), null)
+  // The shared copy is written when the track changes and once a minute
+  // otherwise, not on every poll.
+  if (sameTrack && now - lastTrackWrittenAt < 60_000) return
+  lastTrackWrittenAt = now
+  await writeShared(LAST_TRACK_KEY, lastTrack, LAST_TRACK_TTL_MS)
+}
+
+// The track shown while nothing is playing. recently-played is only called
+// when no instance has seen a track in LAST_TRACK_TTL_MS, or the Runtime
+// Cache was cleared. On failure, EMPTY is returned.
+async function lastPlayed(): Promise<NowPlaying> {
+  // Another instance may have seen a later track.
+  const shared = await readShared<NowPlaying>(LAST_TRACK_KEY)
+  if (shared && (shared.timestamp ?? 0) > (lastTrack?.timestamp ?? 0)) lastTrack = shared
+  if (lastTrack) return lastTrack
+
+  try {
+    const res = await spotifyGet('recently-played', '?limit=1')
+    if (!res.ok) throw new Error(`spotify recently-played ${res.status}`)
+    const item = (await res.json()).items?.[0]
+    if (!item) return EMPTY
+    lastTrack = toNowPlaying(
+      item.track,
+      false,
+      Math.floor(Date.parse(item.played_at) / 1000) || null,
+      null,
+    )
+    await writeShared(LAST_TRACK_KEY, lastTrack, LAST_TRACK_TTL_MS)
+    return lastTrack
+  } catch (err) {
+    if (!(err instanceof RateLimited)) console.error('now-playing: recently-played failed', err)
+    return EMPTY
+  }
 }
 
 // True when the cached response was fetched before its playing track should
@@ -181,22 +251,14 @@ function endedSinceFetch({ data, at }: { data: NowPlaying; at: number }, now: nu
 
 const isFresh = (c: Cached, now: number) => now - c.at < cacheMs(c.data) && !endedSinceFetch(c, now)
 
-async function getNowPlaying(): Promise<NowPlaying | null> {
+// Returns the track, or the error when Spotify failed and nothing is cached.
+async function getNowPlaying(): Promise<NowPlaying | Error> {
   const now = Date.now()
   if (cached && isFresh(cached, now)) return cached.data
-  if (now < blockedUntil) return cached?.data ?? null
 
-  const [shared, sharedBlock] = await Promise.all([
-    readShared<Cached>(CACHED_KEY),
-    readShared<number>(BLOCKED_KEY),
-  ])
+  const shared = await readShared<Cached>(CACHED_KEY)
   if (shared && (!cached || shared.at > cached.at)) cached = shared
   if (cached && isFresh(cached, now)) return cached.data
-  // A block further out than MAX_BLOCK_MS was written before the cap existed
-  // and is ignored.
-  const until = Number(sharedBlock) || 0
-  blockedUntil = until <= now + MAX_BLOCK_MS ? until : 0
-  if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
   inFlight ??= fetchNowPlaying()
@@ -212,27 +274,25 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   try {
     return await inFlight
   } catch (err) {
-    console.error('now-playing: spotify request failed', err)
-    if (err instanceof RateLimited) {
-      const blockMs = Math.min(err.retryAfterSec * 1000, MAX_BLOCK_MS)
-      blockedUntil = Date.now() + blockMs
-      await writeShared(BLOCKED_KEY, blockedUntil, blockMs)
-    }
-    return cached?.data ?? null
+    // A 429 is logged once, by spotifyGet.
+    if (!(err instanceof RateLimited)) console.error('now-playing: spotify request failed', err)
+    return cached?.data ?? (err instanceof Error ? err : new Error(String(err)))
   }
 }
 
 export async function GET(req: Request) {
   const headers = corsHeaders(req)
   const data = await getNowPlaying()
-  if (!data) {
-    const retryAfterSec = Math.ceil((blockedUntil - Date.now()) / 1000)
-    if (retryAfterSec > 0) {
-      return Response.json(
-        { error: 'spotify rate limited' },
-        { status: 503, headers: { ...headers, 'Retry-After': String(retryAfterSec) } },
-      )
-    }
+  if (data instanceof RateLimited) {
+    return Response.json(
+      { error: 'spotify rate limited' },
+      {
+        status: 503,
+        headers: { ...headers, 'Retry-After': String(Math.ceil(data.retryAfterMs / 1000)) },
+      },
+    )
+  }
+  if (data instanceof Error) {
     return Response.json({ error: 'spotify error' }, { status: 502, headers })
   }
   return Response.json(data, {
