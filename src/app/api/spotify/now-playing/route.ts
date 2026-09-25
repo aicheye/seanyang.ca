@@ -159,6 +159,7 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   try {
     return await inFlight
   } catch (err) {
+    console.error('now-playing: spotify request failed', err)
     if (err instanceof RateLimited) blockedUntil = Date.now() + err.retryAfterSec * 1000
     return cached?.data ?? null
   }
