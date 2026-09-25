@@ -192,7 +192,10 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   ])
   if (shared && (!cached || shared.at > cached.at)) cached = shared
   if (cached && isFresh(cached, now)) return cached.data
-  blockedUntil = Number(sharedBlock) || 0
+  // A block further out than MAX_BLOCK_MS was written before the cap existed
+  // and is ignored.
+  const until = Number(sharedBlock) || 0
+  blockedUntil = until <= now + MAX_BLOCK_MS ? until : 0
   if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
