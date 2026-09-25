@@ -56,6 +56,9 @@ interface Cached {
 let cached: Cached | null = null
 let inFlight: Promise<NowPlaying> | null = null
 // Set from Retry-After on a 429; Spotify is not called again until then.
+// Capped at MAX_BLOCK_MS: Spotify has sent Retry-After values of several
+// hours for limits that it lifted within minutes.
+const MAX_BLOCK_MS = 5 * 60_000
 let blockedUntil = 0
 
 // Runtime Cache keys. Without the shared copies, each new instance calls
@@ -189,7 +192,10 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   ])
   if (shared && (!cached || shared.at > cached.at)) cached = shared
   if (cached && isFresh(cached, now)) return cached.data
-  blockedUntil = Number(sharedBlock) || 0
+  // A block further out than MAX_BLOCK_MS was written before the cap existed
+  // and is ignored.
+  const until = Number(sharedBlock) || 0
+  blockedUntil = until <= now + MAX_BLOCK_MS ? until : 0
   if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
@@ -208,8 +214,9 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   } catch (err) {
     console.error('now-playing: spotify request failed', err)
     if (err instanceof RateLimited) {
-      blockedUntil = Date.now() + err.retryAfterSec * 1000
-      await writeShared(BLOCKED_KEY, blockedUntil, err.retryAfterSec * 1000)
+      const blockMs = Math.min(err.retryAfterSec * 1000, MAX_BLOCK_MS)
+      blockedUntil = Date.now() + blockMs
+      await writeShared(BLOCKED_KEY, blockedUntil, blockMs)
     }
     return cached?.data ?? null
   }
@@ -218,7 +225,16 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
 export async function GET(req: Request) {
   const headers = corsHeaders(req)
   const data = await getNowPlaying()
-  if (!data) return Response.json({ error: 'spotify error' }, { status: 502, headers })
+  if (!data) {
+    const retryAfterSec = Math.ceil((blockedUntil - Date.now()) / 1000)
+    if (retryAfterSec > 0) {
+      return Response.json(
+        { error: 'spotify rate limited' },
+        { status: 503, headers: { ...headers, 'Retry-After': String(retryAfterSec) } },
+      )
+    }
+    return Response.json({ error: 'spotify error' }, { status: 502, headers })
+  }
   return Response.json(data, {
     headers: { ...headers, 'Cache-Control': `public, max-age=0, s-maxage=${cacheMs(data) / 1000}` },
   })
