@@ -1,3 +1,4 @@
+import { getCache } from '@vercel/functions'
 import { corsHeaders } from '@/lib/cors'
 
 // Every open tab polls this route every 3s. The response is cached for 3s both
@@ -45,6 +46,27 @@ let cached: { data: NowPlaying; at: number } | null = null
 let inFlight: Promise<NowPlaying> | null = null
 // Set from Retry-After on a 429; Spotify is not called again until then.
 let blockedUntil = 0
+// blockedUntil is also stored in Vercel's Runtime Cache, which every instance
+// in the region reads. Without it, each new instance calls Spotify once and
+// gets another 429.
+const BLOCKED_KEY = 'spotify-now-playing-blocked-until'
+
+async function sharedBlockedUntil(): Promise<number> {
+  try {
+    return Number(await getCache().get(BLOCKED_KEY)) || 0
+  } catch (err) {
+    console.error('now-playing: runtime cache read failed', err)
+    return 0
+  }
+}
+
+async function shareBlock(until: number, ttlSec: number): Promise<void> {
+  try {
+    await getCache().set(BLOCKED_KEY, until, { ttl: ttlSec })
+  } catch (err) {
+    console.error('now-playing: runtime cache write failed', err)
+  }
+}
 
 class RateLimited extends Error {
   constructor(readonly retryAfterSec: number) {
@@ -145,6 +167,8 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   const now = Date.now()
   if (cached && now - cached.at < CACHE_MS && !endedSinceFetch(cached, now)) return cached.data
   if (now < blockedUntil) return cached?.data ?? null
+  blockedUntil = await sharedBlockedUntil()
+  if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
   inFlight ??= fetchNowPlaying()
@@ -160,7 +184,10 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
     return await inFlight
   } catch (err) {
     console.error('now-playing: spotify request failed', err)
-    if (err instanceof RateLimited) blockedUntil = Date.now() + err.retryAfterSec * 1000
+    if (err instanceof RateLimited) {
+      blockedUntil = Date.now() + err.retryAfterSec * 1000
+      await shareBlock(blockedUntil, err.retryAfterSec)
+    }
     return cached?.data ?? null
   }
 }
