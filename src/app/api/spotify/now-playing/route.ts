@@ -1,10 +1,17 @@
+import { getCache } from '@vercel/functions'
 import { corsHeaders } from '@/lib/cors'
 
-// Every open tab polls this route every 3s. The response is cached for 3s both
-// in this instance's memory and on Vercel's CDN (s-maxage), so Spotify sees at
-// most one request per 3s per instance no matter how many visitors there are,
-// plus one when a song ends (see endedSinceFetch).
+// Every open tab polls this route every 3s. The response is cached in this
+// instance's memory, in Vercel's Runtime Cache (shared by every instance in
+// the region) and on Vercel's CDN (s-maxage), so Spotify sees about one
+// request per CACHE_MS per region no matter how many visitors or instances
+// there are, plus one when a song ends (see endedSinceFetch).
 const CACHE_MS = 3_000
+// While nothing is playing the response only changes when playback starts,
+// so it is kept longer. Playback that starts shows up to 15s late.
+const IDLE_CACHE_MS = 15_000
+
+const cacheMs = (data: NowPlaying) => (data.isPlaying ? CACHE_MS : IDLE_CACHE_MS)
 
 interface NowPlaying {
   isPlaying: boolean
@@ -41,10 +48,38 @@ const EMPTY: NowPlaying = {
 }
 
 let accessToken: { token: string; expiresAt: number } | null = null
-let cached: { data: NowPlaying; at: number } | null = null
+interface Cached {
+  data: NowPlaying
+  at: number
+}
+
+let cached: Cached | null = null
 let inFlight: Promise<NowPlaying> | null = null
 // Set from Retry-After on a 429; Spotify is not called again until then.
 let blockedUntil = 0
+
+// Runtime Cache keys. Without the shared copies, each new instance calls
+// Spotify on its first request, and after a 429 gets another 429.
+const CACHED_KEY = 'spotify-now-playing'
+const BLOCKED_KEY = 'spotify-now-playing-blocked-until'
+
+// A failed read counts as a miss, so the route still works without the cache.
+async function readShared<T>(key: string): Promise<T | null> {
+  try {
+    return (await getCache().get(key)) as T | null
+  } catch (err) {
+    console.error('now-playing: runtime cache read failed', err)
+    return null
+  }
+}
+
+async function writeShared(key: string, value: unknown, ttlMs: number): Promise<void> {
+  try {
+    await getCache().set(key, value, { ttl: Math.ceil(ttlMs / 1000) })
+  } catch (err) {
+    console.error('now-playing: runtime cache write failed', err)
+  }
+}
 
 class RateLimited extends Error {
   constructor(readonly retryAfterSec: number) {
@@ -141,15 +176,27 @@ function endedSinceFetch({ data, at }: { data: NowPlaying; at: number }, now: nu
   return at < endsAt && now >= endsAt
 }
 
+const isFresh = (c: Cached, now: number) => now - c.at < cacheMs(c.data) && !endedSinceFetch(c, now)
+
 async function getNowPlaying(): Promise<NowPlaying | null> {
   const now = Date.now()
-  if (cached && now - cached.at < CACHE_MS && !endedSinceFetch(cached, now)) return cached.data
+  if (cached && isFresh(cached, now)) return cached.data
+  if (now < blockedUntil) return cached?.data ?? null
+
+  const [shared, sharedBlock] = await Promise.all([
+    readShared<Cached>(CACHED_KEY),
+    readShared<number>(BLOCKED_KEY),
+  ])
+  if (shared && (!cached || shared.at > cached.at)) cached = shared
+  if (cached && isFresh(cached, now)) return cached.data
+  blockedUntil = Number(sharedBlock) || 0
   if (now < blockedUntil) return cached?.data ?? null
 
   // Concurrent requests on one instance share a single Spotify call.
   inFlight ??= fetchNowPlaying()
-    .then((data) => {
+    .then(async (data) => {
       cached = { data, at: Date.now() }
+      await writeShared(CACHED_KEY, cached, cacheMs(data))
       return data
     })
     .finally(() => {
@@ -159,7 +206,11 @@ async function getNowPlaying(): Promise<NowPlaying | null> {
   try {
     return await inFlight
   } catch (err) {
-    if (err instanceof RateLimited) blockedUntil = Date.now() + err.retryAfterSec * 1000
+    console.error('now-playing: spotify request failed', err)
+    if (err instanceof RateLimited) {
+      blockedUntil = Date.now() + err.retryAfterSec * 1000
+      await writeShared(BLOCKED_KEY, blockedUntil, err.retryAfterSec * 1000)
+    }
     return cached?.data ?? null
   }
 }
@@ -169,6 +220,6 @@ export async function GET(req: Request) {
   const data = await getNowPlaying()
   if (!data) return Response.json({ error: 'spotify error' }, { status: 502, headers })
   return Response.json(data, {
-    headers: { ...headers, 'Cache-Control': `public, max-age=0, s-maxage=${CACHE_MS / 1000}` },
+    headers: { ...headers, 'Cache-Control': `public, max-age=0, s-maxage=${cacheMs(data) / 1000}` },
   })
 }
