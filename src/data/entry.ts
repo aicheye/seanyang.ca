@@ -7,4 +7,7 @@ export interface EntryPage {
   caption?: string
   /** Blurb for this page, one sentence per entry; falls back to the entry's `description`. */
   text?: string[]
+  /** Position in the printed portfolio (ctrl+p). A page without one, or
+      without `media`, is left out of print. */
+  printOrder?: number
 }
