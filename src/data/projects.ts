@@ -14,6 +14,9 @@ export interface Project {
       which stays as the first page for clients built before `pages` existed
       (the mirrors between deploys). */
   pages?: EntryPage[]
+  /** Position in the printed portfolio (ctrl+p); the lowest is featured.
+      A project without one is left out of print. */
+  printOrder?: number
 }
 
 export default projects as Project[]

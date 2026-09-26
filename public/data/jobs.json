@@ -51,20 +51,22 @@
     "pages": [
       {
         "media": "/assets/demos/watonomous-humanoid.mp4",
-        "caption": "badminton receive policy",
+        "caption": "Badminton Receive Policy",
         "text": [
           "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, an EKF-tracked shuttle, and the same arm URDF the hardware runs.",
           "Trained a privileged-state PPO teacher, distilled it into a student on noisy perception, then fine-tuned the student with an asymmetric actor-critic, taking hits from 76.6% to 98.8% of serves with 78% returned over the net."
-        ]
+        ],
+        "printOrder": 2
       },
       {
         "media": "/assets/demos/watonomous.mp4",
-        "caption": "eve prediction pipelines",
+        "caption": "EVE Prediction Pipelines",
         "text": [
           "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
           "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
           "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained Docker environments to keep the stack reproducible."
-        ]
+        ],
+        "printOrder": 6
       }
     ],
     "location": "Waterloo, ON",
@@ -96,21 +98,25 @@
     "pages": [
       {
         "media": "/assets/demos/moss-autonomy.mp4",
-        "caption": "autonomous row following",
+        "caption": "Autonomous Row Following",
         "text": [
           "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
           "RTK-odometry fusion and microsecond-level sensor sync into real-time SLAM held mean follow error under 20cm over 500m of autonomous tests."
-        ]
+        ],
+        "printOrder": 3
       },
       {
         "media": "/assets/demos/moss-synthetic.webp",
-        "caption": "synthetic point cloud pipeline",
+        "caption": "Synthetic Pointcloud Pipeline",
         "text": [
-          "Built Rust synthetic point cloud pipelines at 4M+ points per second, rendering labelled tree-row scenes like this one for computer vision training."
-        ]
+          "Only about 50K of 3M real orchard LiDAR scans were labelled, so I built a Rust generator that makes labelled training data instead.",
+          "It grows procedural apple trees through a PyO3 bridge to The Grove, plants them in rows on sculpted terrain with trellises and ground cover, and simulates the LiDAR's returns at 4M+ points per second.",
+          "Every point carries a tree, trunk or background label and an instance ID, and each block ships with a streaming COPC viewer."
+        ],
+        "printOrder": 4
       },
       {
-        "caption": "reliability",
+        "caption": "Reliability",
         "text": [
           "Developed Ansible playbooks and flashing scripts to provision NVIDIA Jetsons from factory-new to field-ready.",
           "Collaborated on OTA deployment systems to deploy the whole fleet in parallel from a pinned release.",

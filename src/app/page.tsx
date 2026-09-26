@@ -5,6 +5,7 @@ import { Footer } from '@/app/components/Footer'
 import { GameOfLife } from '@/app/components/GameOfLife'
 import { Header } from '@/app/components/Header'
 import { LinksSection } from '@/app/components/LinksSection'
+import { PrintPortfolio } from '@/app/components/PrintPortfolio'
 import { ProjectsSection } from '@/app/components/ProjectsSection'
 import { RandomQuote } from '@/app/components/RandomQuote'
 
@@ -20,6 +21,7 @@ export default function Page() {
         <LinksSection />
         <Footer />
       </div>
+      <PrintPortfolio />
     </>
   )
 }

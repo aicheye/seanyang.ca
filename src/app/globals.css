@@ -1416,3 +1416,269 @@ footer a:hover {
     display: none;
   }
 }
+
+/* Print portfolio (ctrl+p). The interactive page is swapped for
+   PrintPortfolio: experience on the first page, projects from the second. */
+
+.print-portfolio {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.6in 0.65in 0.7in;
+
+    @bottom-left {
+      content: 'Sean Yang · sean@seanyang.ca';
+      font:
+        7.5pt system-ui,
+        sans-serif;
+      color: #a39580;
+    }
+
+    @bottom-right {
+      content: counter(page) ' / ' counter(pages);
+      font:
+        7.5pt system-ui,
+        sans-serif;
+      color: #a39580;
+    }
+  }
+
+  :root {
+    --pp-muted: #8a7a68;
+    --pp-rule: #e4dccb;
+    --pp-card: #fdfaf2;
+
+    font-size: 9pt;
+    line-height: 1.5;
+    background: #fff;
+    color: #4a3a2e;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Letter paper is narrower than 1000px, so the mobile rules apply in print,
+     including the translucent body::before overlay. */
+  body::before,
+  body > :not(.print-portfolio) {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .print-portfolio {
+    display: block;
+  }
+
+  .print-portfolio a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .print-portfolio p {
+    margin: 0;
+  }
+
+  /* Header */
+
+  .pp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24pt;
+    padding-bottom: 14pt;
+    /* the site's header rule adds a 48px bottom margin */
+    margin: 0;
+    border-bottom: 1.25pt solid var(--text-h);
+  }
+
+  .pp-header h1 {
+    font-size: 26pt;
+    letter-spacing: -0.6pt;
+    line-height: 1.05;
+  }
+
+  .pp-role {
+    margin-top: 6pt !important;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .pp-location {
+    color: var(--pp-muted);
+  }
+
+  .pp-contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    font-size: 8.5pt;
+    line-height: 1.6;
+  }
+
+  /* Work: one card per piece, a large picture beside its text, sides
+     alternating down the page. */
+
+  /* One sheet per printed page, exactly the page's content height. Cards
+     keep one fixed gap and the whole group is centred on the page, so any
+     spare height is split evenly above and below.
+     11in - 0.6in top - 0.7in bottom margin = 9.7in; 9.65in leaves room for
+     rounding so a sheet never spills onto a blank page. */
+  .pp-sheet {
+    display: grid;
+    align-content: center;
+    gap: 16pt;
+    height: 9.65in;
+    break-after: page;
+  }
+
+  .pp-sheet:last-child {
+    break-after: auto;
+  }
+
+  /* A page with fewer cards than it holds starts at the top instead. */
+  .pp-sheet-short {
+    align-content: start;
+  }
+
+  /* The first page keeps the header a fixed distance from the top, and
+     centres its cards in the height left below it. */
+  .pp-sheet-first {
+    grid-template-rows: auto 1fr;
+    align-content: stretch;
+  }
+
+  .pp-sheet-first .pp-header {
+    padding-top: 10pt;
+  }
+
+  .pp-sheet-body {
+    display: grid;
+    align-content: center;
+    gap: 16pt;
+  }
+
+  .pp-piece {
+    display: grid;
+    grid-template-columns: 52% 1fr;
+    column-gap: 16pt;
+    align-items: center;
+    padding: 12pt;
+    background: var(--pp-card);
+    border: 0.5pt solid var(--pp-rule);
+    border-radius: 5pt;
+    break-inside: avoid;
+  }
+
+  .pp-flip {
+    grid-template-columns: 1fr 52%;
+  }
+
+  .pp-flip .pp-cover {
+    order: 2;
+  }
+
+  /* The image keeps its own proportions, sized down to fit the column and a
+     height limit, so the rounded border always sits on the picture's edge. */
+  .pp-cover {
+    display: flex;
+    justify-content: center;
+  }
+
+  .pp-cover img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 2.3in;
+    border: 0.5pt solid var(--pp-rule);
+    border-radius: 3pt;
+  }
+
+  .pp-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-portfolio h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--text-h);
+    letter-spacing: -0.1pt;
+    line-height: 1.3;
+  }
+
+  .pp-subtitle {
+    margin: 2pt 0 6pt !important;
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .pp-tech {
+    margin-top: 6pt !important;
+    font-family: var(--font-mono), monospace;
+    font-size: 7.5pt;
+    color: var(--secondary);
+  }
+
+  /* Links look like links on paper too: blue, with an arrow, and on the
+     cards a small pill so they read as buttons in the PDF. */
+  .pp-link {
+    align-self: start;
+    justify-self: start;
+    width: fit-content;
+    margin-top: 7pt;
+    padding: 2pt 7pt;
+    font-family: var(--font-mono), monospace;
+    font-size: 7.5pt;
+    color: var(--link) !important;
+    border: 0.75pt solid color-mix(in srgb, var(--link) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--link) 7%, #fff);
+  }
+
+  .pp-link::after,
+  .pp-contact a::after {
+    content: ' ↗';
+  }
+
+  .pp-contact a {
+    color: var(--link) !important;
+    text-decoration: underline !important;
+    text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent) !important;
+    text-underline-offset: 2pt;
+  }
+
+  /* Featured: the wide demo as a full-width banner, then the title block on
+     the left and the description on the right. */
+  .pp-featured {
+    grid-template-columns: 1fr;
+  }
+
+  .pp-featured .pp-cover {
+    margin-bottom: 12pt;
+  }
+
+  .pp-featured .pp-cover img {
+    max-height: 2.9in;
+  }
+
+  .pp-featured .pp-body {
+    display: grid;
+    grid-template-columns: 34% 1fr;
+    grid-auto-rows: min-content;
+    column-gap: 18pt;
+  }
+
+  .pp-featured .pp-desc {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+}
