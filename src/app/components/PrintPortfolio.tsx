@@ -108,6 +108,17 @@ export function PrintPortfolio() {
   ].toSorted((a, b) => a.order - b.order)
 
   const [firstPage, ...laterPages] = paginate(rest)
+  const total = laterPages.length + 1
+  /* The footer is part of each sheet rather than an @page margin box, which
+     only Chrome prints, and only at the dialog's default margins. */
+  const footer = (page: number) => (
+    <div className="pp-footer">
+      <span>Sean Yang · {primaryEmail.label}</span>
+      <span>
+        {page} / {total}
+      </span>
+    </div>
+  )
 
   return (
     <div className="print-portfolio" aria-hidden="true">
@@ -132,27 +143,29 @@ export function PrintPortfolio() {
             ))}
           </ul>
         </header>
-
         <div className="pp-sheet-body">
           {featured && <PieceCard piece={featured} featured />}
           {firstPage.map((piece) => (
             <PieceCard key={piece.image} piece={piece} flip />
           ))}
         </div>
+        {footer(1)}
       </div>
       {laterPages.map((page, p) => (
-        <div
-          key={page[0].image}
-          className={page.length < PER_PAGE ? 'pp-sheet pp-sheet-short' : 'pp-sheet'}
-        >
-          {page.map((piece, i) => (
-            // Sides alternate across the whole list, not per page.
-            <PieceCard
-              key={piece.image}
-              piece={piece}
-              flip={(FIRST_PAGE + p * PER_PAGE + i) % 2 === 0}
-            />
-          ))}
+        <div key={page[0].image} className="pp-sheet">
+          <div
+            className={page.length < PER_PAGE ? 'pp-sheet-body pp-sheet-short' : 'pp-sheet-body'}
+          >
+            {page.map((piece, i) => (
+              // Sides alternate across the whole list, not per page.
+              <PieceCard
+                key={piece.image}
+                piece={piece}
+                flip={(FIRST_PAGE + p * PER_PAGE + i) % 2 === 0}
+              />
+            ))}
+          </div>
+          {footer(p + 2)}
         </div>
       ))}
     </div>

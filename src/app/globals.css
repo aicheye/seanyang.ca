@@ -1427,23 +1427,7 @@ footer a:hover {
 @media print {
   @page {
     size: letter;
-    margin: 0.6in 0.65in 0.7in;
-
-    @bottom-left {
-      content: 'Sean Yang · sean@seanyang.ca';
-      font:
-        7.5pt system-ui,
-        sans-serif;
-      color: #a39580;
-    }
-
-    @bottom-right {
-      content: counter(page) ' / ' counter(pages);
-      font:
-        7.5pt system-ui,
-        sans-serif;
-      color: #a39580;
-    }
+    margin: 0.6in 0.65in 0.5in;
   }
 
   :root {
@@ -1524,21 +1508,26 @@ footer a:hover {
   /* Work: one card per piece, a large picture beside its text, sides
      alternating down the page. */
 
-  /* One sheet per printed page, exactly the page's content height. Cards
-     keep one fixed gap and the whole group is centred on the page, so any
-     spare height is split evenly above and below.
-     11in - 0.6in top - 0.7in bottom margin = 9.7in; 9.65in leaves room for
+  /* One sheet per printed page, exactly the page's content height: the
+     cards, then the footer. Cards keep one fixed gap and are centred in the
+     height above the footer, so spare height is split evenly above and below.
+     11in - 0.6in top - 0.5in bottom margin = 9.9in; 9.85in leaves room for
      rounding so a sheet never spills onto a blank page. */
   .pp-sheet {
     display: grid;
-    align-content: center;
-    gap: 16pt;
-    height: 9.65in;
+    grid-template-rows: 1fr auto;
+    height: 9.85in;
     break-after: page;
   }
 
   .pp-sheet:last-child {
     break-after: auto;
+  }
+
+  .pp-sheet-body {
+    display: grid;
+    align-content: center;
+    gap: 16pt;
   }
 
   /* A page with fewer cards than it holds starts at the top instead. */
@@ -1547,20 +1536,21 @@ footer a:hover {
   }
 
   /* The first page keeps the header a fixed distance from the top, and
-     centres its cards in the height left below it. */
+     centres its cards in the height between the header and the footer. */
   .pp-sheet-first {
-    grid-template-rows: auto 1fr;
-    align-content: stretch;
+    grid-template-rows: auto 1fr auto;
   }
 
   .pp-sheet-first .pp-header {
     padding-top: 10pt;
   }
 
-  .pp-sheet-body {
-    display: grid;
-    align-content: center;
-    gap: 16pt;
+  .pp-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10pt;
+    font-size: 7.5pt;
+    color: #a39580;
   }
 
   .pp-piece {
