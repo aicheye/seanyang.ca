@@ -4,8 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FiX } from 'react-icons/fi'
 import { PiGraph } from 'react-icons/pi'
+import { clearFocusParam, setFocusParam } from './EntryLink'
 
 const BRAIN_URL = 'https://brain.seanyang.ca'
+
+// ?focus=notes opens the dialog, like ?focus=<slug> for a job or project.
+const SLUG = 'notes'
 
 /* The footer's "notes" link, which opens the lecture-notes graph from
    brain.seanyang.ca in a dialog. brain's /embed page draws only the graph
@@ -20,9 +24,25 @@ export function NotesGraph() {
   const dialog = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
 
+  const openDialog = useCallback(() => {
+    setOpen(true)
+    setFocusParam(SLUG)
+  }, [])
+
   const close = useCallback(() => {
     setOpen(false)
+    clearFocusParam()
     trigger.current?.focus()
+  }, [])
+
+  // Opened from a shared link: show the dialog, with the footer behind it.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('focus') !== SLUG) return
+    const id = setTimeout(() => {
+      setOpen(true)
+      trigger.current?.scrollIntoView({ block: 'center' })
+    }, 50)
+    return () => clearTimeout(id)
   }, [])
 
   useEffect(() => {
@@ -62,12 +82,7 @@ export function NotesGraph() {
 
   return (
     <>
-      <button
-        ref={trigger}
-        className="notes-graph-btn"
-        aria-haspopup="dialog"
-        onClick={() => setOpen(true)}
-      >
+      <button ref={trigger} className="notes-graph-btn" aria-haspopup="dialog" onClick={openDialog}>
         <PiGraph size={18} />
         notes
       </button>
