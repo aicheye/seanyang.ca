@@ -3,113 +3,87 @@
     "title": "Spidey & Armie",
     "description": "3d twin that steers a real robot",
     "details": [
-      "A live 3D reconstruction of a robot table: click anywhere and the real four-legged robot walks there, and when obstacles block every path, a robot arm carries it past.",
-      "Built at Hack the North 2026 with three teammates.",
-      "I built the tracking and navigation that keep it in sync: a C++ camera tracker on a QNX Raspberry Pi, MobileSAM object detection, and path planning."
+      "My team of four built a live 3D model of a robot table at Hack the North 2026, and clicking anywhere in it sends a real four-legged robot walking to that spot.",
+      "If obstacles block every path, a robot arm picks the robot up and carries it over them.",
+      "I worked on tracking and navigation: a C++ camera tracker running on a QNX Raspberry Pi, object detection with MobileSAM, and path planning."
     ],
     "github": "https://github.com/aicheye/HTN26",
     "media": "/assets/demos/spidey-armie.mp4",
-    "technologies": [
-      "C++",
-      "TypeScript",
-      "OpenCV"
-    ],
+    "technologies": ["C++", "TypeScript", "OpenCV"],
     "printOrder": 1
   },
   {
     "title": "swarm_ws",
     "description": "robotic swarm maze exploration",
     "details": [
-      "Four robots map procedurally-generated mazes with no central coordinator, exploring 7.5x faster than one robot alone.",
-      "A geodesic Voronoi partition over the merged map gives each robot the region it can reach fastest, so they spread out instead of racing for the same frontier.",
-      "Four ROS 2 packages with per-robot state machines run across seven Docker services, with Gazebo simulation and live Foxglove visualization."
+      "Four robots explore procedurally generated mazes together without a central coordinator, and they finish 7.5x faster than a single robot.",
+      "A geodesic Voronoi partition of the shared map gives each robot the area it can reach fastest, so they don't all go after the same unexplored corner.",
+      "It's four ROS 2 packages with a state machine per robot, running across seven Docker services, simulated in Gazebo and visualized live in Foxglove."
     ],
     "github": "https://github.com/RRohan4/swarm_ws",
     "media": "/assets/demos/swarm_ws.mp4",
-    "technologies": [
-      "Python",
-      "ROS 2",
-      "Docker"
-    ],
+    "technologies": ["Python", "ROS 2", "Docker"],
     "printOrder": 7
   },
   {
     "title": "CRusTTY",
     "description": "tui c interpreter from scratch",
     "details": [
-      "A C interpreter and debugger written from scratch in Rust, with a recursive-descent parser and a terminal UI that visualizes the stack and heap as a program runs.",
-      "A snapshot-based execution engine records state after every statement, so execution steps backward through history as easily as forward.",
-      "Open-sourced at 50+ stars, with GitHub Actions covering tests, builds, and releases."
+      "A C interpreter and debugger written from scratch in Rust, with a hand-written recursive-descent parser and a terminal UI that shows the stack and heap while a program runs.",
+      "It saves a snapshot after every statement, so you can step backward through a program as well as forward.",
+      "It's open source with over 50 stars, and GitHub Actions runs the tests, builds, and releases."
     ],
     "github": "https://github.com/aicheye/crustty",
     "media": "/assets/demos/crustty.mp4",
-    "technologies": [
-      "Rust",
-      "C"
-    ]
+    "technologies": ["Rust", "C"]
   },
   {
     "title": "Wunder RNN Challenge",
     "description": "top 5% market prediction model",
     "details": [
-      "A Transformer time-series model in PyTorch for the Wunderlab ML Challenge, predicting the next state of noisy 1000-step financial sequences.",
-      "Combining sinusoidal and learnable positional encodings captured long-range dependencies better than either alone.",
-      "It scored a mean R² of 0.396 against a 0.309 participant average, placing top 5% of 3000+ competitors."
+      "A Transformer model in PyTorch for the Wunderlab ML Challenge that predicts the next step of noisy financial sequences 1000 steps long.",
+      "Using sinusoidal and learnable positional encodings together picked up long-range patterns better than either one did alone.",
+      "It scored a mean R² of 0.396 against an average of 0.309, which put it in the top 5% of more than 3000 entrants."
     ],
     "github": "https://github.com/aicheye/wundernn",
     "media": "/assets/demos/wundernn.webp",
-    "technologies": [
-      "Python",
-      "ML",
-      "Jupyter"
-    ],
+    "technologies": ["Python", "ML", "Jupyter"],
     "printOrder": 8
   },
   {
     "title": "aicheye's Combat Tagging",
     "description": "minecraft mod w/ 1k+ downloads",
     "details": [
-      "A Fabric server mod that penalizes players in combat that quit the game.",
-      "Once tagged in PvP you cannot pearl away, eat a god apple, or escape on elytra, and disconnecting mid-fight costs health and absorption on return.",
-      "A boss-bar timer and red nametag keep the tag state legible to everyone in the fight, and every rule is configurable."
+      "A Fabric server mod that stops players from logging out to escape a fight.",
+      "Tagged players can't use ender pearls, god apples, or elytra, and anyone who disconnects anyway comes back with less health and absorption.",
+      "A boss bar shows how long the tag lasts and tagged players get a red nametag, and every rule can be changed in the config."
     ],
     "github": "https://github.com/aicheye/combat-tag",
     "media": "/assets/demos/combat-tag.webp",
-    "technologies": [
-      "Java",
-      "Gradle"
-    ]
+    "technologies": ["Java", "Gradle"]
   },
   {
     "title": "Bucket",
     "description": "intuitive student dashboard",
     "details": [
-      "A course and grade dashboard for Waterloo students that imports outlines and marks straight out of D2L.",
-      "Everything lives in the browser's IndexedDB, so there is no account and no backend database.",
-      "The only server-side code is the HTML and PDF parsing that the import needs."
+      "A dashboard for Waterloo students to track their courses and grades, which imports course outlines and marks directly from D2L.",
+      "All the data is stored in the browser with IndexedDB, so there's no account to make and no database on a server.",
+      "The server only parses the HTML and PDFs during an import."
     ],
     "github": "https://github.com/aicheye/bucket",
     "media": "/assets/demos/bucket.webp",
-    "technologies": [
-      "TypeScript",
-      "React",
-      "GraphQL"
-    ]
+    "technologies": ["TypeScript", "React", "GraphQL"]
   },
   {
     "title": "ezp2p Arcade",
     "description": "p2p serverless minigames",
     "details": [
-      "Browser multiplayer with no game server behind it.",
-      "Peers connect over WebRTC DataChannels and trade offers, answers, and ICE candidates through a lobby code, so no lobby database exists anywhere.",
-      "Each peer applies its own moves immediately and broadcasts them with sequence numbers, keeping both sides deterministic and convergent."
+      "Multiplayer browser games that run without a game server.",
+      "Players connect directly over WebRTC DataChannels and swap offers, answers, and ICE candidates through a lobby code, so there's no lobby database either.",
+      "Each player's moves apply locally right away and get sent to the other player with sequence numbers, so both games stay in the same state."
     ],
     "github": "https://github.com/aicheye/ezp2p",
     "media": "/assets/demos/ezp2p.webp",
-    "technologies": [
-      "TypeScript",
-      "Vite",
-      "WebRTC"
-    ]
+    "technologies": ["TypeScript", "Vite", "WebRTC"]
   }
 ]

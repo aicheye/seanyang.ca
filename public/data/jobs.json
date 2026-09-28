@@ -4,16 +4,13 @@
     "company": "Medra",
     "description": "incoming: autonomous biology labs",
     "details": [
-      "Incoming Member of Technical Staff intern for Winter 2027, building robots that run biology experiments end to end so scientists can spend less time pipetting and more time on discovery."
+      "Incoming Member of Technical Staff intern for Winter 2027, working on robots that run biology experiments from start to finish so scientists spend less time pipetting."
     ],
     "website": "https://medra.ai",
     "logo": "/assets/logos/medra.png",
     "location": "San Francisco, CA",
     "technologies": [],
-    "dates": [
-      "2027.1",
-      "2027.4"
-    ],
+    "dates": ["2027.1", "2027.4"],
     "current": false
   },
   {
@@ -21,20 +18,13 @@
     "company": "UWaterloo",
     "description": "distributed coordination for mobile robot networks",
     "details": [
-      "Research assistant at CAMS-Lab, working on distributed mobile robotics under the Department of Mechanical and Mechatronics Engineering."
+      "Research assistant at CAMS-Lab in Waterloo's Mechanical and Mechatronics Engineering department, working on distributed coordination for mobile robots."
     ],
     "website": "https://uwaterloo.ca/cooperative-adaptive-mechatronic-systems-lab/",
     "logo": "/assets/logos/uwaterloo.webp",
     "location": "Waterloo, ON",
-    "technologies": [
-      "ROS 2",
-      "C++",
-      "Python"
-    ],
-    "dates": [
-      "2026.9",
-      "Present"
-    ],
+    "technologies": ["ROS 2", "C++", "Python"],
+    "dates": ["2026.9", "Present"],
     "current": true
   },
   {
@@ -42,8 +32,8 @@
     "company": "WATonomous",
     "description": "humanoid rl and autonomous vehicle prediction",
     "details": [
-      "Training humanoid robots to play badminton: policies that have to track a shuttle and commit to a swing inside a sub-second window.",
-      "Previously wrote concurrent C++/ROS 2 prediction software for EVE, the autonomous vehicle built by Waterloo's student design team, cutting safety incidents by 3x."
+      "Training humanoid robots to play badminton, which means tracking the shuttle and committing to a swing in under a second.",
+      "Before that, I wrote concurrent C++/ROS 2 prediction software for EVE, Waterloo's student-built autonomous car, which cut safety incidents by 3x."
     ],
     "website": "https://watonomous.ca",
     "logo": "/assets/logos/watonomous.jpg",
@@ -53,8 +43,9 @@
         "media": "/assets/demos/watonomous-humanoid.mp4",
         "caption": "Badminton Receive Policy",
         "text": [
-          "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, an EKF-tracked shuttle, and the same arm URDF the hardware runs.",
-          "Trained a privileged-state PPO teacher, distilled it into a student on noisy perception, then fine-tuned the student with an asymmetric actor-critic, taking hits from 76.6% to 98.8% of serves with 78% returned over the net."
+          "Built the badminton receive environment in mjlab on MuJoCo Warp, with shuttle aerodynamics, EKF shuttle tracking, and the same arm URDF the real hardware uses.",
+          "Trained a PPO teacher on privileged state, distilled it into a student that only sees noisy perception, and fine-tuned the student with an asymmetric actor-critic.",
+          "That raised the hit rate from 76.6% to 98.8% of serves, with 78% returned over the net."
         ],
         "printOrder": 2
       },
@@ -62,25 +53,16 @@
         "media": "/assets/demos/watonomous.mp4",
         "caption": "EVE Prediction Pipelines",
         "text": [
-          "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous vehicle built by Waterloo's student design team.",
-          "Rapid-inference models predicting how external agents behave cut safety incidents by 3x.",
-          "Integrated those models with the perception, world modelling, planning, and action nodes, and maintained Docker environments to keep the stack reproducible."
+          "Wrote concurrent C++/ROS 2 software for perception and planning on EVE, the autonomous car built by Waterloo's student design team.",
+          "Fast-inference models predicting what other road users will do cut safety incidents by 3x.",
+          "Also connected those models to the perception, world modelling, planning, and action nodes, and maintained the Docker environments so the stack builds the same way everywhere."
         ],
         "printOrder": 6
       }
     ],
     "location": "Waterloo, ON",
-    "technologies": [
-      "Python",
-      "PyTorch",
-      "mjlab",
-      "C++",
-      "ROS 2"
-    ],
-    "dates": [
-      "2025.9",
-      "Present"
-    ],
+    "technologies": ["Python", "PyTorch", "mjlab", "C++", "ROS 2"],
+    "dates": ["2025.9", "Present"],
     "current": true
   },
   {
@@ -88,9 +70,9 @@
     "company": "moss",
     "description": "autonomy, cv pipelines, and reliability for agbots",
     "details": [
-      "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
-      "RTK-odometry fusion and microsecond-level sensor sync into real-time SLAM held mean follow error under 20cm over 500m of autonomous tests.",
-      "Also built Rust synthetic point cloud pipelines at 4M+ points per second for computer vision training."
+      "Built a C++/ROS 2 autonomy stack for agricultural rovers end to end, covering sensor integration, planning, and control on two robot platforms.",
+      "Fusing RTK with odometry and syncing sensors to the microsecond for real-time SLAM kept the mean follow error under 20cm across 500m of autonomous testing.",
+      "Also wrote a Rust pipeline that generates synthetic point clouds at over 4M points per second for training computer vision models."
     ],
     "website": "https://moss.ag",
     "logo": "/assets/logos/moss.webp",
@@ -100,8 +82,8 @@
         "media": "/assets/demos/moss-autonomy.mp4",
         "caption": "Autonomous Row Following",
         "text": [
-          "Architected an end-to-end C++/ROS 2 stack for autonomous agricultural rovers, owning sensor integration, planning, and control across two robot platforms.",
-          "RTK-odometry fusion and microsecond-level sensor sync into real-time SLAM held mean follow error under 20cm over 500m of autonomous tests."
+          "Built a C++/ROS 2 autonomy stack for agricultural rovers end to end, covering sensor integration, planning, and control on two robot platforms.",
+          "Fusing RTK with odometry and syncing sensors to the microsecond for real-time SLAM kept the mean follow error under 20cm across 500m of autonomous testing."
         ],
         "printOrder": 3
       },
@@ -109,32 +91,24 @@
         "media": "/assets/demos/moss-synthetic.webp",
         "caption": "Synthetic Pointcloud Pipeline",
         "text": [
-          "Only about 50K of 3M real orchard LiDAR scans were labelled, so I built a Rust generator that makes labelled training data instead.",
-          "It grows procedural apple trees through a PyO3 bridge to The Grove, plants them in rows on sculpted terrain with trellises and ground cover, and simulates the LiDAR's returns at 4M+ points per second.",
-          "Every point carries a tree, trunk or background label and an instance ID, and each block ships with a streaming COPC viewer."
+          "Only about 50K of 3M real orchard LiDAR scans were labelled, so I wrote a Rust generator to make labelled training data instead.",
+          "It grows procedural apple trees through a PyO3 bridge to The Grove, plants them in rows on shaped terrain with trellises and ground cover, and simulates LiDAR returns at over 4M points per second.",
+          "Every point is labelled as tree, trunk, or background with an instance ID, and each generated block comes with a streaming COPC viewer."
         ],
         "printOrder": 4
       },
       {
         "caption": "Reliability",
         "text": [
-          "Developed Ansible playbooks and flashing scripts to provision NVIDIA Jetsons from factory-new to field-ready.",
-          "Collaborated on OTA deployment systems to deploy the whole fleet in parallel from a pinned release.",
-          "Also built a hardware test harness to verify each kit, covering sensor bringup, end-to-end mission recording, and sensor dropouts."
+          "Wrote Ansible playbooks and flashing scripts that take NVIDIA Jetsons from factory-new to ready for the field.",
+          "Helped build the OTA system that updates the whole fleet at once from a pinned release.",
+          "Also built a hardware test harness that checks each kit, including sensor bringup, recording a full mission, and handling sensor dropouts."
         ]
       }
     ],
     "location": "San Francisco, CA",
-    "technologies": [
-      "ROS 2",
-      "Rust",
-      "C++",
-      "Linux"
-    ],
-    "dates": [
-      "2026.5",
-      "2026.8"
-    ],
+    "technologies": ["ROS 2", "Rust", "C++", "Linux"],
+    "dates": ["2026.5", "2026.8"],
     "current": false
   }
 ]
