@@ -31,13 +31,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Static copies of the site are hosted on UW student servers and tilde.club. They are built with `output: export` and served as plain files out of `~/public_html`.
 
-| Mirror | SSH server |
-| --- | --- |
-| https://student.cs.uwaterloo.ca/~s532yang/ | `linux.student.cs.uwaterloo.ca` |
-| https://ece.uwaterloo.ca/~s532yang/ | `eceubuntu1.uwaterloo.ca` |
-| https://www.eng.uwaterloo.ca/~s532yang/ | `sftp.eng.uwaterloo.ca` |
+| Mirror                                       | SSH server                        |
+| -------------------------------------------- | --------------------------------- |
+| https://student.cs.uwaterloo.ca/~s532yang/   | `linux.student.cs.uwaterloo.ca`   |
+| https://ece.uwaterloo.ca/~s532yang/          | `eceubuntu1.uwaterloo.ca`         |
+| https://www.eng.uwaterloo.ca/~s532yang/      | `sftp.eng.uwaterloo.ca`           |
 | https://student.math.uwaterloo.ca/~s532yang/ | `linux.student.math.uwaterloo.ca` |
-| https://tilde.club/~syang/ | `tilde.club` |
+| https://tilde.club/~syang/                   | `tilde.club`                      |
 
 ### Deploying mirrors
 

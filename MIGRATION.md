@@ -15,10 +15,10 @@ to be rolled back.
 
 The only things still written as `.me` are names that were never hostnames:
 
-| Thing | Where | Why it stays |
-|---|---|---|
-| `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs | GitHub **repository** names. Renaming the repos would break the TUI's data fetch and every published release download URL. |
-| `tui-seanyang-me` crate/binary | `Cargo.toml`, Dockerfile, systemd unit, release assets | The published artifact name. Renaming breaks `Dockerfile`'s release lookup and every existing install. |
+| Thing                                            | Where                                                  | Why it stays                                                                                                               |
+| ------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `aicheye/seanyang.me`, `aicheye/tui.seanyang.me` | jsDelivr URL, git remotes, release asset URLs          | GitHub **repository** names. Renaming the repos would break the TUI's data fetch and every published release download URL. |
+| `tui-seanyang-me` crate/binary                   | `Cargo.toml`, Dockerfile, systemd unit, release assets | The published artifact name. Renaming breaks `Dockerfile`'s release lookup and every existing install.                     |
 
 Everything else names `.ca`, including three links that point at registrations
 not yet moved — the Bluesky profile, the websitecarbon badge, and the SE'30
@@ -30,13 +30,13 @@ short and written down.
 
 ## Phase 1 — dual domain (code, done)
 
-| Repo | Change |
-|---|---|
-| `seanyang.me` | `src/data/site.ts` holds the canonical origin; `metadataBase` + `alternates.canonical` now emit `https://seanyang.ca`; `/resume` and `/transcript` proxy `docs.seanyang.ca`; SSH hint copies `ssh seanyang.ca`; primary email → `sean@seanyang.ca` |
-| `tui.seanyang.me` | Nav border and resume link name `seanyang.ca` (`SITE_DOMAIN` const); fallback email → `sean@seanyang.ca`; crate metadata |
-| `bucket` | Contact/website links → `.ca`; Hasura vhost serves both hostnames |
-| `rankl` | Author credit link → `.ca` |
-| `ezp2p` | No domain references — nothing to change |
+| Repo              | Change                                                                                                                                                                                                                                             |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `seanyang.me`     | `src/data/site.ts` holds the canonical origin; `metadataBase` + `alternates.canonical` now emit `https://seanyang.ca`; `/resume` and `/transcript` proxy `docs.seanyang.ca`; SSH hint copies `ssh seanyang.ca`; primary email → `sean@seanyang.ca` |
+| `tui.seanyang.me` | Nav border and resume link name `seanyang.ca` (`SITE_DOMAIN` const); fallback email → `sean@seanyang.ca`; crate metadata                                                                                                                           |
+| `bucket`          | Contact/website links → `.ca`; Hasura vhost serves both hostnames                                                                                                                                                                                  |
+| `rankl`           | Author credit link → `.ca`                                                                                                                                                                                                                         |
+| `ezp2p`           | No domain references — nothing to change                                                                                                                                                                                                           |
 
 `public/data/socials.json` is the shared source of truth: the TUI pulls it over
 jsDelivr, so the email change reaches the terminal UI without a redeploy.
@@ -48,7 +48,7 @@ nameservers are live.
 
 1. **Apex + www** — add `seanyang.ca` and `www.seanyang.ca` as domains on the
    Vercel project for this repo. Let Vercel issue the certificate. Verify both
-   hostnames serve the site *before* touching `.me`.
+   hostnames serve the site _before_ touching `.me`.
 2. **`docs.seanyang.ca`** — point at the same host serving `docs.seanyang.me`
    and issue a certificate. `/resume` and `/transcript` fetch this upstream, so
    until it resolves both routes return the upstream's error status. This is the
@@ -71,7 +71,7 @@ Done at the platform level, no deploy required.
 
 **Vercel** (for the site): keep `seanyang.me` and `www.seanyang.me` on the
 project, and set each one's redirect target to `seanyang.ca` in
-*Project → Settings → Domains*. Vercel issues a 308 and preserves the path, so
+_Project → Settings → Domains_. Vercel issues a 308 and preserves the path, so
 `seanyang.me/resume` lands on `seanyang.ca/resume`.
 
 **Cloudflare** (if `.me` DNS moves there instead): a single Redirect Rule —
@@ -99,7 +99,7 @@ The first three are **blocking**: the code already links to `.ca` for each, so
 until they are done the footer ships three dead links.
 
 - [ ] **Bluesky** — add the `_atproto.seanyang.ca` TXT record, then change the
-      handle in the app under *Settings → Account → Handle*. Until then
+      handle in the app under _Settings → Account → Handle_. Until then
       `bsky.app/profile/seanyang.ca` resolves to no account. `socials.json`
       already names `.ca`, and the TUI picks that up from jsDelivr on its next
       pull, so no deploy is needed once the handle is live.
