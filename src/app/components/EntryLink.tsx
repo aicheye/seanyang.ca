@@ -61,13 +61,15 @@ function aspectRatio(url: string): string {
   return size ? `${size[0]} / ${size[1]}` : '16 / 9'
 }
 
-function setFocusParam(slug: string) {
+/* ?focus=<slug> names the open dialog, so a copied URL reopens it. Shared
+   with NotesGraph, whose dialog uses ?focus=notes. */
+export function setFocusParam(slug: string) {
   const url = new URL(window.location.href)
   url.searchParams.set('focus', slug)
   history.replaceState(null, '', url)
 }
 
-function clearFocusParam() {
+export function clearFocusParam() {
   const url = new URL(window.location.href)
   if (!url.searchParams.has('focus')) return
   url.searchParams.delete('focus')
