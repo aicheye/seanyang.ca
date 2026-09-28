@@ -1,17 +1,33 @@
 import Link from 'next/link'
-import { SITE_URL } from '@/data/site'
+import { DOCS_URL, SITE_URL } from '@/data/site'
+import { NotesGraph } from './NotesGraph'
 
 export function Footer() {
   return (
     <footer>
-      <a
-        href="https://websitecarbon.com/website/seanyang-ca/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        0.06 g CO₂ / view
-      </a>
-      <Link href="/mirrors">mirrors</Link>
+      <div className="footer-links">
+        <a
+          href="https://websitecarbon.com/website/seanyang-ca/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          0.06 g CO₂ / view
+        </a>
+        <span className="sep" aria-hidden="true">
+          ·
+        </span>
+        <Link href="/mirrors">mirrors</Link>
+        <span className="sep" aria-hidden="true">
+          ·
+        </span>
+        <a href={DOCS_URL} target="_blank" rel="noopener noreferrer">
+          docs ↗
+        </a>
+        <span className="sep" aria-hidden="true">
+          ·
+        </span>
+        <NotesGraph />
+      </div>
       <div className="webring-wrapper">
         <a
           className="webring"

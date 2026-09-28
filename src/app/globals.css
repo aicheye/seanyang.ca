@@ -730,6 +730,18 @@ footer a:hover {
   text-decoration: underline;
 }
 
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 14px;
+}
+
+.footer-links .sep {
+  color: var(--secondary);
+  font-weight: 700;
+}
+
 .webring-wrapper {
   display: flex;
   align-items: center;
@@ -1233,6 +1245,58 @@ footer a:hover {
   justify-content: flex-end;
 }
 
+/* Lecture notes graph: the footer's "notes" link opens
+   brain.seanyang.ca/embed in a dialog (NotesGraph.tsx). It is a button,
+   styled like the footer's links. */
+
+.notes-graph-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.notes-graph-btn:hover {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.notes-graph-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Fills the overlay, which already keeps 24px clear on every side. */
+.modal.notes-graph-modal {
+  width: 100%;
+  height: 100%;
+}
+
+/* Focus returns here after a click in the graph (see NotesGraph.tsx), which
+   is not a keyboard action, so no outline. */
+.modal.notes-graph-modal:focus {
+  outline: none;
+}
+
+.notes-graph-modal .modal-meta a {
+  color: inherit;
+}
+
+.notes-graph-modal iframe {
+  display: block;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
 .ssh-hint {
   display: flex;
   align-items: center;
@@ -1379,6 +1443,27 @@ footer a:hover {
 
   .gol-controls {
     display: none;
+  }
+
+  /* One link per line instead of a dotted row */
+  .footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .footer-links .sep {
+    display: none;
+  }
+
+  footer {
+    align-items: flex-start;
+  }
+
+  .webring-wrapper {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
   }
 
   body::before {
