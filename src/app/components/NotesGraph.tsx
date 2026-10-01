@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { FiX } from 'react-icons/fi'
 import { PiGraph } from 'react-icons/pi'
-import { clearFocusParam, setFocusParam } from './EntryLink'
+import { useFocusDialog } from './EntryLink'
 
 const BRAIN_URL = 'https://brain.seanyang.ca'
 
@@ -14,26 +14,41 @@ const SLUG = 'notes'
 /* The footer's "notes" link, which opens the lecture-notes graph from
    brain.seanyang.ca in a dialog. brain's /embed page draws only the graph
    and opens clicked notes in a new tab; its frame-ancestors header allows
-   this site, the mirrors, and localhost:3000. The iframe exists only while
-   the dialog is open, so the graph is never downloaded until someone opens
-   it. */
+   this site, the mirrors, and localhost:3000. The iframe is added, hidden,
+   once the page has loaded, so the graph is downloaded before anyone opens
+   it. /embed?wait runs no physics and draws nothing until this page posts
+   "brain:play", which it does each time the dialog opens. */
 export function NotesGraph() {
-  const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
   const dialog = useRef<HTMLDivElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
 
-  const openDialog = useCallback(() => {
-    setOpen(true)
-    setFocusParam(SLUG)
+  const { open, setOpen, show: openDialog, close } = useFocusDialog(SLUG, trigger)
+  const [pageLoaded, setPageLoaded] = useState(false)
+
+  useEffect(() => {
+    const onLoad = () => setPageLoaded(true)
+    if (document.readyState === 'complete') onLoad()
+    else window.addEventListener('load', onLoad, { once: true })
+    return () => window.removeEventListener('load', onLoad)
   }, [])
 
-  const close = useCallback(() => {
-    setOpen(false)
-    clearFocusParam()
-    trigger.current?.focus()
+  const play = useCallback(() => {
+    frame.current?.contentWindow?.postMessage('brain:play', BRAIN_URL)
   }, [])
+
+  // A play posted before the frame's script listens is lost, so the frame
+  // posts "brain:ready" once it listens, and gets another play if open.
+  useEffect(() => {
+    if (!open) return
+    play()
+    const onMessage = (e: MessageEvent) => {
+      if (e.source === frame.current?.contentWindow && e.data === 'brain:ready') play()
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [open, play])
 
   // Opened from a shared link: show the dialog, with the footer behind it.
   useEffect(() => {
@@ -43,7 +58,7 @@ export function NotesGraph() {
       trigger.current?.scrollIntoView({ block: 'center' })
     }, 50)
     return () => clearTimeout(id)
-  }, [])
+  }, [setOpen])
 
   useEffect(() => {
     if (!open) return
@@ -86,9 +101,9 @@ export function NotesGraph() {
         <PiGraph size={18} />
         notes
       </button>
-      {open &&
+      {(open || pageLoaded) &&
         createPortal(
-          <div className="modal-overlay" onClick={close}>
+          <div className="modal-overlay" hidden={!open} onClick={close}>
             <div
               ref={dialog}
               className="modal notes-graph-modal"
@@ -124,8 +139,8 @@ export function NotesGraph() {
                   open in a new tab. */}
               <iframe
                 ref={frame}
-                src={`${BRAIN_URL}/embed`}
-                title="Graph of my lecture notes"
+                src={`${BRAIN_URL}/embed?wait`}
+                aria-label="Graph of my lecture notes"
                 // eslint-disable-next-line react/iframe-missing-sandbox
                 sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
               />

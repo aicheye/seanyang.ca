@@ -330,6 +330,17 @@ h2 span {
   animation: modal-fade 0.15s ease-out;
 }
 
+/* The notes dialog stays in the page while closed, so its graph is loaded
+   before it opens. It keeps its layout, because a graph built in a
+   display:none frame measures a 0×0 view and frames and zooms from that.
+   Removing animation: none on open plays the fade again. */
+.modal-overlay[hidden] {
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+}
+
 .modal {
   display: flex;
   flex-direction: column;

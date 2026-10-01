@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import type { MouseEvent } from 'react'
+import type { MouseEvent, RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
 import type { EntryPage } from '@/data/entry'
@@ -61,19 +61,51 @@ function aspectRatio(url: string): string {
   return size ? `${size[0]} / ${size[1]}` : '16 / 9'
 }
 
-/* ?focus=<slug> names the open dialog, so a copied URL reopens it. Shared
-   with NotesGraph, whose dialog uses ?focus=notes. */
-export function setFocusParam(slug: string) {
-  const url = new URL(window.location.href)
-  url.searchParams.set('focus', slug)
-  history.replaceState(null, '', url)
-}
+/* ?focus=<slug> names the open dialog, so a copied URL reopens it. Opening
+   the dialog pushes a history entry, so Back closes it and Forward reopens it.
+   A dialog opened from a shared link has no entry under it to go back to, so
+   closing it removes the param in place. Shared with NotesGraph, whose dialog
+   uses ?focus=notes. */
+export function useFocusDialog(slug: string, trigger: RefObject<HTMLElement | null>) {
+  const [open, setOpen] = useState(false)
+  // True while the current history entry is one this dialog pushed.
+  const pushed = useRef(false)
 
-export function clearFocusParam() {
-  const url = new URL(window.location.href)
-  if (!url.searchParams.has('focus')) return
-  url.searchParams.delete('focus')
-  history.replaceState(null, '', url)
+  const show = useCallback(() => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('focus', slug)
+    history.pushState(null, '', url)
+    pushed.current = true
+    setOpen(true)
+  }, [slug])
+
+  const close = useCallback(() => {
+    // The popstate handler below closes the dialog.
+    if (pushed.current) {
+      history.back()
+      return
+    }
+    const url = new URL(window.location.href)
+    url.searchParams.delete('focus')
+    history.replaceState(null, '', url)
+    setOpen(false)
+    trigger.current?.focus()
+  }, [trigger])
+
+  useEffect(() => {
+    const onPop = () => {
+      const want = new URLSearchParams(window.location.search).get('focus') === slug
+      if (want === open) return
+      // Forward onto this dialog's entry means the entry behind it lacks the param.
+      pushed.current = want
+      setOpen(want)
+      if (!want) trigger.current?.focus()
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [slug, open, trigger])
+
+  return { open, setOpen, show, close }
 }
 
 export function EntryLink({
@@ -105,7 +137,6 @@ export function EntryLink({
   )
   const imageUrls = useMemo(() => pages.flatMap((p) => (p.media ? [p.media] : [])), [pages])
   const icon = iconProp && withBase(iconProp)
-  const [open, setOpen] = useState(false)
   const [page, setPage] = useState(0)
   const [src, setSrc] = useState<string | null>(null)
   const [failed, setFailed] = useState(false)
@@ -126,11 +157,7 @@ export function EntryLink({
   const media = current?.media
   const ratio = ratios[page]
 
-  const close = useCallback(() => {
-    setOpen(false)
-    clearFocusParam()
-    trigger.current?.focus()
-  }, [])
+  const { open, setOpen, show, close } = useFocusDialog(slug, trigger)
 
   /* A fresh object URL per show so a gif always restarts from frame 0 —
      a cached <img> src can resume mid-loop in some browsers. */
@@ -167,10 +194,9 @@ export function EntryLink({
         const iconBlob = cachedMedia(icon)
         iconUrl.current = iconBlob ? URL.createObjectURL(iconBlob) : null
       }
-      setOpen(true)
-      setFocusParam(slug)
+      show()
     },
-    [goTo, icon, slug],
+    [goTo, icon, show],
   )
 
   /* Hovering or tabbing to the title is a strong hint the demo is about to be
@@ -189,7 +215,7 @@ export function EntryLink({
     setTimeout(() => {
       trigger.current?.scrollIntoView({ block: 'center' })
     }, 50)
-  }, [slug])
+  }, [slug, setOpen])
 
   useEffect(() => {
     if (!open || !media || shown.current === media) return
