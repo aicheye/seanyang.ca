@@ -1,6 +1,6 @@
 # seanyang.ca
 
-Personal website built with Next.js, React, and TypeScript. Deployed on Vercel with static mirrors on UW student servers and tilde.club.
+Personal website built with Next.js, React, and TypeScript. Deployed on Vercel with static mirrors on UW student servers, the CS Club server, and tilde.club.
 
 ## Tech Stack
 
@@ -29,15 +29,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Mirrors
 
-Static copies of the site are hosted on UW student servers and tilde.club. They are built with `output: export` and served as plain files out of `~/public_html`.
+Static copies of the site are hosted on UW student servers, the CS Club server, and tilde.club. They are built with `output: export` and served as plain files out of `~/public_html` (`~/www` on CSC).
 
-| Mirror                                       | SSH server                        |
-| -------------------------------------------- | --------------------------------- |
-| https://student.cs.uwaterloo.ca/~s532yang/   | `linux.student.cs.uwaterloo.ca`   |
-| https://ece.uwaterloo.ca/~s532yang/          | `eceubuntu1.uwaterloo.ca`         |
-| https://www.eng.uwaterloo.ca/~s532yang/      | `sftp.eng.uwaterloo.ca`           |
-| https://student.math.uwaterloo.ca/~s532yang/ | `linux.student.math.uwaterloo.ca` |
-| https://tilde.club/~syang/                   | `tilde.club`                      |
+| Mirror                                       | SSH server                                     |
+| -------------------------------------------- | ---------------------------------------------- |
+| https://student.cs.uwaterloo.ca/~s532yang/   | `linux.student.cs.uwaterloo.ca`                |
+| https://ece.uwaterloo.ca/~s532yang/          | `eceubuntu1.uwaterloo.ca`                      |
+| https://www.eng.uwaterloo.ca/~s532yang/      | `sftp.eng.uwaterloo.ca`                        |
+| https://student.math.uwaterloo.ca/~s532yang/ | `linux.student.math.uwaterloo.ca`              |
+| https://csclub.uwaterloo.ca/~s532yang/       | `high-fructose-corn-syrup.csclub.uwaterloo.ca` |
+| https://tilde.club/~syang/                   | `tilde.club`                                   |
 
 ### Deploying mirrors
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Build a static copy of the site for the UW student servers and tilde.club,
-# which serve plain files out of ~/public_html at https://<host>/~<user>/
-# where <host> is student.cs.uwaterloo.ca, ece.uwaterloo.ca,
-# student.math.uwaterloo.ca, www.eng.uwaterloo.ca, or tilde.club.
+# Build a static copy of the site for the UW student servers, CSC, and
+# tilde.club, which serve plain files out of ~/public_html (~/www on CSC) at
+# https://<host>/~<user>/ where <host> is student.cs.uwaterloo.ca,
+# ece.uwaterloo.ca, student.math.uwaterloo.ca, www.eng.uwaterloo.ca,
+# csclub.uwaterloo.ca, or tilde.club.
 # Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math /
-# sftp.eng / tilde.club.
+# sftp.eng / high-fructose-corn-syrup.csclub / tilde.club.
 #
 # Usage:
 #   scripts/build-static.sh <userid>
