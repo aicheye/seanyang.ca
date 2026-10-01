@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the static export and deploy to the UW mirrors and tilde.club.
+# Build the static export and deploy to the UW mirrors, CSC, and tilde.club.
 #
 # Usernames come from ~/.ssh/config (resolved with `ssh -G`), so each host
 # needs a `User` entry there. Hosts sharing a user share one build (the
@@ -16,7 +16,13 @@ HOSTS=(
   eceubuntu1.uwaterloo.ca
   sftp.eng.uwaterloo.ca
   linux.student.math.uwaterloo.ca
+  high-fructose-corn-syrup.csclub.uwaterloo.ca
   tilde.club
+)
+
+# Apache serves ~/public_html everywhere except CSC, which serves ~/www.
+declare -A WEB_DIRS=(
+  [high-fructose-corn-syrup.csclub.uwaterloo.ca]=www
 )
 
 # Resolve each host's user from ssh config. `ssh -G` falls back to the
@@ -33,9 +39,10 @@ done
 
 deploy() {
   local user="$1" host="$2"
+  local dir="${WEB_DIRS[$host]:-public_html}"
   echo "deploying to $host ..."
-  scp -r "$ROOT/out/." "${user}@${host}:~/public_html/"
-  ssh "${user}@${host}" 'chmod -R a+rX ~/public_html'
+  scp -r "$ROOT/out/." "${user}@${host}:~/${dir}/"
+  ssh "${user}@${host}" "chmod -R a+rX ~/${dir}"
   echo "$host done"
 }
 
