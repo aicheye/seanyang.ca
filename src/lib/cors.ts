@@ -16,7 +16,6 @@ const ALLOWED_ORIGINS = new Set([
   'https://tilde.club',
   'https://www.tilde.club',
   'https://envs.net',
-  'https://syang.envs.net',
 ])
 
 export function corsHeaders(req: Request): Record<string, string> {
