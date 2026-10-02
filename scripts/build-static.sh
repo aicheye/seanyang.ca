@@ -1,34 +1,28 @@
 #!/usr/bin/env bash
-# Build a static copy of the site for the UW student servers, CSC, and
-# tilde.club, which serve plain files out of ~/public_html (~/www on CSC) at
-# https://<host>/~<user>/ where <host> is student.cs.uwaterloo.ca,
-# ece.uwaterloo.ca, student.math.uwaterloo.ca, www.eng.uwaterloo.ca,
-# csclub.uwaterloo.ca, or tilde.club.
-# Upload over ssh to linux.student.cs / eceubuntu1 / linux.student.math /
-# sftp.eng / high-fructose-corn-syrup.csclub / tilde.club.
+# Build one static copy of the site for every mirror (UW student servers,
+# CSC, tilde.club, envs.net). They serve plain files at
+# https://<host>/~<user>/, so the basePath depends on the username. This
+# build uses the placeholder basePath below; scripts/deploy-mirrors.sh
+# copies out/ per host and replaces the placeholder with /~<user>, so
+# every mirror shares one `next build`.
 #
 # Usage:
-#   scripts/build-static.sh <userid>
-#   scp -r out/. <watiam>@linux.student.cs.uwaterloo.ca:~/public_html/
+#   scripts/build-static.sh
 #
 # The production (Vercel) build is untouched: everything server-side is
 # stripped only for this build, and the sources moved aside are restored
 # on exit even if the build fails.
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-  echo "usage: $0 <watiam-userid>" >&2
-  exit 1
-fi
-
-WATIAM="$1"
-BASE_PATH="/~${WATIAM}"
+# Must match MIRROR_BASE_PLACEHOLDER in scripts/deploy-mirrors.sh.
+BASE_PATH="/__MIRROR_BASE_PATH__"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 # Route handlers can't exist in an `output: export` build: the API route
 # sources are dropped (the NowPlaying widget calls prod's routes cross-origin
-# instead), and /resume + /transcript become .htaccess redirects to prod.
+# instead), and /resume + /transcript become redirects to prod, which
+# deploy-mirrors.sh adds per host.
 BAK="$(mktemp -d)"
 restore() {
   [[ -e "$BAK/api" ]] && mv "$BAK/api" src/app/api
@@ -65,27 +59,5 @@ find out -mindepth 1 -type d | while read -r d; do
   [ -f "${d}.html" ] && rm -rf "$d"
 done
 
-# The static site.webmanifest has root-relative icon paths; rewrite them
-# so they resolve under the basePath on the mirrors.
-sed -i "s|\"src\": \"/|\"src\": \"${BASE_PATH}/|g" out/site.webmanifest
-
-# UW's Apache honors .htaccess. Redirect the proxy paths to prod, which
-# serves the PDFs, and serve the exported 404 page. Images get the same
-# Cache-Control as prod (IMAGE_CACHE_CONTROL in src/lib/cache.ts); the
-# IfModule keeps the file valid if mod_headers is off.
-cat > out/.htaccess <<EOF
-Options -Indexes
-ErrorDocument 404 ${BASE_PATH}/404.html
-RedirectMatch 302 ^${BASE_PATH}/resume(\.pdf)?/?$ https://seanyang.ca/resume
-RedirectMatch 302 ^${BASE_PATH}/transcript(\.pdf)?/?$ https://seanyang.ca/transcript
-<IfModule mod_headers.c>
-  <FilesMatch "\.(png|jpe?g|gif|webp|svg|ico|mp4|webm)\$">
-    Header set Cache-Control "public, max-age=86400, stale-while-revalidate=604800"
-  </FilesMatch>
-</IfModule>
-EOF
-
 echo
-echo "Static build done: $ROOT/out"
-echo "Deploy: scp -r out/. ${WATIAM}@linux.student.cs.uwaterloo.ca:~/public_html/"
-echo "Then:   ssh ${WATIAM}@linux.student.cs.uwaterloo.ca 'chmod -R a+rX ~/public_html'"
+echo "Static build done: $ROOT/out (basePath placeholder ${BASE_PATH})"
