@@ -39,10 +39,10 @@ declare -A NGINX_HOSTS=(
 )
 
 # envs.net also serves ~/public_html at https://<user>.envs.net/, where the
-# pages' /~<user>/ asset paths would 404. A ~<user> -> . symlink in the web
-# root makes those paths resolve there too.
-declare -A SUBDOMAIN_HOSTS=(
-  [envs.net]=1
+# pages' /~<user>/ asset paths 404. Pages on these hosts send any other
+# origin to the same path on the canonical one.
+declare -A CANONICAL_ORIGINS=(
+  [envs.net]=https://envs.net
 )
 
 # Resolve each host's user from ssh config. `ssh -G` falls back to the
@@ -83,6 +83,15 @@ stage() {
   # so they resolve under the basePath.
   sed -i "s|\"src\": \"/|\"src\": \"${base}/|g" "$dir/site.webmanifest"
 
+  local origin="${CANONICAL_ORIGINS[$host]:-}"
+  if [[ -n "$origin" ]]; then
+    # https://syang.envs.net/mirrors/ goes to https://envs.net/~syang/mirrors/.
+    # The script is first in <head>, so it runs before any asset loads.
+    local js="if(location.origin!=='${origin}'){var p=location.pathname,b='${base}';if(p!==b)if(p.indexOf(b+'/'))p=b+p;location.replace('${origin}'+p+location.search+location.hash)}"
+    find "$dir" -name '*.html' -print0 \
+      | xargs -0 -r sed -i "0,/<head>/s#<head>#<head><script>${js}</script>#"
+  fi
+
   if [[ -n "${NGINX_HOSTS[$host]:-}" ]]; then
     # /page 301s to /page/, which serves page/index.html.
     find "$dir" -name '*.html' ! -name index.html ! -name 404.html \
@@ -118,9 +127,6 @@ deploy() {
   echo "deploying to $host ..."
   scp -r "$ROOT/out-mirrors/$host/." "${user}@${host}:~/${dir}/"
   ssh "${user}@${host}" "chmod -R a+rX ~/${dir}"
-  if [[ -n "${SUBDOMAIN_HOSTS[$host]:-}" ]]; then
-    ssh "${user}@${host}" "ln -sfn . ~/${dir}/~${user}"
-  fi
   echo "$host done"
 }
 
