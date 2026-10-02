@@ -13,6 +13,7 @@ const MIRRORS = [
   'https://student.math.uwaterloo.ca/~s532yang/',
   'https://csclub.uwaterloo.ca/~s532yang/',
   'https://tilde.club/~syang/',
+  'https://envs.net/~syang/',
 ]
 
 export default function MirrorsPage() {
