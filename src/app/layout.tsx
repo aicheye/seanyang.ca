@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
+import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/data/site'
@@ -12,12 +12,9 @@ const geist = Geist({
   variable: '--font-geist',
 })
 
-// Display face for the name and dialog titles; a single-weight serif, so
-// the weight has to be named.
-const instrumentSerif = Instrument_Serif({
+const unbounded = Unbounded({
   subsets: ['latin'],
-  weight: '400',
-  variable: '--font-serif',
+  variable: '--font-unbounded',
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -55,10 +52,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geist.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en" className={`${geist.variable} ${unbounded.variable} ${jetbrainsMono.variable}`}>
       <body>
         {children}
         {/* Vercel telemetry POSTs to /_vercel/* — dead endpoints on the

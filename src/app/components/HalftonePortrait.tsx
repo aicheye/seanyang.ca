@@ -9,9 +9,10 @@ import { withBase } from '@/lib/basePath'
    photo is under it, and fade out toward the edges so the night background
    dissolves into the paper instead of printing as a black square.
 
-   The dots are live: the pointer pushes them aside and they spring back,
-   and while hovered a second, accent-coloured pass prints slightly off
-   register under the ink, like a two-colour print that didn't quite line up. */
+   The dots are live: they print on in a diagonal sweep when the page loads,
+   a moving pointer brushes them aside and they spring back, and while hovered a
+   second, accent-coloured pass prints slightly off register under the ink,
+   like a two-colour print that didn't quite line up. */
 
 const SRC = '/assets/portrait.webp'
 const SAMPLE = 160 // the photo is read at this many pixels across
@@ -23,10 +24,14 @@ const GAMMA = 0.7 // < 1 lifts the mid-tones, so the lit face still gets ink
 const MIN_RADIUS = 0.2
 
 const PUSH_RADIUS = 36
-const PUSH_FORCE = 0.7
+const PUSH_FORCE = 0.11 // per css px the pointer travels; a still pointer leaves the dots alone
+const PUSH_MAX_TRAVEL = 24 // one event's travel is capped so a fast swipe doesn't scatter dots
 const SPRING = 0.1
 const DAMPING = 0.8
 const REST = 0.02 // offsets and velocities below this count as settled
+
+const PRINT_MS = 1100 // the opening sweep, corner to corner
+const PRINT_EDGE = 0.18 // width of the sweep's soft edge, as a fraction of the diagonal
 
 const SHIFT_X = 1.4 // accent pass offset, css px
 const SHIFT_Y = 0.9
@@ -128,61 +133,63 @@ export function HalftonePortrait() {
     let pointer: { x: number; y: number } | null = null
     let raf = 0
     let img: HTMLImageElement | null = null
+    let printedAt = 0 // when the opening sweep started
+    let print = reduceMotion ? 1 : 0 // 0..1, how far the sweep has got
+
+    // Each dot's radius right now: the screened radius, scaled by the sweep
+    // front — 0 ahead of it, full behind it, with a soft edge between.
+    const radius = (i: number): number => {
+      if (print >= 1) return dots!.r[i]
+      const along = (dots!.x[i] + dots!.y[i]) / (2 * size)
+      const front = print * (1 + PRINT_EDGE)
+      return dots!.r[i] * Math.min(1, Math.max(0, (front - along) / PRINT_EDGE))
+    }
+
+    const pass = (dx: number, dy: number) => {
+      const { n, x, y } = dots!
+      ctx.beginPath()
+      for (let i = 0; i < n; i++) {
+        const rr = radius(i)
+        if (rr <= 0) continue
+        const cx = x[i] + ox[i] + dx
+        const cy = y[i] + oy[i] + dy
+        ctx.moveTo(cx + rr, cy)
+        ctx.arc(cx, cy, rr, 0, Math.PI * 2)
+      }
+      ctx.fill()
+    }
 
     const draw = () => {
       if (!dots) return
       const dpr = window.devicePixelRatio || 1
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.clearRect(0, 0, size, size)
-      const { n, x, y, r } = dots
       if (shift > 0.01) {
         ctx.globalAlpha = SHIFT_ALPHA * shift
         ctx.fillStyle = accent
-        ctx.beginPath()
-        const sx = SHIFT_X * shift
-        const sy = SHIFT_Y * shift
-        for (let i = 0; i < n; i++) {
-          const cx = x[i] + ox[i] + sx
-          const cy = y[i] + oy[i] + sy
-          ctx.moveTo(cx + r[i], cy)
-          ctx.arc(cx, cy, r[i], 0, Math.PI * 2)
-        }
-        ctx.fill()
+        pass(SHIFT_X * shift, SHIFT_Y * shift)
         ctx.globalAlpha = 1
       }
       ctx.fillStyle = ink
-      ctx.beginPath()
-      for (let i = 0; i < n; i++) {
-        const cx = x[i] + ox[i]
-        const cy = y[i] + oy[i]
-        ctx.moveTo(cx + r[i], cy)
-        ctx.arc(cx, cy, r[i], 0, Math.PI * 2)
-      }
-      ctx.fill()
+      pass(0, 0)
     }
 
     // One physics step. Returns whether anything is still moving.
     const step = (): boolean => {
       if (!dots) return false
       let moving = false
+      if (print < 1) {
+        print = Math.min(1, (performance.now() - printedAt) / PRINT_MS)
+        moving = true
+      }
       const target = pointer ? 1 : 0
       if (Math.abs(shift - target) > 0.005) {
         shift += (target - shift) * 0.15
         moving = true
       } else shift = target
       if (reduceMotion) return moving
-      const { n, x, y } = dots
+      const { n } = dots
       for (let i = 0; i < n; i++) {
-        if (pointer) {
-          const dx = x[i] + ox[i] - pointer.x
-          const dy = y[i] + oy[i] - pointer.y
-          const d = Math.hypot(dx, dy)
-          if (d < PUSH_RADIUS && d > 0.001) {
-            const f = ((PUSH_RADIUS - d) / PUSH_RADIUS) * PUSH_FORCE
-            vx[i] += (dx / d) * f
-            vy[i] += (dy / d) * f
-          }
-        }
         vx[i] = (vx[i] - ox[i] * SPRING) * DAMPING
         vy[i] = (vy[i] - oy[i] * SPRING) * DAMPING
         ox[i] += vx[i]
@@ -228,7 +235,8 @@ export function HalftonePortrait() {
     image.onload = () => {
       img = image
       rebuild()
-      canvas.classList.add('portrait-ready')
+      printedAt = performance.now()
+      wake()
     }
     image.src = withBase(SRC)
 
@@ -237,9 +245,30 @@ export function HalftonePortrait() {
     })
     observer.observe(canvas)
 
+    // Each pointer move gives the dots around it a shove, outward from the
+    // pointer and in proportion to how far it travelled since the last move.
+    const brush = (px: number, py: number, travel: number) => {
+      if (!dots || reduceMotion) return
+      const { n, x, y } = dots
+      const f0 = Math.min(travel, PUSH_MAX_TRAVEL) * PUSH_FORCE
+      for (let i = 0; i < n; i++) {
+        const dx = x[i] + ox[i] - px
+        const dy = y[i] + oy[i] - py
+        const d = Math.hypot(dx, dy)
+        if (d < PUSH_RADIUS && d > 0.001) {
+          const f = ((PUSH_RADIUS - d) / PUSH_RADIUS) * f0
+          vx[i] += (dx / d) * f
+          vy[i] += (dy / d) * f
+        }
+      }
+    }
+
     const move = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect()
-      pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+      const px = e.clientX - rect.left
+      const py = e.clientY - rect.top
+      if (pointer) brush(px, py, Math.hypot(px - pointer.x, py - pointer.y))
+      pointer = { x: px, y: py }
       wake()
     }
     const leave = () => {

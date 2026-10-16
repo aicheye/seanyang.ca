@@ -10,16 +10,15 @@
   --desk: #e6dcc4;
   --bg: var(--paper);
   --border: #d2c6a9;
-  --rule: color-mix(in srgb, var(--ink) 28%, transparent);
   --accent: #c8502c;
   --secondary: #6f8a45;
   --link: #2a6aa8;
   --badge-bg: #e6dcc3;
   --surface: rgba(241, 233, 214, 0.9);
   --surface-shadow: rgba(42, 29, 21, 0.14);
-  --display: var(--font-serif), 'Iowan Old Style', Georgia, serif;
-  /* A row (or column) of halftone dots, used in place of hairline rules. */
-  --dot-row: radial-gradient(circle at 2px 2px, var(--rule) 1px, transparent 1.5px);
+  --display: var(--font-unbounded), system-ui, sans-serif;
+  /* Section rule: a row of halftone dots that shrink away to the right. */
+  --halftone-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='8' fill='%232a1d15' fill-opacity='.32'%3E%3Ccircle cx='4' cy='4' r='2.55'/%3E%3Ccircle cx='12' cy='4' r='2.51'/%3E%3Ccircle cx='20' cy='4' r='2.48'/%3E%3Ccircle cx='28' cy='4' r='2.44'/%3E%3Ccircle cx='36' cy='4' r='2.40'/%3E%3Ccircle cx='44' cy='4' r='2.37'/%3E%3Ccircle cx='52' cy='4' r='2.33'/%3E%3Ccircle cx='60' cy='4' r='2.30'/%3E%3Ccircle cx='68' cy='4' r='2.26'/%3E%3Ccircle cx='76' cy='4' r='2.23'/%3E%3Ccircle cx='84' cy='4' r='2.19'/%3E%3Ccircle cx='92' cy='4' r='2.16'/%3E%3Ccircle cx='100' cy='4' r='2.12'/%3E%3Ccircle cx='108' cy='4' r='2.09'/%3E%3Ccircle cx='116' cy='4' r='2.05'/%3E%3Ccircle cx='124' cy='4' r='2.02'/%3E%3Ccircle cx='132' cy='4' r='1.98'/%3E%3Ccircle cx='140' cy='4' r='1.95'/%3E%3Ccircle cx='148' cy='4' r='1.92'/%3E%3Ccircle cx='156' cy='4' r='1.88'/%3E%3Ccircle cx='164' cy='4' r='1.85'/%3E%3Ccircle cx='172' cy='4' r='1.82'/%3E%3Ccircle cx='180' cy='4' r='1.78'/%3E%3Ccircle cx='188' cy='4' r='1.75'/%3E%3Ccircle cx='196' cy='4' r='1.72'/%3E%3Ccircle cx='204' cy='4' r='1.69'/%3E%3Ccircle cx='212' cy='4' r='1.65'/%3E%3Ccircle cx='220' cy='4' r='1.62'/%3E%3Ccircle cx='228' cy='4' r='1.59'/%3E%3Ccircle cx='236' cy='4' r='1.56'/%3E%3Ccircle cx='244' cy='4' r='1.53'/%3E%3Ccircle cx='252' cy='4' r='1.50'/%3E%3Ccircle cx='260' cy='4' r='1.47'/%3E%3Ccircle cx='268' cy='4' r='1.44'/%3E%3Ccircle cx='276' cy='4' r='1.41'/%3E%3Ccircle cx='284' cy='4' r='1.37'/%3E%3Ccircle cx='292' cy='4' r='1.35'/%3E%3Ccircle cx='300' cy='4' r='1.32'/%3E%3Ccircle cx='308' cy='4' r='1.29'/%3E%3Ccircle cx='316' cy='4' r='1.26'/%3E%3Ccircle cx='324' cy='4' r='1.23'/%3E%3Ccircle cx='332' cy='4' r='1.20'/%3E%3Ccircle cx='340' cy='4' r='1.17'/%3E%3Ccircle cx='348' cy='4' r='1.14'/%3E%3Ccircle cx='356' cy='4' r='1.11'/%3E%3Ccircle cx='364' cy='4' r='1.09'/%3E%3Ccircle cx='372' cy='4' r='1.06'/%3E%3Ccircle cx='380' cy='4' r='1.03'/%3E%3Ccircle cx='388' cy='4' r='1.01'/%3E%3Ccircle cx='396' cy='4' r='0.98'/%3E%3Ccircle cx='404' cy='4' r='0.95'/%3E%3Ccircle cx='412' cy='4' r='0.93'/%3E%3Ccircle cx='420' cy='4' r='0.90'/%3E%3Ccircle cx='428' cy='4' r='0.87'/%3E%3Ccircle cx='436' cy='4' r='0.85'/%3E%3Ccircle cx='444' cy='4' r='0.82'/%3E%3Ccircle cx='452' cy='4' r='0.80'/%3E%3Ccircle cx='460' cy='4' r='0.78'/%3E%3Ccircle cx='468' cy='4' r='0.75'/%3E%3Ccircle cx='476' cy='4' r='0.73'/%3E%3Ccircle cx='484' cy='4' r='0.70'/%3E%3Ccircle cx='492' cy='4' r='0.68'/%3E%3Ccircle cx='500' cy='4' r='0.66'/%3E%3Ccircle cx='508' cy='4' r='0.64'/%3E%3Ccircle cx='516' cy='4' r='0.62'/%3E%3Ccircle cx='524' cy='4' r='0.59'/%3E%3Ccircle cx='532' cy='4' r='0.57'/%3E%3Ccircle cx='540' cy='4' r='0.55'/%3E%3Ccircle cx='548' cy='4' r='0.53'/%3E%3Ccircle cx='556' cy='4' r='0.51'/%3E%3Ccircle cx='564' cy='4' r='0.49'/%3E%3Ccircle cx='572' cy='4' r='0.47'/%3E%3Ccircle cx='580' cy='4' r='0.45'/%3E%3Ccircle cx='588' cy='4' r='0.44'/%3E%3Ccircle cx='596' cy='4' r='0.42'/%3E%3Ccircle cx='604' cy='4' r='0.40'/%3E%3Ccircle cx='612' cy='4' r='0.38'/%3E%3Ccircle cx='620' cy='4' r='0.37'/%3E%3Ccircle cx='628' cy='4' r='0.35'/%3E%3Ccircle cx='636' cy='4' r='0.34'/%3E%3Ccircle cx='644' cy='4' r='0.32'/%3E%3Ccircle cx='652' cy='4' r='0.31'/%3E%3Ccircle cx='660' cy='4' r='0.30'/%3E%3Ccircle cx='668' cy='4' r='0.29'/%3E%3Ccircle cx='676' cy='4' r='0.28'/%3E%3Ccircle cx='684' cy='4' r='0.27'/%3E%3Ccircle cx='692' cy='4' r='0.26'/%3E%3Ccircle cx='700' cy='4' r='0.25'/%3E%3C/svg%3E");
 
   font:
     16px/1.7 var(--font-geist),
@@ -47,7 +46,7 @@ body::after {
   z-index: 5;
   pointer-events: none;
   mix-blend-mode: multiply;
-  opacity: 0.5;
+  opacity: 0.45;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.22 0 0 0 0 0.15 0 0 0 0 0.09 0.9 0 0 0 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.22' numOctaves='3' stitchTiles='stitch' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.12 0.4 0 0 0 -0.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
@@ -63,9 +62,8 @@ body::after {
 
 h1 {
   font-family: var(--display);
-  font-size: 44px;
-  font-weight: 400;
-  line-height: 1;
+  font-size: 28px;
+  font-weight: 600;
   color: var(--text-h);
   letter-spacing: -0.5px;
   margin: 0;
@@ -99,8 +97,7 @@ a:focus-visible {
 
 .site a:hover {
   color: var(--link);
-  text-decoration: underline dotted;
-  text-underline-offset: 3px;
+  text-decoration: underline;
 }
 
 /* Header */
@@ -129,17 +126,9 @@ header {
   width: var(--portrait);
   height: var(--portrait);
   flex-shrink: 0;
-  /* above the fold with nothing drawn yet, the canvas is blank paper; it
-     fades in once the dots are screened */
-  opacity: 0;
-  transition: opacity 0.5s ease-out;
   /* the dots move under the pointer, so the pointer stays on the canvas */
   touch-action: none;
   cursor: crosshair;
-}
-
-.portrait.portrait-ready {
-  opacity: 1;
 }
 
 .name-row {
@@ -179,17 +168,18 @@ section {
   grid-template-columns: 100px 1fr;
   gap: 0 40px;
   margin-bottom: 56px;
-  /* a row of dots instead of a hairline */
-  background: var(--dot-row) left top / 6px 4px repeat-x;
+  /* the rule is 700px of shrinking dots; narrower columns just lose the
+     tail end, which is nearly gone by then anyway */
+  background: var(--halftone-rule) left top / 700px 8px no-repeat;
   padding-top: 40px;
 }
 
 h2 {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--display);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.6px;
+  letter-spacing: 1.2px;
   color: var(--secondary);
   margin: 0;
   padding-top: 3px;
@@ -219,7 +209,7 @@ h2 span {
 /* Quote */
 
 .quote {
-  background: var(--dot-row) left top / 4px 6px repeat-y;
+  border-left: 1px solid var(--border);
   padding-left: 16px;
   margin: 0 3px 60px;
 }
@@ -596,7 +586,6 @@ h2 span {
   color: var(--accent);
   padding: 0;
   cursor: pointer;
-  box-shadow: 2px 2px 0 var(--border);
 }
 
 .modal-page-btn:hover:not(:disabled) {
@@ -703,11 +692,10 @@ h2 span {
 }
 
 .badge {
-  font-family: var(--font-mono), monospace;
-  font-size: 12.5px;
+  font-size: 14px;
   padding: 1px 6px;
   border-radius: 3px;
-  border: 1px solid var(--border);
+  background: var(--badge-bg);
   color: var(--text);
 }
 
@@ -796,7 +784,7 @@ h2 span {
 footer {
   margin-top: auto;
   padding-top: 16px;
-  background: var(--dot-row) left top / 6px 4px repeat-x;
+  border-top: 1px solid var(--border);
   font-size: 14px;
   color: var(--text);
   display: flex;
@@ -918,8 +906,7 @@ footer a:hover {
   align-items: flex-start;
   gap: 10px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 3px 3px 0 var(--border);
+  box-shadow: 0 0 20px 8px var(--surface);
   padding: 10px 12px;
   cursor: pointer;
   text-decoration: none;
@@ -1278,8 +1265,7 @@ footer a:hover {
   align-items: flex-end;
   gap: 6px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 3px 3px 0 var(--border);
+  box-shadow: 0 0 60px 30px var(--surface);
   padding: 10px 12px;
 }
 
@@ -1303,19 +1289,11 @@ footer a:hover {
   border-radius: 4px;
   padding: 2px 8px;
   cursor: pointer;
-  box-shadow: 2px 2px 0 var(--border);
 }
 
 .gol-btn:hover {
   border-color: var(--accent);
   color: var(--text-h);
-}
-
-.gol-btn:active,
-.ssh-copy:active,
-.modal-page-btn:active:not(:disabled) {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 var(--border);
 }
 
 .gol-slider-row {
@@ -1419,7 +1397,6 @@ footer a:hover {
   padding: 5px 10px;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 2px 2px 0 var(--border);
 }
 
 .ssh-copy:hover {
@@ -1474,10 +1451,6 @@ footer a:hover {
     padding: 48px max(20px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom))
       max(20px, env(safe-area-inset-left));
     min-height: unset;
-  }
-
-  h1 {
-    font-size: 36px;
   }
 
   .masthead {
