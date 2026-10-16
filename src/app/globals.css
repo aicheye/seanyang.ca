@@ -1,15 +1,25 @@
 :root {
-  --text: #6b5545;
-  --text-h: #3b2010;
-  --bg: #fdf6e3;
-  --border: #d6cfb8;
-  --accent: #d16d3e;
-  --secondary: #77934d;
-  --link: #268bd2;
-  --badge-bg: #eee8d5;
-  --surface: rgba(253, 246, 227, 0.8);
-  --surface-shadow: var(--surface);
-  --display: var(--font-unbounded), system-ui, sans-serif;
+  /* Ink on paper: the sheet (.site) is a lighter leaf laid on a slightly
+     darker desk (body), and everything is drawn in one brown ink with a
+     print-red accent. The grain is a fixed noise layer over the whole page
+     (body::after) so the paper reads as paper, not a flat fill. */
+  --ink: #2a1d15;
+  --text: #5e4a3a;
+  --text-h: var(--ink);
+  --paper: #f1e9d6;
+  --desk: #e6dcc4;
+  --bg: var(--paper);
+  --border: #d2c6a9;
+  --rule: color-mix(in srgb, var(--ink) 28%, transparent);
+  --accent: #c8502c;
+  --secondary: #6f8a45;
+  --link: #2a6aa8;
+  --badge-bg: #e6dcc3;
+  --surface: rgba(241, 233, 214, 0.9);
+  --surface-shadow: rgba(42, 29, 21, 0.14);
+  --display: var(--font-serif), 'Iowan Old Style', Georgia, serif;
+  /* A row (or column) of halftone dots, used in place of hairline rules. */
+  --dot-row: radial-gradient(circle at 2px 2px, var(--rule) 1px, transparent 1.5px);
 
   font:
     16px/1.7 var(--font-geist),
@@ -17,12 +27,33 @@
     sans-serif;
   user-select: none;
   color: var(--text);
-  background: var(--bg);
+  background: var(--desk);
   -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
+  /* a little darker toward the corners, like a desk lamp over the sheet */
+  background: radial-gradient(ellipse 120% 90% at 50% 20%, transparent 40%, rgba(42, 29, 21, 0.09));
+}
+
+/* Paper grain: two layers of SVG noise, a fine tooth and some long fibres,
+   multiplied over the whole page. It sits above the sheet and the fixed
+   panels but under dialogs, and never takes the pointer. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.22 0 0 0 0 0.15 0 0 0 0 0.09 0.9 0 0 0 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.22' numOctaves='3' stitchTiles='stitch' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.12 0.4 0 0 0 -0.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  background-size:
+    260px 260px,
+    420px 420px;
 }
 
 ::selection {
@@ -32,8 +63,9 @@ body {
 
 h1 {
   font-family: var(--display);
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
   color: var(--text-h);
   letter-spacing: -0.5px;
   margin: 0;
@@ -54,7 +86,11 @@ a:focus-visible {
   position: relative;
   z-index: 1;
   background: var(--surface);
-  box-shadow: 0 0 70px 70px var(--surface-shadow);
+  /* a sheet laid on the desk: a hairline edge and a soft shadow under it */
+  box-shadow:
+    0 0 0 1px rgba(42, 29, 21, 0.08),
+    0 18px 50px -18px var(--surface-shadow),
+    0 2px 6px rgba(42, 29, 21, 0.06);
   min-height: 100vh;
   box-sizing: border-box;
   display: flex;
@@ -63,13 +99,47 @@ a:focus-visible {
 
 .site a:hover {
   color: var(--link);
-  text-decoration: underline;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
 }
 
 /* Header */
 
 header {
   margin-bottom: 48px;
+}
+
+/* Name and tagline on the left, the halftone portrait on the right. */
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.masthead-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.portrait {
+  --portrait: 168px;
+
+  display: block;
+  width: var(--portrait);
+  height: var(--portrait);
+  flex-shrink: 0;
+  /* above the fold with nothing drawn yet, the canvas is blank paper; it
+     fades in once the dots are screened */
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+  /* the dots move under the pointer, so the pointer stays on the canvas */
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.portrait.portrait-ready {
+  opacity: 1;
 }
 
 .name-row {
@@ -109,16 +179,17 @@ section {
   grid-template-columns: 100px 1fr;
   gap: 0 40px;
   margin-bottom: 56px;
-  border-top: 1px solid var(--border);
+  /* a row of dots instead of a hairline */
+  background: var(--dot-row) left top / 6px 4px repeat-x;
   padding-top: 40px;
 }
 
 h2 {
-  font-family: var(--display);
+  font-family: var(--font-mono), monospace;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.6px;
   color: var(--secondary);
   margin: 0;
   padding-top: 3px;
@@ -148,7 +219,7 @@ h2 span {
 /* Quote */
 
 .quote {
-  border-left: 1px solid var(--border);
+  background: var(--dot-row) left top / 4px 6px repeat-y;
   padding-left: 16px;
   margin: 0 3px 60px;
 }
@@ -525,6 +596,7 @@ h2 span {
   color: var(--accent);
   padding: 0;
   cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
 }
 
 .modal-page-btn:hover:not(:disabled) {
@@ -631,10 +703,11 @@ h2 span {
 }
 
 .badge {
-  font-size: 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
   padding: 1px 6px;
   border-radius: 3px;
-  background: var(--badge-bg);
+  border: 1px solid var(--border);
   color: var(--text);
 }
 
@@ -723,7 +796,7 @@ h2 span {
 footer {
   margin-top: auto;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  background: var(--dot-row) left top / 6px 4px repeat-x;
   font-size: 14px;
   color: var(--text);
   display: flex;
@@ -845,7 +918,8 @@ footer a:hover {
   align-items: flex-start;
   gap: 10px;
   background: var(--surface);
-  box-shadow: 0 0 20px 8px var(--surface-shadow);
+  border: 1px solid var(--border);
+  box-shadow: 3px 3px 0 var(--border);
   padding: 10px 12px;
   cursor: pointer;
   text-decoration: none;
@@ -1204,7 +1278,8 @@ footer a:hover {
   align-items: flex-end;
   gap: 6px;
   background: var(--surface);
-  box-shadow: 0 0 60px 30px var(--surface-shadow);
+  border: 1px solid var(--border);
+  box-shadow: 3px 3px 0 var(--border);
   padding: 10px 12px;
 }
 
@@ -1228,11 +1303,19 @@ footer a:hover {
   border-radius: 4px;
   padding: 2px 8px;
   cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
 }
 
 .gol-btn:hover {
   border-color: var(--accent);
   color: var(--text-h);
+}
+
+.gol-btn:active,
+.ssh-copy:active,
+.modal-page-btn:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--border);
 }
 
 .gol-slider-row {
@@ -1336,6 +1419,7 @@ footer a:hover {
   padding: 5px 10px;
   font-size: 14px;
   cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
 }
 
 .ssh-copy:hover {
@@ -1390,6 +1474,18 @@ footer a:hover {
     padding: 48px max(20px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom))
       max(20px, env(safe-area-inset-left));
     min-height: unset;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  .masthead {
+    gap: 16px;
+  }
+
+  .portrait {
+    --portrait: 112px;
   }
 
   section {
@@ -1542,6 +1638,7 @@ footer a:hover {
   /* Letter paper is narrower than 1000px, so the mobile rules apply in print,
      including the translucent body::before overlay. */
   body::before,
+  body::after,
   body > :not(.print-portfolio) {
     display: none !important;
   }

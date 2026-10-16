@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const CELL = 14
+const DOT = CELL * 0.3 // dot radius: cells print as halftone dots
+const INK = 'rgba(42, 29, 21, 0.16)'
 const TICK = 80
 const SIM_STEPS = 300 // generations to look ahead when scoring a seed
 const SEED_BUDGET_MS = 500 // max time spent searching for a lively seed
@@ -197,13 +199,21 @@ export function GameOfLife() {
           const hx = hv[2 * i]
           const hy = hv[2 * i + 1]
           const s = Math.min(1, Math.hypot(hx, hy))
-          ctx.fillStyle = '#eae3cd'
-          ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+          // Live cells print as halftone dots in faint ink on the desk;
+          // painted cells take their hue, fading back to ink as it decays.
+          const cx = c * CELL + CELL / 2
+          const cy = r * CELL + CELL / 2
+          ctx.fillStyle = INK
+          ctx.beginPath()
+          ctx.arc(cx, cy, DOT, 0, Math.PI * 2)
+          ctx.fill()
           if (s > HUE_FLOOR) {
             const hue = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
-            ctx.globalAlpha = s
-            ctx.fillStyle = `hsl(${hue}, 65%, 82%)`
-            ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+            ctx.globalAlpha = s * 0.6
+            ctx.fillStyle = `hsl(${hue}, 60%, 48%)`
+            ctx.beginPath()
+            ctx.arc(cx, cy, DOT, 0, Math.PI * 2)
+            ctx.fill()
             ctx.globalAlpha = 1
           }
         }
