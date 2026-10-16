@@ -1,15 +1,24 @@
 :root {
-  --text: #6b5545;
-  --text-h: #3b2010;
-  --bg: #fdf6e3;
-  --border: #d6cfb8;
-  --accent: #d16d3e;
-  --secondary: #77934d;
-  --link: #268bd2;
-  --badge-bg: #eee8d5;
-  --surface: rgba(253, 246, 227, 0.8);
-  --surface-shadow: var(--surface);
+  /* Ink on paper: the sheet (.site) is a lighter leaf laid on a slightly
+     darker desk (body), and everything is drawn in one brown ink with a
+     print-red accent. The grain is a fixed noise layer over the whole page
+     (body::after) so the paper reads as paper, not a flat fill. */
+  --ink: #2a1d15;
+  --text: #5e4a3a;
+  --text-h: var(--ink);
+  --paper: #f1e9d6;
+  --desk: #e6dcc4;
+  --bg: var(--paper);
+  --border: #d2c6a9;
+  --accent: #c8502c;
+  --secondary: #6f8a45;
+  --link: #2a6aa8;
+  --badge-bg: #e6dcc3;
+  --surface: rgba(241, 233, 214, 0.9);
+  --surface-shadow: rgba(42, 29, 21, 0.14);
   --display: var(--font-unbounded), system-ui, sans-serif;
+  /* Section rule: a row of halftone dots that shrink away to the right. */
+  --halftone-rule: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='8' fill='%232a1d15' fill-opacity='.32'%3E%3Ccircle cx='4' cy='4' r='2.55'/%3E%3Ccircle cx='12' cy='4' r='2.51'/%3E%3Ccircle cx='20' cy='4' r='2.48'/%3E%3Ccircle cx='28' cy='4' r='2.44'/%3E%3Ccircle cx='36' cy='4' r='2.40'/%3E%3Ccircle cx='44' cy='4' r='2.37'/%3E%3Ccircle cx='52' cy='4' r='2.33'/%3E%3Ccircle cx='60' cy='4' r='2.30'/%3E%3Ccircle cx='68' cy='4' r='2.26'/%3E%3Ccircle cx='76' cy='4' r='2.23'/%3E%3Ccircle cx='84' cy='4' r='2.19'/%3E%3Ccircle cx='92' cy='4' r='2.16'/%3E%3Ccircle cx='100' cy='4' r='2.12'/%3E%3Ccircle cx='108' cy='4' r='2.09'/%3E%3Ccircle cx='116' cy='4' r='2.05'/%3E%3Ccircle cx='124' cy='4' r='2.02'/%3E%3Ccircle cx='132' cy='4' r='1.98'/%3E%3Ccircle cx='140' cy='4' r='1.95'/%3E%3Ccircle cx='148' cy='4' r='1.92'/%3E%3Ccircle cx='156' cy='4' r='1.88'/%3E%3Ccircle cx='164' cy='4' r='1.85'/%3E%3Ccircle cx='172' cy='4' r='1.82'/%3E%3Ccircle cx='180' cy='4' r='1.78'/%3E%3Ccircle cx='188' cy='4' r='1.75'/%3E%3Ccircle cx='196' cy='4' r='1.72'/%3E%3Ccircle cx='204' cy='4' r='1.69'/%3E%3Ccircle cx='212' cy='4' r='1.65'/%3E%3Ccircle cx='220' cy='4' r='1.62'/%3E%3Ccircle cx='228' cy='4' r='1.59'/%3E%3Ccircle cx='236' cy='4' r='1.56'/%3E%3Ccircle cx='244' cy='4' r='1.53'/%3E%3Ccircle cx='252' cy='4' r='1.50'/%3E%3Ccircle cx='260' cy='4' r='1.47'/%3E%3Ccircle cx='268' cy='4' r='1.44'/%3E%3Ccircle cx='276' cy='4' r='1.41'/%3E%3Ccircle cx='284' cy='4' r='1.37'/%3E%3Ccircle cx='292' cy='4' r='1.35'/%3E%3Ccircle cx='300' cy='4' r='1.32'/%3E%3Ccircle cx='308' cy='4' r='1.29'/%3E%3Ccircle cx='316' cy='4' r='1.26'/%3E%3Ccircle cx='324' cy='4' r='1.23'/%3E%3Ccircle cx='332' cy='4' r='1.20'/%3E%3Ccircle cx='340' cy='4' r='1.17'/%3E%3Ccircle cx='348' cy='4' r='1.14'/%3E%3Ccircle cx='356' cy='4' r='1.11'/%3E%3Ccircle cx='364' cy='4' r='1.09'/%3E%3Ccircle cx='372' cy='4' r='1.06'/%3E%3Ccircle cx='380' cy='4' r='1.03'/%3E%3Ccircle cx='388' cy='4' r='1.01'/%3E%3Ccircle cx='396' cy='4' r='0.98'/%3E%3Ccircle cx='404' cy='4' r='0.95'/%3E%3Ccircle cx='412' cy='4' r='0.93'/%3E%3Ccircle cx='420' cy='4' r='0.90'/%3E%3Ccircle cx='428' cy='4' r='0.87'/%3E%3Ccircle cx='436' cy='4' r='0.85'/%3E%3Ccircle cx='444' cy='4' r='0.82'/%3E%3Ccircle cx='452' cy='4' r='0.80'/%3E%3Ccircle cx='460' cy='4' r='0.78'/%3E%3Ccircle cx='468' cy='4' r='0.75'/%3E%3Ccircle cx='476' cy='4' r='0.73'/%3E%3Ccircle cx='484' cy='4' r='0.70'/%3E%3Ccircle cx='492' cy='4' r='0.68'/%3E%3Ccircle cx='500' cy='4' r='0.66'/%3E%3Ccircle cx='508' cy='4' r='0.64'/%3E%3Ccircle cx='516' cy='4' r='0.62'/%3E%3Ccircle cx='524' cy='4' r='0.59'/%3E%3Ccircle cx='532' cy='4' r='0.57'/%3E%3Ccircle cx='540' cy='4' r='0.55'/%3E%3Ccircle cx='548' cy='4' r='0.53'/%3E%3Ccircle cx='556' cy='4' r='0.51'/%3E%3Ccircle cx='564' cy='4' r='0.49'/%3E%3Ccircle cx='572' cy='4' r='0.47'/%3E%3Ccircle cx='580' cy='4' r='0.45'/%3E%3Ccircle cx='588' cy='4' r='0.44'/%3E%3Ccircle cx='596' cy='4' r='0.42'/%3E%3Ccircle cx='604' cy='4' r='0.40'/%3E%3Ccircle cx='612' cy='4' r='0.38'/%3E%3Ccircle cx='620' cy='4' r='0.37'/%3E%3Ccircle cx='628' cy='4' r='0.35'/%3E%3Ccircle cx='636' cy='4' r='0.34'/%3E%3Ccircle cx='644' cy='4' r='0.32'/%3E%3Ccircle cx='652' cy='4' r='0.31'/%3E%3Ccircle cx='660' cy='4' r='0.30'/%3E%3Ccircle cx='668' cy='4' r='0.29'/%3E%3Ccircle cx='676' cy='4' r='0.28'/%3E%3Ccircle cx='684' cy='4' r='0.27'/%3E%3Ccircle cx='692' cy='4' r='0.26'/%3E%3Ccircle cx='700' cy='4' r='0.25'/%3E%3C/svg%3E");
 
   font:
     16px/1.7 var(--font-geist),
@@ -17,12 +26,33 @@
     sans-serif;
   user-select: none;
   color: var(--text);
-  background: var(--bg);
+  background: var(--desk);
   -webkit-font-smoothing: antialiased;
 }
 
 body {
   margin: 0;
+  /* a little darker toward the corners, like a desk lamp over the sheet */
+  background: radial-gradient(ellipse 120% 90% at 50% 20%, transparent 40%, rgba(42, 29, 21, 0.09));
+}
+
+/* Paper grain: two layers of SVG noise, a fine tooth and some long fibres,
+   multiplied over the whole page. It sits above the sheet and the fixed
+   panels but under dialogs, and never takes the pointer. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.22 0 0 0 0 0.15 0 0 0 0 0.09 0.9 0 0 0 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.22' numOctaves='3' stitchTiles='stitch' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0 0.12 0.4 0 0 0 -0.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  background-size:
+    260px 260px,
+    420px 420px;
 }
 
 ::selection {
@@ -54,7 +84,11 @@ a:focus-visible {
   position: relative;
   z-index: 1;
   background: var(--surface);
-  box-shadow: 0 0 70px 70px var(--surface-shadow);
+  /* a sheet laid on the desk: a hairline edge and a soft shadow under it */
+  box-shadow:
+    0 0 0 1px rgba(42, 29, 21, 0.08),
+    0 18px 50px -18px var(--surface-shadow),
+    0 2px 6px rgba(42, 29, 21, 0.06);
   min-height: 100vh;
   box-sizing: border-box;
   display: flex;
@@ -70,6 +104,31 @@ a:focus-visible {
 
 header {
   margin-bottom: 48px;
+}
+
+/* Name and tagline on the left, the halftone portrait on the right. */
+.masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.masthead-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.portrait {
+  --portrait: 168px;
+
+  display: block;
+  width: var(--portrait);
+  height: var(--portrait);
+  flex-shrink: 0;
+  /* the dots move under the pointer, so the pointer stays on the canvas */
+  touch-action: none;
+  cursor: crosshair;
 }
 
 .name-row {
@@ -109,7 +168,9 @@ section {
   grid-template-columns: 100px 1fr;
   gap: 0 40px;
   margin-bottom: 56px;
-  border-top: 1px solid var(--border);
+  /* the rule is 700px of shrinking dots; narrower columns just lose the
+     tail end, which is nearly gone by then anyway */
+  background: var(--halftone-rule) left top / 700px 8px no-repeat;
   padding-top: 40px;
 }
 
@@ -845,7 +906,7 @@ footer a:hover {
   align-items: flex-start;
   gap: 10px;
   background: var(--surface);
-  box-shadow: 0 0 20px 8px var(--surface-shadow);
+  box-shadow: 0 0 20px 8px var(--surface);
   padding: 10px 12px;
   cursor: pointer;
   text-decoration: none;
@@ -1204,7 +1265,7 @@ footer a:hover {
   align-items: flex-end;
   gap: 6px;
   background: var(--surface);
-  box-shadow: 0 0 60px 30px var(--surface-shadow);
+  box-shadow: 0 0 60px 30px var(--surface);
   padding: 10px 12px;
 }
 
@@ -1392,6 +1453,14 @@ footer a:hover {
     min-height: unset;
   }
 
+  .masthead {
+    gap: 16px;
+  }
+
+  .portrait {
+    --portrait: 112px;
+  }
+
   section {
     grid-template-columns: 1fr;
     gap: 8px 0;
@@ -1542,6 +1611,7 @@ footer a:hover {
   /* Letter paper is narrower than 1000px, so the mobile rules apply in print,
      including the translucent body::before overlay. */
   body::before,
+  body::after,
   body > :not(.print-portfolio) {
     display: none !important;
   }

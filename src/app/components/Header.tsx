@@ -1,5 +1,6 @@
 import { SITE_URL } from '@/data/site'
 import { primaryEmail } from '@/data/socials'
+import { HalftonePortrait } from './HalftonePortrait'
 import { HeaderAdjectives, HeaderLocation } from './HeaderBio'
 import { NowPlaying } from './NowPlaying'
 import { SSHCopyButton } from './SSHCopyButton'
@@ -14,19 +15,24 @@ const resumeHref = staticExport ? `${SITE_URL}/resume` : '/resume'
 export function Header() {
   return (
     <header>
-      <div className="name-row">
-        <h1>Sean Yang</h1>
-        <HeaderLocation />
+      <div className="masthead">
+        <div className="masthead-text">
+          <div className="name-row">
+            <h1>Sean Yang</h1>
+            <HeaderLocation />
+          </div>
+          <div className="tagline">
+            <a href={primaryEmail.url}>{primaryEmail.label}</a>
+            <span>|</span>
+            <a href={resumeHref} target="_blank" rel="noopener noreferrer">
+              résumé ↗
+            </a>
+          </div>
+          <NowPlaying />
+          <HeaderAdjectives />
+        </div>
+        <HalftonePortrait />
       </div>
-      <div className="tagline">
-        <a href={primaryEmail.url}>{primaryEmail.label}</a>
-        <span>|</span>
-        <a href={resumeHref} target="_blank" rel="noopener noreferrer">
-          résumé ↗
-        </a>
-      </div>
-      <NowPlaying />
-      <HeaderAdjectives />
       <TermProgress />
       <SSHCopyButton />
     </header>
