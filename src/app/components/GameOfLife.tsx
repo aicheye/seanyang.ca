@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 const CELL = 14
 const DOT = CELL * 0.3 // full dot radius: cells print as halftone dots
 const GROW_TICKS = 3 // a new cell's dot grows to full size over this many generations
-const INK = 'rgba(42, 29, 21, 0.16)'
+const INK = 'rgba(42, 29, 21, 0.14)'
 const TICK = 80
 const SIM_STEPS = 300 // generations to look ahead when scoring a seed
 const SEED_BUDGET_MS = 500 // max time spent searching for a lively seed
