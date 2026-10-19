@@ -1,28 +1,52 @@
-:root {
-  --text: #6b5545;
-  --text-h: #3b2010;
-  --bg: #fdf6e3;
-  --border: #d6cfb8;
-  --accent: #d16d3e;
-  --secondary: #77934d;
-  --link: #268bd2;
-  --badge-bg: #eee8d5;
-  --surface: rgba(253, 246, 227, 0.8);
-  --surface-shadow: var(--surface);
-  --display: var(--font-unbounded), system-ui, sans-serif;
+/* ═══════════════════════════════════════════════════════════════════════
+   seanyang.ca, circa 1997. Geocities walls, Windows 95 chrome, Comic Sans
+   body copy, Impact headings, a marquee, a hit counter, 88×31 buttons and a
+   sparkle trail on the cursor. The content and every component's markup
+   are the ones the quiet design used; only this sheet changed. The print
+   portfolio at the bottom keeps the old palette, because paper is not the
+   place for it.
+   ═══════════════════════════════════════════════════════════════════════ */
 
-  font:
-    16px/1.7 var(--font-geist),
-    system-ui,
-    sans-serif;
+:root {
+  --text: #000;
+  --text-h: #000080;
+  --bg: #c0c0c0;
+  --border: #808080;
+  --accent: #ff00ff;
+  --secondary: #008080;
+  --link: #0000ee;
+  --visited: #551a8b;
+  --badge-bg: #ffff00;
+  --surface: #c0c0c0;
+  --surface-shadow: #000;
+
+  /* Win95 bevels */
+  --bevel-light: #fff;
+  --bevel-mid: #dfdfdf;
+  --bevel-dark: #808080;
+  --bevel-black: #404040;
+  --title-bar: linear-gradient(90deg, #000080, #1084d0);
+
+  --display: Impact, 'Arial Black', 'Haettenschweiler', var(--font-anton), sans-serif;
+  --font-body: 'Comic Sans MS', 'Comic Sans', var(--font-comic), 'Chalkboard SE', cursive;
+  --font-serif: 'Times New Roman', Times, serif;
+  --font-ui: 'MS Sans Serif', 'Microsoft Sans Serif', Tahoma, Arial, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+  font: 16px/1.55 var(--font-body);
   user-select: none;
   color: var(--text);
-  background: var(--bg);
+  background: #000;
   -webkit-font-smoothing: antialiased;
+  scrollbar-color: var(--bg) #dfdfdf;
 }
 
 body {
   margin: 0;
+  /* A tiled starfield, the way every homepage had one. The canvas behind
+     the page (GameOfLife) clears to transparent so this shows through. */
+  background-color: #000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='%23fff'%3E%3Ccircle cx='12' cy='20' r='1'/%3E%3Ccircle cx='70' cy='8' r='1.5'/%3E%3Ccircle cx='140' cy='40' r='1'/%3E%3Ccircle cx='40' cy='90' r='1'/%3E%3Ccircle cx='100' cy='70' r='1'/%3E%3Ccircle cx='150' cy='120' r='1.5'/%3E%3Ccircle cx='20' cy='140' r='1'/%3E%3Ccircle cx='90' cy='130' r='1'/%3E%3Ccircle cx='60' cy='155' r='1.5'/%3E%3Ccircle cx='120' cy='100' r='0.8'/%3E%3C/g%3E%3Cg fill='%23ff0'%3E%3Ccircle cx='30' cy='55' r='1'/%3E%3Ccircle cx='125' cy='15' r='1'/%3E%3C/g%3E%3Cg fill='%230ff'%3E%3Ccircle cx='80' cy='45' r='1'/%3E%3Ccircle cx='10' cy='110' r='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 ::selection {
@@ -30,67 +54,286 @@ body {
   color: inherit;
 }
 
-h1 {
-  font-family: var(--display);
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-h);
-  letter-spacing: -0.5px;
-  margin: 0;
-}
-
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-.site {
-  max-width: 700px;
-  margin: 0 auto;
-  /* max() with the safe-area insets keeps content clear of the notch in
-     landscape now that viewport-fit=cover draws the page edge-to-edge */
-  padding: 64px max(32px, env(safe-area-inset-right)) 64px max(32px, env(safe-area-inset-left));
-  position: relative;
-  z-index: 1;
-  background: var(--surface);
-  box-shadow: 0 0 70px 70px var(--surface-shadow);
-  min-height: 100vh;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
-.site a:hover {
+a {
   color: var(--link);
   text-decoration: underline;
 }
 
-/* Header */
+a:visited {
+  color: var(--visited);
+}
+
+a:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: 1px;
+}
+
+/* ── Win95 bevel helpers ───────────────────────────────────────────────── */
+
+.win,
+.site,
+.now-playing,
+.gol-controls,
+.modal,
+section,
+footer,
+.project,
+.ssh-copy,
+.gol-btn,
+.modal-close,
+.modal-page-btn,
+.links a,
+.hit-counter,
+.badge88,
+.not-found-box,
+.mirrors-box {
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-black) var(--bevel-black) var(--bevel-light);
+  box-shadow:
+    inset 1px 1px var(--bevel-mid),
+    inset -1px -1px var(--bevel-dark);
+}
+
+.inset,
+section > :not(h2),
+.modal-media,
+.modal-loading,
+.term-bar,
+.about,
+.quote,
+.hit-counter {
+  border: 2px solid;
+  border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
+  box-shadow:
+    inset 1px 1px var(--bevel-black),
+    inset -1px -1px var(--bevel-mid);
+}
+
+/* Title bars: the blue gradient with white bold text and the fake ✕ box. */
+h2,
+.modal-header,
+.gol-link,
+.np-titlebar,
+.win-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 3px 4px 3px 8px;
+  background: var(--title-bar);
+  color: #fff;
+  font: bold 13px/1.4 var(--font-ui);
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+}
+
+h2::after,
+.gol-link::after,
+.np-titlebar::after,
+.win-title::after {
+  content: '✕';
+  margin-left: auto;
+  width: 16px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: bold 10px/1 var(--font-ui);
+  color: #000;
+  background: var(--bg);
+  border: 1px solid;
+  border-color: var(--bevel-light) var(--bevel-black) var(--bevel-black) var(--bevel-light);
+  box-shadow: inset -1px -1px var(--bevel-dark);
+}
+
+h2::before,
+.win-title::before {
+  content: '▣';
+  font-size: 12px;
+}
+
+/* ── Page ──────────────────────────────────────────────────────────────── */
+
+.site {
+  max-width: 780px;
+  margin: 24px auto 48px;
+  padding: 10px max(10px, env(safe-area-inset-right)) 10px max(10px, env(safe-area-inset-left));
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.site a:hover {
+  color: #f00;
+  text-decoration: underline;
+  background: #ff0;
+}
+
+/* ── Marquee, blink, rainbow rules, construction tape ─────────────────── */
+
+.marquee {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  background: #000;
+  color: #0f0;
+  font: bold 14px/1.6 var(--font-mono);
+  border: 2px inset var(--bevel-dark);
+  padding: 2px 0;
+}
+
+.marquee-inner {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 22s linear infinite;
+}
+
+.marquee-inner a {
+  color: #ff0;
+}
+
+.marquee-inner a:visited {
+  color: #ff0;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hr-rainbow {
+  display: block;
+  height: 6px;
+  margin: 0;
+  border: 1px outset var(--bevel-light);
+  background: linear-gradient(90deg, #f00, #ff7f00, #ff0, #0f0, #0ff, #00f, #8b00ff);
+}
+
+.construction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 26px;
+  font: bold 12px/1 var(--font-ui);
+  color: #000;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: repeating-linear-gradient(-45deg, #ff0 0 14px, #000 14px 28px);
+  background-size: 40px 40px;
+  animation: tape 1.2s linear infinite;
+  border: 2px outset var(--bevel-light);
+}
+
+.construction span {
+  background: #ff0;
+  padding: 2px 8px;
+  border: 1px solid #000;
+}
+
+@keyframes tape {
+  to {
+    background-position: 40px 0;
+  }
+}
+
+.new-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 4px;
+  font: bold 10px/1.6 var(--font-ui);
+  color: #fff;
+  background: #f00;
+  border: 1px solid #ff0;
+  vertical-align: middle;
+}
+
+/* ── Nav bar ───────────────────────────────────────────────────────────── */
+
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 6px;
+  font: bold 16px/1.6 var(--font-serif);
+  color: #f00;
+}
+
+.navbar a {
+  font-weight: 700;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
 
 header {
-  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.welcome {
+  margin: 0;
+  text-align: center;
+  font: bold 15px/1.3 var(--font-serif);
+  color: #f00;
 }
 
 .name-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 2px;
+  gap: 16px;
+}
+
+h1 {
+  margin: 0;
+  font: 400 52px/1 var(--display);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  /* WordArt: a rainbow fill that cycles, on a hard black drop shadow */
+  background: linear-gradient(90deg, #f00, #ff7f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(3px 3px 0 #000);
+  animation: wordart 6s linear infinite;
+}
+
+@keyframes wordart {
+  to {
+    background-position: 200% 0;
+  }
 }
 
 .tagline {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  color: var(--text);
+  flex-wrap: wrap;
+  gap: 10px;
   margin: 0;
+  font-size: 15px;
 }
 
 .tagline a {
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
+  color: var(--link);
 }
 
 .location {
@@ -98,69 +341,41 @@ header {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
-  color: var(--text);
+  padding: 2px 8px;
+  font: bold 13px/1.5 var(--font-ui);
+  color: #fff;
+  background: #008080;
+  border: 2px outset var(--bevel-light);
 }
 
-/* Sections */
-
-section {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 0 40px;
-  margin-bottom: 56px;
-  border-top: 1px solid var(--border);
-  padding-top: 40px;
-}
-
-h2 {
-  font-family: var(--display);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--secondary);
-  margin: 0;
-  padding-top: 3px;
-}
-
-h2 span {
-  position: sticky;
-  top: 28px;
-  display: block;
-}
-
-/* About */
-
+/* Adjectives: a green-on-black LED strip */
 .about {
   display: flex;
-  justify-content: space-between;
-  margin: 10px 0 0;
-  font-size: 15px;
-  color: var(--text);
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  margin: 0;
+  padding: 4px 10px;
+  font: bold 15px/1.7 var(--font-mono);
+  color: #0f0;
+  background: #000;
+  text-shadow: 0 0 6px #0f0;
 }
 
 .about .sep {
-  color: var(--secondary);
+  color: #ff0;
   font-weight: 700;
 }
 
-/* Quote */
+/* ── Quote ─────────────────────────────────────────────────────────────── */
 
 .quote {
-  border-left: 1px solid var(--border);
-  padding-left: 16px;
-  margin: 0 3px 60px;
+  margin: 0;
+  padding: 12px 16px;
+  background: #fffacd;
+  font-family: var(--font-serif);
 }
 
-/* Static mirror only (RandomQuoteClient): the quote is rolled in the browser,
-   so a wrapper around .quote reserves room up front instead of growing when
-   the quote lands. It sits on a wrapper, not on .quote itself, so the
-   border-left only spans the actual text. Sized to fit the second-longest
-   quote (93 chars); the one 137-char outlier adds a line when rolled rather
-   than every load paying for it in blank space. 1lh = one blockquote line;
-   the 28px is the cite line (14px × 1.7 + 4px margin). Prod never renders
-   this class. */
 .quote-reserve {
   min-height: calc(2lh + 28px);
 }
@@ -173,8 +388,9 @@ h2 span {
 
 .quote blockquote {
   margin: 0;
+  font-size: 18px;
   font-style: italic;
-  color: var(--text-h);
+  color: #000;
 }
 
 .quote cite {
@@ -182,124 +398,117 @@ h2 span {
   margin-top: 4px;
   font-size: 14px;
   font-style: normal;
-  color: var(--text);
-}
-
-/* Experience */
-
-.jobs {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding-left: 20px;
-}
-
-.job {
-  position: relative;
-  padding-bottom: 24px;
-}
-
-.job:last-child {
-  padding-bottom: 0;
-}
-
-.job:last-child::before {
-  content: '';
-  position: absolute;
-  left: -16px;
-  width: 1px;
-  top: 10px;
-  height: 64px;
-  background: var(--border);
-}
-
-.job:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: -16px;
-  width: 1px;
-  top: 10px;
-  bottom: -16px;
-  background: var(--border);
-}
-
-.job-header {
-  display: flex;
-  justify-content: space-between;
-  /* the 12px date column and the 16px title sit on the same first baseline */
-  align-items: baseline;
-  gap: 24px;
-  position: relative;
-}
-
-.job-header::before {
-  content: '';
-  position: absolute;
-  left: -20px;
-  top: 10px;
-  transform: translateY(-50%);
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 1px solid var(--secondary);
-}
-
-.job-current .job-header::before {
-  background: var(--secondary);
-}
-
-.job-meta {
-  font-size: 14px;
-  color: var(--text);
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.job-location {
-  opacity: 0.7;
-}
-
-.job-body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  color: #800000;
   text-align: right;
 }
 
+/* ── Sections (each one a window) ──────────────────────────────────────── */
+
+section {
+  display: block;
+  margin: 0;
+  padding: 2px;
+  background: var(--bg);
+}
+
+section > :not(h2) {
+  margin: 4px;
+  padding: 14px;
+  background: #fff;
+}
+
+h2 span {
+  position: static;
+  display: inline;
+}
+
+/* ── Experience (a <table border>) ────────────────────────────────────── */
+
+.jobs-wrap {
+  overflow-x: auto;
+}
+
+.jobs {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #000;
+  font-size: 14px;
+  background: #fff;
+}
+
+.jobs th,
+.jobs td {
+  border: 1px solid #000;
+  vertical-align: top;
+  text-align: left;
+}
+
+.jobs th {
+  font: bold 13px/1.5 var(--font-ui);
+  color: #ff0;
+  background: #000080;
+  text-transform: uppercase;
+}
+
+.jobs tbody tr:nth-child(odd) td {
+  background: #e0ffff;
+}
+
+.jobs tbody tr:nth-child(even) td {
+  background: #fff0f5;
+}
+
+.job-meta {
+  font: 13px/1.5 var(--font-mono);
+  white-space: nowrap;
+}
+
+.job-location {
+  color: #800080;
+}
+
 .job-body a {
-  color: var(--text-h);
-  /* the title sits inside <strong>; restate the weight so the anchor keeps it */
+  color: var(--link);
   font-weight: 700;
-  text-decoration: none;
+  font-size: 16px;
 }
 
 .job-description {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 14px;
-  color: var(--text);
 }
 
-.badges-right {
-  justify-content: flex-end;
+.job-tech .badges {
+  margin-top: 0;
 }
 
-/* Projects */
+/* ── Projects ──────────────────────────────────────────────────────────── */
 
 .projects {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px 28px;
+  gap: 0;
+  border: 1px solid #000;
+}
+
+.project {
+  padding: 10px 12px;
+  border: 1px solid #000;
+}
+
+.project:nth-child(odd) {
+  background: #e0ffff;
+}
+
+.project:nth-child(even) {
+  background: #ffe4e1;
 }
 
 .project a {
-  color: var(--text-h);
-  font-weight: 500;
-  text-decoration: none;
+  color: var(--link);
+  font-weight: 700;
+  font-size: 17px;
 }
 
 .project p {
@@ -313,7 +522,63 @@ h2 span {
   gap: 8px;
 }
 
-/* Entry dialogs */
+.project-title::before {
+  content: '►';
+  color: #f00;
+  font-size: 12px;
+}
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.badge {
+  font: bold 11px/1.6 var(--font-mono);
+  text-transform: uppercase;
+  padding: 0 5px;
+  background: var(--badge-bg);
+  color: #000;
+  border: 1px solid #000;
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* ── Links (a wall of buttons) ─────────────────────────────────────────── */
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.links a {
+  display: block;
+  padding: 6px 4px;
+  text-align: center;
+  font: bold 13px/1.4 var(--font-ui);
+  color: #000;
+  text-decoration: none;
+  background: var(--bg);
+}
+
+.links a:visited {
+  color: #000;
+}
+
+.site .links a:hover {
+  color: #000;
+  background: #ff0;
+}
+
+.links a:active {
+  border-color: var(--bevel-black) var(--bevel-light) var(--bevel-light) var(--bevel-black);
+}
+
+/* ── Entry dialogs (Win95 windows) ─────────────────────────────────────── */
 
 .modal-overlay {
   position: fixed;
@@ -322,12 +587,9 @@ h2 span {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* the overlay itself extends into the safe areas (viewport-fit=cover);
-     this padding keeps the dialog box out of them */
   padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
     calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
-  background: rgba(59, 32, 16, 0.45);
-  animation: modal-fade 0.15s ease-out;
+  background: transparent;
 }
 
 /* The notes dialog stays in the page while closed, so its graph is loaded
@@ -338,45 +600,40 @@ h2 span {
   display: flex;
   visibility: hidden;
   pointer-events: none;
-  animation: none;
 }
 
 .modal {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   background: var(--bg);
-  border: 1px solid var(--border);
-  padding: 16px;
+  padding: 3px 10px 12px;
   box-sizing: border-box;
   width: min(560px, 100%);
   max-height: 100%;
   overflow-y: auto;
-  /* a tall dialog scrolls itself without handing the leftover scroll to the
-     page behind it */
   overscroll-behavior: contain;
-  animation: modal-pop 0.15s ease-out;
+  outline: 1px solid #000;
+  filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.6));
 }
 
 .modal-header {
-  display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
+  margin: 0 -7px;
+  padding: 4px 4px 4px 6px;
 }
 
 .modal-icon {
   position: relative;
-  /* 48px squares up with the title + meta block beside it. Stretching to that
-     block instead would feed back: a wider icon wraps the title, which grows
-     the block, which grows the icon. */
   display: block;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   box-sizing: border-box;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 1px solid #fff;
   overflow: hidden;
+  background: #fff;
 }
 
 .modal-icon img {
@@ -407,19 +664,16 @@ h2 span {
 }
 
 .modal-title {
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-h);
-  letter-spacing: -0.2px;
+  font: bold 14px/1.4 var(--font-ui);
+  color: #fff;
   margin: 0;
 }
 
 .modal-meta {
-  margin: 2px 0 0;
-  font-size: 14px;
-  color: var(--text);
-  opacity: 0.8;
+  margin: 0;
+  font: 12px/1.4 var(--font-ui);
+  color: #fff;
+  opacity: 0.9;
 }
 
 .modal-close {
@@ -427,41 +681,39 @@ h2 span {
   align-self: flex-start;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 18px;
   flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: none;
-  color: var(--text);
+  background: var(--bg);
+  color: #000;
+  font: bold 11px/1 var(--font-ui);
   padding: 0;
   cursor: pointer;
 }
 
 .modal-close:hover {
-  border-color: var(--accent);
-  color: var(--text-h);
+  color: #f00;
+}
+
+.modal-close:active {
+  border-color: var(--bevel-black) var(--bevel-light) var(--bevel-light) var(--bevel-black);
 }
 
 .modal-close:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 1px dotted #000;
+  outline-offset: -4px;
 }
 
 .modal-media {
   display: block;
   width: 100%;
-  /* the border has to sit inside the 100%, or it overflows the dialog */
   box-sizing: border-box;
   max-height: 60vh;
   object-fit: contain;
-  background: var(--badge-bg);
-  border: 1px solid var(--border);
+  background: #000;
 }
 
 .modal-loading {
-  /* same box as .modal-media (aspect-ratio set inline from the demo's size),
-     so the dialog doesn't resize when the demo arrives */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -469,10 +721,9 @@ h2 span {
   max-height: 60vh;
   overflow: hidden;
   box-sizing: border-box;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--badge-bg);
-  border: 1px solid var(--border);
+  font: 13px/1.4 var(--font-mono);
+  color: #0f0;
+  background: #000;
 }
 
 /* react-loading-skeleton: a highlight sweeps across the empty slot */
@@ -483,8 +734,6 @@ h2 span {
   line-height: 0;
 }
 
-/* Multi-page dialogs: the demo slot holds one page at a time, with a
-   prev/next row under it. A page with no image shows the row alone. */
 .modal-pages {
   display: flex;
   flex-direction: column;
@@ -495,20 +744,18 @@ h2 span {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
-  color: var(--text);
+  font: 12px/1.4 var(--font-ui);
 }
 
 .modal-pager-caption {
   flex: 1;
   min-width: 0;
   text-align: center;
-  opacity: 0.8;
 }
 
 .modal-pager-count {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  opacity: 0.6;
   white-space: nowrap;
 }
 
@@ -517,36 +764,33 @@ h2 span {
   align-items: center;
   justify-content: center;
   width: 32px;
-  height: 28px;
+  height: 24px;
   flex-shrink: 0;
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  background: none;
-  color: var(--accent);
+  background: var(--bg);
+  color: #000;
+  font: 11px/1 var(--font-ui);
   padding: 0;
   cursor: pointer;
 }
 
-.modal-page-btn:hover:not(:disabled) {
-  background: var(--accent);
-  color: var(--bg);
+.modal-page-btn:active:not(:disabled) {
+  border-color: var(--bevel-black) var(--bevel-light) var(--bevel-light) var(--bevel-black);
 }
 
 .modal-page-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 1px dotted #000;
+  outline-offset: -4px;
 }
 
 .modal-page-btn:disabled {
-  border-color: var(--border);
-  color: var(--border);
+  color: var(--bevel-dark);
+  text-shadow: 1px 1px #fff;
   cursor: default;
 }
 
 .modal-description {
   margin: 0;
   font-size: 14px;
-  color: var(--text);
 }
 
 .modal .badges {
@@ -560,26 +804,15 @@ h2 span {
   gap: 6px;
   font-size: 14px;
   color: var(--link);
-  text-decoration: none;
   word-break: break-all;
 }
 
-.modal-link:hover {
-  text-decoration: underline;
-}
-
-/* The dialog tops out at 560px, so it only runs out of room on phones: past
-   that point the meta drops to a full-width row of its own instead of sitting
-   indented under the title. The "title @ company" phrase wraps naturally. */
 @media (max-width: 640px) {
   .modal-header {
     flex-wrap: wrap;
-    /* row gap matches the 2px the meta sat at while it was under the title */
-    gap: 2px 12px;
+    gap: 2px 10px;
   }
 
-  /* Lift the title and meta out of .modal-heading so the header's own wrapping
-     can put the meta on the row below the logo. */
   .modal-heading {
     display: contents;
   }
@@ -589,7 +822,6 @@ h2 span {
     min-width: 0;
   }
 
-  /* The close button stays on the first row; the meta wraps past it. */
   .modal-close {
     order: 1;
   }
@@ -601,162 +833,149 @@ h2 span {
   }
 }
 
-@keyframes modal-fade {
-  from {
-    opacity: 0;
-  }
-}
+/* ── Not found / mirrors ───────────────────────────────────────────────── */
 
-@keyframes modal-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal-overlay,
-  .modal {
-    animation: none;
-  }
-}
-
-/* Badges */
-
-.badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 6px;
-}
-
-.badge {
-  font-size: 14px;
-  padding: 1px 6px;
-  border-radius: 3px;
-  background: var(--badge-bg);
-  color: var(--text);
-}
-
-/* Links */
-
-.links {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(2, 1fr);
-  gap: 6px 0;
-}
-
-.links a {
-  color: var(--text);
-  text-decoration: none;
-  font-size: 15px;
-  width: fit-content;
-  border-radius: 4px;
-}
-
-/* Not found */
-
-.not-found {
+.not-found,
+.mirrors-page {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100svh;
+  padding: 24px;
+  box-sizing: border-box;
   text-align: center;
   position: relative;
   z-index: 2;
 }
 
+.not-found-box,
+.mirrors-box {
+  width: min(420px, 100%);
+  background: var(--bg);
+  padding: 3px;
+  text-align: left;
+}
+
+.win-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font: 13px/1.5 var(--font-ui);
+}
+
+.win-body h1 {
+  font: bold 13px/1.5 var(--font-ui);
+  background: none;
+  color: #000;
+  filter: none;
+  animation: none;
+  letter-spacing: 0;
+  text-transform: none;
+  -webkit-text-fill-color: #000;
+}
+
+.win-error {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.win-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f00;
+  color: #fff;
+  font: bold 22px/1 var(--font-ui);
+  border: 2px solid #800000;
+}
+
 .not-found-link {
-  color: var(--text);
+  align-self: center;
+  display: inline-block;
+  min-width: 80px;
+  padding: 3px 12px;
+  text-align: center;
+  font: 13px/1.5 var(--font-ui);
+  color: #000;
   text-decoration: none;
-  font-size: 14px;
+  background: var(--bg);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-black) var(--bevel-black) var(--bevel-light);
+  box-shadow:
+    inset 1px 1px var(--bevel-mid),
+    inset -1px -1px var(--bevel-dark),
+    0 0 0 1px #000;
+}
+
+.not-found-link:visited {
+  color: #000;
 }
 
 .not-found-link:hover {
-  color: var(--link);
-  text-decoration: underline;
-}
-
-/* Mirrors */
-
-.mirrors-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100svh;
-  position: relative;
-  z-index: 2;
-}
-
-.mirrors-page h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--secondary);
-  letter-spacing: -0.5px;
-  margin: 0 0 12px;
+  color: #000;
+  background: #ff0;
 }
 
 .mirrors-page ul {
   list-style: none;
-  padding: 0;
-  margin: 0 0 20px;
+  padding: 10px 12px;
+  margin: 0;
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
 }
 
 .mirrors-page li {
-  margin: 6px 0;
+  margin: 2px 0;
+  font: 13px/1.6 var(--font-mono);
 }
 
-.mirrors-page li a {
-  color: var(--text);
-  text-decoration: none;
+.mirrors-page li::before {
+  content: '• ';
+  color: #f00;
 }
 
-.mirrors-page li a:hover {
-  color: var(--link);
-  text-decoration: underline;
-}
-
-/* Footer */
+/* ── Footer ────────────────────────────────────────────────────────────── */
 
 footer {
   margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  padding: 10px 12px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   font-size: 14px;
-  color: var(--text);
+}
+
+.footer-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-footer a {
-  color: var(--text);
-  text-decoration: none;
-}
-
-footer a:hover {
-  color: var(--link);
-  text-decoration: underline;
+  gap: 16px;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 14px;
+  gap: 0 10px;
 }
 
 .footer-links .sep {
-  color: var(--secondary);
+  color: #f00;
   font-weight: 700;
 }
 
 .webring-wrapper {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .webring {
@@ -769,42 +988,109 @@ footer a:hover {
 .webring svg {
   height: 22px;
   display: block;
-  filter: invert(35%) sepia(20%) saturate(300%) hue-rotate(345deg);
+  fill: #000080;
 }
 
 .webring img:hover,
 .webring svg:hover {
-  filter: invert(53%) sepia(26%) saturate(3066%) hue-rotate(180deg) brightness(90%) contrast(87%);
+  fill: #f00;
 }
 
 .webring-arrow {
   font-size: 16px;
+  font-weight: 700;
 }
 
-/* Term progress */
+.site .webring:hover,
+.site .webring-arrow:hover {
+  background: none;
+}
+
+/* 88×31 buttons, the universal currency of the old web */
+.badges88 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.badge88 {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 31px;
+  box-sizing: border-box;
+  padding: 0 3px;
+  font: bold 9px/1.1 var(--font-mono);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  image-rendering: pixelated;
+}
+
+.badge88 small {
+  font-size: 7px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.badge88:visited {
+  color: inherit;
+}
+
+.hit-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px;
+  background: #000;
+}
+
+.hit-counter span {
+  display: inline-block;
+  width: 14px;
+  font: bold 16px/20px var(--font-mono);
+  text-align: center;
+  color: #0f0;
+  background: #111;
+  border: 1px solid #333;
+}
+
+.footer-fine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 14px;
+  font: 12px/1.6 var(--font-ui);
+  text-align: center;
+}
+
+/* ── Term progress (a Win95 progress bar) ──────────────────────────────── */
 
 .term-progress {
-  margin-top: 14px;
+  margin: 0;
 }
 
 .term-label {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  color: var(--text);
   margin-bottom: 3px;
 }
 
 .term-label a {
-  color: inherit;
-  text-decoration: none;
+  color: var(--link);
 }
 
 .term-bar {
   position: relative;
-  height: 8px;
-  background: var(--border);
-  overflow: visible;
+  height: 18px;
+  background: var(--bg);
+  overflow: hidden;
 }
 
 .term-fill {
@@ -812,55 +1098,74 @@ footer a:hover {
   left: 0;
   top: 0;
   height: 100%;
-  background: var(--secondary);
+  background: repeating-linear-gradient(90deg, #000080 0 8px, var(--bg) 8px 10px);
   z-index: 0;
 }
 
 .term-tick {
   position: absolute;
-  width: 1px;
-  height: 8px;
-  background: var(--bg);
+  width: 2px;
+  height: 100%;
+  background: #f00;
   transform: translateX(-50%);
   z-index: 1;
 }
 
-/* Now Playing */
+/* ── Now Playing (a tiny Winamp) ───────────────────────────────────────── */
 
 .now-playing {
-  /* Album art size; the progress bar matches it. The card is fixed at the
-     top left, and with the record out its right edge is about
-     36px + 1.45 × size; the site column's heading starts at
-     (100vw - 699px) / 2 + 32px. Keeping 16px between them gives
-     size ≤ (100vw - 739px) / 2.9, so the art is 120px on wide windows and
-     shrinks toward the 1000px mobile breakpoint. */
-  --np-album: clamp(96px, calc((100vw - 739px) / 2.9), 120px);
+  --np-album: clamp(96px, calc((100vw - 819px) / 2.9), 120px);
 
   position: fixed;
   top: 20px;
-  left: 24px;
+  left: 20px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  background: var(--surface);
-  box-shadow: 0 0 20px 8px var(--surface-shadow);
-  padding: 10px 12px;
+  gap: 8px;
+  /* Winamp 2: dark steel with a black LED display */
+  background: #3a3a3a;
+  border-color: #7a7a7a #000 #000 #7a7a7a;
+  box-shadow:
+    inset 1px 1px #555,
+    inset -1px -1px #1a1a1a;
+  padding: 3px 8px 10px;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
 }
 
+.np-titlebar {
+  align-self: stretch;
+  margin: 0 -5px;
+  background: linear-gradient(#6a6a6a, #2a2a2a);
+  color: #c0c0c0;
+  font: bold 10px/1.6 var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.np-titlebar::before {
+  content: '♫';
+}
+
+.np-titlebar::after {
+  background: #3a3a3a;
+  color: #c0c0c0;
+  border-color: #7a7a7a #000 #000 #7a7a7a;
+  box-shadow: none;
+}
+
 .site .now-playing:hover,
 .site .now-playing:focus {
   text-decoration: none;
+  background: #3a3a3a;
 }
 
-/* Whole panel is the link — highlight only the title to keep it quiet */
 .now-playing:hover .np-title,
 .now-playing:focus .np-title {
-  color: var(--link);
+  color: #ff0;
   text-decoration: underline;
 }
 
@@ -895,14 +1200,10 @@ footer a:hover {
   animation-play-state: running;
 }
 
-/* Keep the record out of sight at the edge-on moment of the cover flip */
 .np-vinyl-hidden {
   visibility: hidden;
 }
 
-/* Center label — dominant album colour tinted over the record's own label texture.
-   `color` blend keeps the backdrop's luminance (sheen + spindle dot) but takes the
-   album's hue + saturation, so it's a saturated tint rather than a flat disc. */
 .np-print {
   position: absolute;
   top: 32%;
@@ -914,7 +1215,6 @@ footer a:hover {
   mix-blend-mode: color;
 }
 
-/* 3D flip card holding the two cover faces */
 .np-cover-flip {
   position: absolute;
   top: 0;
@@ -927,7 +1227,6 @@ footer a:hover {
   transition: transform 0.9s ease-in-out;
 }
 
-/* Adapted from CodePen #cover — now a single flip-card face */
 .np-cover {
   position: absolute;
   top: 0;
@@ -935,12 +1234,13 @@ footer a:hover {
   width: 100%;
   height: 100%;
   background-size: 100% 100%;
-  background-color: var(--badge-bg);
+  background-color: #000;
   box-shadow:
     3px 0 10px 0 rgba(0, 0, 0, 0.2),
     inset 0 0 6px 2px rgba(255, 255, 255, 0.1),
     inset 0 0 3px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border: 1px solid #fff;
+  box-sizing: border-box;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
@@ -958,9 +1258,6 @@ footer a:hover {
   height: 100%;
   background-image: var(--vinyl-tex1);
   background-size: 100% 100%;
-  border-radius: 4px;
-  /* overlay (not screen) so the grain shows on light covers too — screen only
-     adds light and vanishes on bright art. */
   mix-blend-mode: overlay;
   opacity: 0.5;
   content: '';
@@ -975,7 +1272,6 @@ footer a:hover {
   height: 100%;
   background-image: var(--vinyl-tex2);
   background-size: 100% 100%;
-  border-radius: 4px;
   mix-blend-mode: screen;
   opacity: 0.08;
   content: '';
@@ -997,16 +1293,19 @@ footer a:hover {
   gap: 2px;
   min-width: 0;
   max-width: 160px;
-  padding: 4px 0;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  background: #000;
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-title {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-h);
+  font: bold 12px/1.4 var(--font-mono);
+  color: #0f0;
   min-width: 0;
 }
 
@@ -1016,7 +1315,6 @@ footer a:hover {
   text-overflow: ellipsis;
 }
 
-/* Spotify-style now-playing equalizer */
 .np-eq {
   display: flex;
   align-items: flex-end;
@@ -1028,7 +1326,7 @@ footer a:hover {
 .np-eq span {
   width: 2px;
   height: 100%;
-  background: var(--secondary);
+  background: #0f0;
   transform-origin: bottom;
   animation: np-eq-bounce ease-in-out infinite;
 }
@@ -1059,24 +1357,14 @@ footer a:hover {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .np-eq span {
-    animation: none;
-    transform: scaleY(0.5);
-  }
-}
-
 .np-artist {
-  font-size: 14px;
-  color: var(--text);
+  font: 12px/1.4 var(--font-mono);
+  color: #0f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Playback position of the current track (see ProgressBar in NowPlaying).
-   --np-progress (0–1) is set from JS each frame. */
-/* As wide as the album art */
 .np-progress {
   display: block;
   width: var(--np-album);
@@ -1090,29 +1378,25 @@ footer a:hover {
 .np-progress-bar {
   position: relative;
   display: block;
-  height: 4px;
+  height: 8px;
   margin: 3px 0;
-  background: var(--border);
+  background: #000;
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--np-progress, 0) * 100%);
-  background: var(--secondary);
+  background: repeating-linear-gradient(90deg, #0f0 0 3px, #000 3px 4px);
 }
 
-/* Current lyric line (see Lyric in NowPlaying), up to three rows of text.
-   The width is set because the lines are absolutely positioned and so don't
-   size .np-info. The card's text column (12px padding each side, 24px from
-   the window's left edge) keeps 16px from the site column's heading at
-   (100vw - 699px) / 2 + 32px, which gives width ≤ 50vw - 382px: 180px on
-   wide windows, shrinking toward the 1000px mobile breakpoint. */
 .now-playing {
-  --np-lyric-width: clamp(120px, calc(50vw - 382px), 180px);
+  --np-lyric-width: clamp(120px, calc(50vw - 422px), 180px);
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1081px) {
   .np-info:has(> .np-lyric) {
     max-width: var(--np-lyric-width);
   }
@@ -1125,20 +1409,20 @@ footer a:hover {
   display: block;
   width: var(--np-lyric-width);
   height: var(--np-lyric-height);
-  /* Set apart from the title and artist, and dimmed, so it reads as its own
-     block rather than a third line of song info */
-  margin-top: 10px;
-  opacity: 0.7;
+  margin-top: 8px;
+  padding: 2px 4px;
+  box-sizing: border-box;
   overflow: hidden;
-  font-size: 12px;
-  font-style: italic;
-  line-height: 1.4;
-  color: var(--text);
+  font: 11px/1.4 var(--font-mono);
+  color: #0f0;
+  background: #000;
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-lyric-line {
   position: absolute;
-  inset: 0 0 auto;
+  inset: 2px 4px auto;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -1167,20 +1451,6 @@ footer a:hover {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .np-lyric-in {
-    animation: none;
-  }
-
-  .np-lyric-out {
-    display: none;
-  }
-}
-
-/* Loading skeleton — reserves the card's footprint while the track loads, so
-   the header doesn't jump on mobile where the card sits in the page flow. The
-   bare .np-cover already reads as an empty sleeve (badge bg + grain), so only
-   the text lines need placeholder bars. */
 .now-playing.np-loading {
   cursor: default;
   pointer-events: none;
@@ -1192,47 +1462,54 @@ footer a:hover {
   line-height: 0;
 }
 
-/* Game of Life controls */
+/* ── Game of Life controls (another window) ────────────────────────────── */
 
 .gol-controls {
   position: fixed;
   top: 20px;
-  right: 24px;
+  right: 20px;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
   gap: 6px;
   background: var(--surface);
-  box-shadow: 0 0 60px 30px var(--surface-shadow);
-  padding: 10px 12px;
+  padding: 3px 8px 8px;
 }
 
 .gol-link {
-  font-size: 14px;
-  color: var(--text);
-  text-decoration: none;
+  margin: 0 -5px;
+  color: #fff;
+}
+
+.gol-link::before {
+  content: '▦';
+  font-size: 12px;
+}
+
+.gol-link:visited {
+  color: #fff;
 }
 
 .gol-link:hover {
-  color: var(--link);
+  color: #ff0;
   text-decoration: underline;
 }
 
 .gol-btn {
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--text);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 8px;
+  font: 12px/1.5 var(--font-ui);
+  color: #000;
+  background: var(--bg);
+  padding: 1px 10px;
   cursor: pointer;
 }
 
 .gol-btn:hover {
-  border-color: var(--accent);
-  color: var(--text-h);
+  color: #f00;
+}
+
+.gol-btn:active {
+  border-color: var(--bevel-black) var(--bevel-light) var(--bevel-light) var(--bevel-black);
 }
 
 .gol-slider-row {
@@ -1240,13 +1517,12 @@ footer a:hover {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: 14px;
-  color: var(--text);
+  font: 12px/1.5 var(--font-ui);
 }
 
 .gol-slider-row input[type='range'] {
   width: 80px;
-  accent-color: var(--accent);
+  accent-color: #000080;
   cursor: pointer;
 }
 
@@ -1256,9 +1532,7 @@ footer a:hover {
   justify-content: flex-end;
 }
 
-/* Lecture notes graph: the footer's "notes" link opens
-   brain.seanyang.ca/embed in a dialog (NotesGraph.tsx). It is a button,
-   styled like the footer's links. */
+/* ── Lecture notes graph ───────────────────────────────────────────────── */
 
 .notes-graph-btn {
   display: inline-flex;
@@ -1268,29 +1542,26 @@ footer a:hover {
   border: 0;
   background: none;
   font: inherit;
-  color: var(--text);
+  color: var(--link);
+  text-decoration: underline;
   cursor: pointer;
 }
 
 .notes-graph-btn:hover {
-  color: var(--link);
-  text-decoration: underline;
+  color: #f00;
+  background: #ff0;
 }
 
 .notes-graph-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 1px dotted #000;
+  outline-offset: 1px;
 }
 
-/* Fills the overlay, which already keeps 24px clear on every side. */
 .modal.notes-graph-modal {
   width: 100%;
   height: 100%;
 }
 
-/* Focus returns here after a click in the graph (see NotesGraph.tsx), which
-   is not a keyboard action, so no outline. */
 .modal.notes-graph-modal:focus {
   outline: none;
 }
@@ -1304,64 +1575,111 @@ footer a:hover {
   flex: 1;
   width: 100%;
   min-height: 0;
-  border: 1px solid var(--border);
+  border: 2px solid;
+  border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
   box-sizing: border-box;
+  background: #fff;
 }
+
+/* ── SSH hint ──────────────────────────────────────────────────────────── */
 
 .ssh-hint {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: var(--text);
-  margin-top: 16px;
+  margin: 0;
 }
 
 .ssh-hint code {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
-  background: var(--badge-bg);
-  padding: 1px 6px;
-  border-radius: 3px;
 }
 
 .ssh-copy {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: none;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 14px;
+  background: var(--bg);
+  color: #000;
+  padding: 3px 10px;
+  font-size: 13px;
   cursor: pointer;
 }
 
-.ssh-copy:hover {
-  border-color: var(--accent);
-  color: var(--text-h);
+.ssh-copy:active {
+  border-color: var(--bevel-black) var(--bevel-light) var(--bevel-light) var(--bevel-black);
 }
 
 .ssh-copy code {
   background: none;
   padding: 0;
-  border-radius: 0;
-  font-size: 14px;
+  font: bold 13px/1.5 var(--font-mono);
   color: inherit;
 }
 
 .ssh-copy-label {
-  color: var(--accent);
-  display: flex;
-  align-items: center;
+  color: #000080;
+  font: bold 11px/1.5 var(--font-ui);
 }
 
-@media (max-width: 1000px) {
+/* ── Sparkle cursor trail ──────────────────────────────────────────────── */
+
+.sparkle {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: sparkle 0.7s ease-out forwards;
+}
+
+@keyframes sparkle {
+  to {
+    opacity: 0;
+    transform: translate(-50%, 24px) scale(0.3) rotate(180deg);
+  }
+}
+
+/* ── Motion ────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-inner,
+  .blink,
+  .job-current .job-header::before,
+  h1,
+  .construction,
+  .np-lyric-in {
+    animation: none;
+  }
+
+  .marquee-inner {
+    padding-left: 0;
+  }
+
+  .np-eq span {
+    animation: none;
+    transform: scaleY(0.5);
+  }
+
+  .np-lyric-out,
+  .sparkle {
+    display: none;
+  }
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
   .name-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 6px;
+  }
+
+  h1 {
+    font-size: 40px;
   }
 
   .location {
@@ -1372,33 +1690,14 @@ footer a:hover {
     order: -1;
   }
 
-  .location .pulse {
-    order: 1;
-  }
-
-  .about {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 0px 8px;
-  }
-
-  .quote {
-    margin-bottom: 40px;
-  }
-
   .site {
-    padding: 48px max(20px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom))
-      max(20px, env(safe-area-inset-left));
+    margin: 0;
+    max-width: none;
+    padding: 8px max(8px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
     min-height: unset;
-  }
-
-  section {
-    grid-template-columns: 1fr;
-    gap: 8px 0;
-  }
-
-  h2 span {
-    position: static;
+    border: 0;
+    box-shadow: none;
   }
 
   .projects {
@@ -1406,11 +1705,7 @@ footer a:hover {
   }
 
   .links {
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-rows: repeat(3, auto);
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px 16px;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .now-playing {
@@ -1422,41 +1717,41 @@ footer a:hover {
     gap: 12px;
     background: none;
     box-shadow: none;
+    border: 0;
     padding: 0;
-    margin-top: 10px;
-    /* Follows the record (see .np-record-out), with the same 1s ease-out as
-       .np-vinyl's left, so the text moves with it. */
     transition: gap 1s ease-out;
   }
 
-  /* Beside the art on mobile, so the bar uses the text column's full width
-     (.np-info's 160px max); max-width lets it shrink on narrow screens. */
+  .np-titlebar {
+    display: none;
+  }
+
   .np-progress {
     width: 160px;
     max-width: 100%;
   }
 
-  /* Desktop only */
   .np-lyric {
     display: none;
   }
 
-  /* Room for the record beside the art while it is out */
   .now-playing.np-record-out {
     gap: 50px;
   }
 
   .np-info {
-    background: none;
-    box-shadow: none;
-    padding: 0;
+    padding: 4px 6px;
   }
 
   .gol-controls {
     display: none;
   }
 
-  /* One link per line instead of a dotted row */
+  .footer-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .footer-links {
     flex-direction: column;
     align-items: flex-start;
@@ -1467,11 +1762,8 @@ footer a:hover {
     display: none;
   }
 
-  footer {
-    align-items: flex-start;
-  }
-
   .webring-wrapper {
+    align-self: flex-end;
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
@@ -1488,27 +1780,52 @@ footer a:hover {
 
   .site {
     background: none;
-    box-shadow: none;
     position: relative;
     z-index: 2;
   }
 
-  .job-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  /* The table stacks: each job is its cells one under the other. */
+  .jobs thead {
+    display: none;
   }
 
-  .job-body {
-    align-items: flex-start;
-    text-align: left;
+  .jobs,
+  .jobs tbody,
+  .jobs tr,
+  .jobs td {
+    display: block;
   }
 
-  .job {
-    padding-bottom: 32px;
+  .jobs tr {
+    border-bottom: 1px solid #000;
+  }
+
+  .jobs tr:last-child {
+    border-bottom: 0;
+  }
+
+  .jobs td {
+    border: 0;
+    padding: 3px 8px;
+  }
+
+  .jobs td:first-child {
+    padding-top: 8px;
+  }
+
+  .jobs td:last-child {
+    padding-bottom: 10px;
+  }
+
+  .job-meta {
+    white-space: normal;
   }
 
   .ssh-hint {
+    display: none;
+  }
+
+  .sparkle {
     display: none;
   }
 }
@@ -1526,11 +1843,20 @@ footer a:hover {
     margin: 0.6in 0.65in 0.5in;
   }
 
+  /* The screen palette above is the 1997 one; paper keeps the quiet one. */
   :root {
     --pp-muted: #8a7a68;
     --pp-rule: #e4dccb;
     --pp-card: #fdfaf2;
+    --text: #6b5545;
+    --text-h: #3b2010;
+    --accent: #d16d3e;
+    --secondary: #77934d;
+    --link: #268bd2;
+    --display: var(--font-unbounded), system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains), monospace;
 
+    font-family: var(--font-geist), system-ui, sans-serif;
     font-size: 9pt;
     line-height: 1.5;
     background: #fff;
@@ -1577,9 +1903,14 @@ footer a:hover {
   }
 
   .pp-header h1 {
-    font-size: 26pt;
+    font: 600 26pt/1.05 var(--display);
     letter-spacing: -0.6pt;
-    line-height: 1.05;
+    text-transform: none;
+    background: none;
+    color: var(--text-h);
+    -webkit-text-fill-color: var(--text-h);
+    filter: none;
+    animation: none;
   }
 
   .pp-role {

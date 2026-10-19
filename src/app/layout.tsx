@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Unbounded, JetBrains_Mono } from 'next/font/google'
+import { Anton, Comic_Neue, Geist, JetBrains_Mono, Unbounded } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { SITE_URL } from '@/data/site'
@@ -7,19 +7,41 @@ import { location } from '@/data/adjectives'
 import { withBase } from '@/lib/basePath'
 import './globals.css'
 
+/* The screen fonts are the ones every machine shipped with in 1997: Comic
+   Sans MS, Impact, Courier New, MS Sans Serif. These two are the fallbacks
+   for machines without them (Linux, mostly); globals.css lists them after
+   the system names. */
+const comicNeue = Comic_Neue({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-comic',
+})
+
+const anton = Anton({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-anton',
+  preload: false,
+})
+
+/* Only the print portfolio (ctrl+p) uses these three, so they aren't
+   preloaded; the browser fetches them when it prints. */
 const geist = Geist({
   subsets: ['latin'],
   variable: '--font-geist',
+  preload: false,
 })
 
 const unbounded = Unbounded({
   subsets: ['latin'],
   variable: '--font-unbounded',
+  preload: false,
 })
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-jetbrains',
+  preload: false,
 })
 
 /* viewport-fit=cover draws the page edge-to-edge on iOS, so the dialog
@@ -52,7 +74,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} ${unbounded.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      className={`${comicNeue.variable} ${anton.variable} ${geist.variable} ${unbounded.variable} ${jetbrainsMono.variable}`}
+    >
       <body>
         {children}
         {/* Vercel telemetry POSTs to /_vercel/* — dead endpoints on the

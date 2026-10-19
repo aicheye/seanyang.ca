@@ -23,50 +23,71 @@ export function ExperienceSection() {
   const jobs = useLiveData('jobs.json', bakedJobs)
   const ids = jobIds(jobs)
   return (
-    <section>
+    <section id="experience">
       <h2>
         <span>Experience</span>
       </h2>
-      <div className="jobs">
-        {jobs.map((job, i) => {
-          const dates = formatDateRange(job.dates)
-          return (
-            <div key={ids[i]} className={`job${job.current ? ' job-current' : ''}`}>
-              <div className="job-header">
-                <div className="job-meta">
-                  <span>{dates}</span>
-                  {job.location && <span className="job-location">{job.location}</span>}
-                </div>
-                <div className="job-body">
-                  <strong>
-                    <EntryLink
-                      title={job.title}
-                      company={job.company}
-                      href={job.website}
-                      description={job.details ?? job.description}
-                      technologies={job.technologies}
-                      media={job.media}
-                      pages={job.pages}
-                      icon={job.logo}
-                      slug={ids[i]}
-                      meta={[dates, job.location].filter(Boolean)}
-                    />
-                  </strong>
-                  {job.description && <p className="job-description">{job.description}</p>}
-                  {job.technologies.length > 0 && (
-                    <div className="badges badges-right">
-                      {job.technologies.map((t: string) => (
-                        <span key={t} className="badge">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )
-        })}
+      {/* A real <table border>, the way a 1997 page laid out anything with
+          columns. Each row is one job; the dialog opens from the title. */}
+      <div className="jobs-wrap">
+        <table className="jobs" cellPadding={6} cellSpacing={0}>
+          <thead>
+            <tr>
+              <th scope="col">when</th>
+              <th scope="col">where</th>
+              <th scope="col">what</th>
+              <th scope="col">with</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.map((job, i) => {
+              const dates = formatDateRange(job.dates)
+              return (
+                <tr key={ids[i]} className={`job${job.current ? ' job-current' : ''}`}>
+                  <td className="job-meta">
+                    <span className="job-dates">{dates}</span>
+                  </td>
+                  <td className="job-meta">
+                    <span className="job-location">{job.location}</span>
+                  </td>
+                  <td className="job-body">
+                    <strong>
+                      <EntryLink
+                        title={job.title}
+                        company={job.company}
+                        href={job.website}
+                        description={job.details ?? job.description}
+                        technologies={job.technologies}
+                        media={job.media}
+                        pages={job.pages}
+                        icon={job.logo}
+                        slug={ids[i]}
+                        meta={[dates, job.location].filter(Boolean)}
+                      />
+                    </strong>
+                    {job.current && (
+                      <span className="new-badge blink" aria-label="current">
+                        NEW!
+                      </span>
+                    )}
+                    {job.description && <p className="job-description">{job.description}</p>}
+                  </td>
+                  <td className="job-tech">
+                    {job.technologies.length > 0 && (
+                      <div className="badges">
+                        {job.technologies.map((t: string) => (
+                          <span key={t} className="badge">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   )

@@ -8,11 +8,13 @@ import { LinksSection } from '@/app/components/LinksSection'
 import { PrintPortfolio } from '@/app/components/PrintPortfolio'
 import { ProjectsSection } from '@/app/components/ProjectsSection'
 import { RandomQuote } from '@/app/components/RandomQuote'
+import { SparkleTrail } from '@/app/components/SparkleTrail'
 
 export default function Page() {
   return (
     <>
       <GameOfLife />
+      <SparkleTrail />
       <div className="site">
         <Header />
         <RandomQuote />

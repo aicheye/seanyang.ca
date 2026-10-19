@@ -2,7 +2,7 @@ import { socials } from '@/data/socials'
 
 export function LinksSection() {
   return (
-    <section>
+    <section id="links">
       <h2>
         <span>Links</span>
       </h2>

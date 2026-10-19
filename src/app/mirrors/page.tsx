@@ -19,19 +19,24 @@ const MIRRORS = [
 export default function MirrorsPage() {
   return (
     <div className="mirrors-page">
-      <h1>mirrors</h1>
-      <ul>
-        {MIRRORS.map((url) => (
-          <li key={url}>
-            <a href={url} target="_blank" rel="noopener noreferrer">
-              {url}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <Link href="/" className="not-found-link">
-        ← go home
-      </Link>
+      <div className="mirrors-box">
+        <div className="win-title">mirrors</div>
+        <div className="win-body">
+          <h1>this page is also available at:</h1>
+          <ul>
+            {MIRRORS.map((url) => (
+              <li key={url}>
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                  {url}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <Link href="/" className="not-found-link">
+            ← go home
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }

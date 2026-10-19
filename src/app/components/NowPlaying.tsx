@@ -521,6 +521,7 @@ export function NowPlaying() {
     // mobile, so appearing from nothing shifts everything below it).
     return (
       <div className="now-playing np-loading" aria-hidden="true">
+        <span className="np-titlebar">now playing</span>
         <div className="np-album">
           <div className="np-cover">{coverSkel}</div>
         </div>
@@ -559,6 +560,8 @@ export function NowPlaying() {
       target="_blank"
       rel="noopener noreferrer"
     >
+      {/* Win95 title bar; hidden on mobile where the card sits in the page flow */}
+      <span className="np-titlebar">now playing</span>
       <div
         className="np-album"
         style={
