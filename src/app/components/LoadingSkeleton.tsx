@@ -7,6 +7,12 @@ export function LoadingSkeleton(
   props: Omit<SkeletonProps, 'baseColor' | 'highlightColor' | 'duration'>,
 ) {
   return (
-    <Skeleton {...props} baseColor="var(--badge-bg)" highlightColor="var(--bg)" duration={1.4} />
+    <Skeleton
+      {...props}
+      baseColor="#808080"
+      highlightColor="#a8a8a8"
+      borderRadius={0}
+      duration={1.4}
+    />
   )
 }

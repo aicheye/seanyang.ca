@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MouseEvent, RefObject } from 'react'
 import { createPortal } from 'react-dom'
-import { FiChevronLeft, FiChevronRight, FiExternalLink, FiX } from 'react-icons/fi'
 import type { EntryPage } from '@/data/entry'
 import mediaSizes from '@/data/mediaSizes.json'
 import { withBase } from '@/lib/basePath'
@@ -384,7 +383,7 @@ export function EntryLink({
                   aria-label={`Close ${label}`}
                   onClick={close}
                 >
-                  <FiX size={14} />
+                  ✕
                 </button>
               </div>
               {current && (media || pages.length > 1) && (
@@ -438,7 +437,7 @@ export function EntryLink({
                         disabled={page === 0}
                         onClick={() => goTo(page - 1)}
                       >
-                        <FiChevronLeft size={18} />
+                        ◄
                       </button>
                       <span className="modal-pager-caption">{current.caption}</span>
                       <span className="modal-pager-count" aria-live="polite">
@@ -451,7 +450,7 @@ export function EntryLink({
                         disabled={page === pages.length - 1}
                         onClick={() => goTo(page + 1)}
                       >
-                        <FiChevronRight size={18} />
+                        ►
                       </button>
                     </div>
                   )}
@@ -472,8 +471,7 @@ export function EntryLink({
                 </div>
               )}
               <a className="modal-link" href={href} target="_blank" rel="noopener noreferrer">
-                <FiExternalLink size={12} />
-                {linkLabel(href)}
+                » {linkLabel(href)}
               </a>
             </div>
           </div>,

@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { FiX } from 'react-icons/fi'
-import { PiGraph } from 'react-icons/pi'
 import { useFocusDialog } from './EntryLink'
 
 const BRAIN_URL = 'https://brain.seanyang.ca'
@@ -98,8 +96,7 @@ export function NotesGraph() {
   return (
     <>
       <button ref={trigger} className="notes-graph-btn" aria-haspopup="dialog" onClick={openDialog}>
-        <PiGraph size={18} />
-        notes
+        ◈ notes
       </button>
       {(open || pageLoaded) &&
         createPortal(
@@ -130,7 +127,7 @@ export function NotesGraph() {
                   aria-label="Close lecture notes"
                   onClick={close}
                 >
-                  <FiX size={14} />
+                  ✕
                 </button>
               </div>
               {/* Scripts draw the graph, and same-origin lets them fetch brain's

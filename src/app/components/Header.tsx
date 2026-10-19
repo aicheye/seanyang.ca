@@ -2,6 +2,7 @@ import { SITE_URL } from '@/data/site'
 import { primaryEmail } from '@/data/socials'
 import { HeaderAdjectives, HeaderLocation } from './HeaderBio'
 import { Marquee } from './Marquee'
+import { NavBar } from './NavBar'
 import { NowPlaying } from './NowPlaying'
 import { SSHCopyButton } from './SSHCopyButton'
 import { TermProgress } from './TermProgress'
@@ -23,6 +24,7 @@ export function Header() {
         <HeaderLocation />
       </div>
       <Marquee />
+      <NavBar />
       <div className="tagline">
         <a href={primaryEmail.url}>✉ {primaryEmail.label}</a>
         <span>|</span>

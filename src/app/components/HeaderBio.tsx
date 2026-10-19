@@ -2,7 +2,6 @@
 
 import bakedData from '@public/data/adjectives.json'
 import { useLiveData } from '@/lib/liveData'
-import { FiMapPin } from 'react-icons/fi'
 
 interface Bio {
   location: string
@@ -15,8 +14,8 @@ export function HeaderLocation() {
   const { location } = useLiveData<Bio>('adjectives.json', bakedData)
   return (
     <span className="location">
+      <span aria-hidden="true">◉</span>
       {location}
-      <FiMapPin size={12} />
     </span>
   )
 }

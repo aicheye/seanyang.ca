@@ -265,6 +265,21 @@ h2::before,
   vertical-align: middle;
 }
 
+/* ── Nav bar ───────────────────────────────────────────────────────────── */
+
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 6px;
+  font: bold 16px/1.6 var(--font-serif);
+  color: #f00;
+}
+
+.navbar a {
+  font-weight: 700;
+}
+
 /* ── Header ────────────────────────────────────────────────────────────── */
 
 header {
@@ -407,104 +422,65 @@ h2 span {
   display: inline;
 }
 
-/* ── Experience ────────────────────────────────────────────────────────── */
+/* ── Experience (a <table border>) ────────────────────────────────────── */
+
+.jobs-wrap {
+  overflow-x: auto;
+}
 
 .jobs {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding-left: 32px !important;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #000;
+  font-size: 14px;
+  background: #fff;
 }
 
-.job {
-  position: relative;
-  padding-bottom: 24px;
+.jobs th,
+.jobs td {
+  border: 1px solid #000;
+  vertical-align: top;
+  text-align: left;
 }
 
-.job:last-child {
-  padding-bottom: 0;
-}
-
-.job:last-child::before {
-  content: '';
-  position: absolute;
-  left: -16px;
-  width: 3px;
-  top: 10px;
-  height: 64px;
-  background: repeating-linear-gradient(180deg, #f0f 0 6px, #0ff 6px 12px);
-}
-
-.job:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: -16px;
-  width: 3px;
-  top: 10px;
-  bottom: -16px;
-  background: repeating-linear-gradient(180deg, #f0f 0 6px, #0ff 6px 12px);
-}
-
-.job-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 24px;
-  position: relative;
-}
-
-.job-header::before {
-  content: '★';
-  position: absolute;
-  left: -23px;
-  top: 10px;
-  transform: translateY(-50%);
-  font-size: 15px;
-  line-height: 1;
+.jobs th {
+  font: bold 13px/1.5 var(--font-ui);
   color: #ff0;
-  -webkit-text-stroke: 1px #000;
+  background: #000080;
+  text-transform: uppercase;
 }
 
-.job-current .job-header::before {
-  color: #f00;
-  animation: blink 1s step-end infinite;
+.jobs tbody tr:nth-child(odd) td {
+  background: #e0ffff;
+}
+
+.jobs tbody tr:nth-child(even) td {
+  background: #fff0f5;
 }
 
 .job-meta {
   font: 13px/1.5 var(--font-mono);
-  color: #000;
   white-space: nowrap;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
 .job-location {
   color: #800080;
 }
 
-.job-body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  text-align: right;
-}
-
 .job-body a {
   color: var(--link);
   font-weight: 700;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .job-description {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 14px;
 }
 
-.badges-right {
-  justify-content: flex-end;
+.job-tech .badges {
+  margin-top: 0;
 }
 
 /* ── Projects ──────────────────────────────────────────────────────────── */
@@ -512,12 +488,13 @@ h2 span {
 .projects {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 0;
+  border: 1px solid #000;
 }
 
 .project {
   padding: 10px 12px;
-  background: var(--bg);
+  border: 1px solid #000;
 }
 
 .project:nth-child(odd) {
@@ -612,8 +589,7 @@ h2 span {
   justify-content: center;
   padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
     calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
-  background: rgba(0, 0, 0, 0.55);
-  animation: modal-fade 0.15s ease-out;
+  background: transparent;
 }
 
 /* The notes dialog stays in the page while closed, so its graph is loaded
@@ -624,7 +600,6 @@ h2 span {
   display: flex;
   visibility: hidden;
   pointer-events: none;
-  animation: none;
 }
 
 .modal {
@@ -638,7 +613,8 @@ h2 span {
   max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  animation: modal-pop 0.15s ease-out;
+  outline: 1px solid #000;
+  filter: drop-shadow(6px 6px 0 rgba(0, 0, 0, 0.6));
 }
 
 .modal-header {
@@ -710,6 +686,7 @@ h2 span {
   flex-shrink: 0;
   background: var(--bg);
   color: #000;
+  font: bold 11px/1 var(--font-ui);
   padding: 0;
   cursor: pointer;
 }
@@ -791,6 +768,7 @@ h2 span {
   flex-shrink: 0;
   background: var(--bg);
   color: #000;
+  font: 11px/1 var(--font-ui);
   padding: 0;
   cursor: pointer;
 }
@@ -852,19 +830,6 @@ h2 span {
     order: 2;
     flex-basis: 100%;
     margin-top: 0;
-  }
-}
-
-@keyframes modal-fade {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes modal-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
   }
 }
 
@@ -1159,7 +1124,12 @@ footer {
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
-  background: var(--surface);
+  /* Winamp 2: dark steel with a black LED display */
+  background: #3a3a3a;
+  border-color: #7a7a7a #000 #000 #7a7a7a;
+  box-shadow:
+    inset 1px 1px #555,
+    inset -1px -1px #1a1a1a;
   padding: 3px 8px 10px;
   cursor: pointer;
   text-decoration: none;
@@ -1169,21 +1139,33 @@ footer {
 .np-titlebar {
   align-self: stretch;
   margin: 0 -5px;
+  background: linear-gradient(#6a6a6a, #2a2a2a);
+  color: #c0c0c0;
+  font: bold 10px/1.6 var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .np-titlebar::before {
   content: '♫';
 }
 
+.np-titlebar::after {
+  background: #3a3a3a;
+  color: #c0c0c0;
+  border-color: #7a7a7a #000 #000 #7a7a7a;
+  box-shadow: none;
+}
+
 .site .now-playing:hover,
 .site .now-playing:focus {
   text-decoration: none;
-  background: var(--surface);
+  background: #3a3a3a;
 }
 
 .now-playing:hover .np-title,
 .now-playing:focus .np-title {
-  color: #f00;
+  color: #ff0;
   text-decoration: underline;
 }
 
@@ -1311,15 +1293,19 @@ footer {
   gap: 2px;
   min-width: 0;
   max-width: 160px;
-  padding: 4px 0;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  background: #000;
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-title {
   display: flex;
   align-items: center;
   gap: 5px;
-  font: bold 13px/1.4 var(--font-ui);
-  color: #000;
+  font: bold 12px/1.4 var(--font-mono);
+  color: #0f0;
   min-width: 0;
 }
 
@@ -1372,8 +1358,8 @@ footer {
 }
 
 .np-artist {
-  font: 12px/1.4 var(--font-ui);
-  color: #000;
+  font: 12px/1.4 var(--font-mono);
+  color: #0f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1395,7 +1381,8 @@ footer {
   height: 8px;
   margin: 3px 0;
   background: #000;
-  border: 1px inset var(--bevel-dark);
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-progress-fill {
@@ -1429,7 +1416,8 @@ footer {
   font: 11px/1.4 var(--font-mono);
   color: #0f0;
   background: #000;
-  border: 1px inset var(--bevel-dark);
+  border: 1px solid;
+  border-color: #000 #7a7a7a #7a7a7a #000;
 }
 
 .np-lyric-line {
@@ -1632,8 +1620,7 @@ footer {
 
 .ssh-copy-label {
   color: #000080;
-  display: flex;
-  align-items: center;
+  font: bold 11px/1.5 var(--font-ui);
 }
 
 /* ── Sparkle cursor trail ──────────────────────────────────────────────── */
@@ -1658,8 +1645,6 @@ footer {
 /* ── Motion ────────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .modal-overlay,
-  .modal,
   .marquee-inner,
   .blink,
   .job-current .job-header::before,
@@ -1755,9 +1740,7 @@ footer {
   }
 
   .np-info {
-    background: none;
-    box-shadow: none;
-    padding: 0;
+    padding: 4px 6px;
   }
 
   .gol-controls {
@@ -1801,19 +1784,41 @@ footer {
     z-index: 2;
   }
 
-  .job-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  /* The table stacks: each job is its cells one under the other. */
+  .jobs thead {
+    display: none;
   }
 
-  .job-body {
-    align-items: flex-start;
-    text-align: left;
+  .jobs,
+  .jobs tbody,
+  .jobs tr,
+  .jobs td {
+    display: block;
   }
 
-  .job {
-    padding-bottom: 32px;
+  .jobs tr {
+    border-bottom: 1px solid #000;
+  }
+
+  .jobs tr:last-child {
+    border-bottom: 0;
+  }
+
+  .jobs td {
+    border: 0;
+    padding: 3px 8px;
+  }
+
+  .jobs td:first-child {
+    padding-top: 8px;
+  }
+
+  .jobs td:last-child {
+    padding-bottom: 10px;
+  }
+
+  .job-meta {
+    white-space: normal;
   }
 
   .ssh-hint {

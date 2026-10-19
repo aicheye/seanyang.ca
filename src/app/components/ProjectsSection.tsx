@@ -7,7 +7,7 @@ import { useLiveData } from '@/lib/liveData'
 export function ProjectsSection() {
   const projects = useLiveData('projects.json', bakedProjects)
   return (
-    <section>
+    <section id="projects">
       <h2>
         <span>Projects</span>
       </h2>
