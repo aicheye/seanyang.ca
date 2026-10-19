@@ -19,7 +19,7 @@ const SAMPLE = 160 // the photo is read at this many pixels across
 const DOTS_ACROSS = 54 // dot pitch is the canvas width over this, so phones get the same screen
 const ANGLE = Math.PI / 4 // screen angle
 const DOT_MAX = 0.66 // radius of a dot over solid black, as a fraction of the pitch
-const INK_CAP = 0.86 // darkness is capped so even the blackest areas keep a dot grid
+const INK_CAP = 0.8 // darkness is capped so even the blackest areas keep a dot grid
 const GAMMA = 0.7 // < 1 lifts the mid-tones, so the lit face still gets ink
 const MIN_RADIUS = 0.2
 
@@ -93,7 +93,7 @@ function buildDots(img: HTMLImageElement, size: number): Dots {
       // around it, solid inside and gone by the edge.
       const du = (u - 0.5) * 2
       const dv = (v - 0.45) * 2
-      const mask = 1 - smoothstep(0.62, 1.0, Math.hypot(du, dv * 0.86))
+      const mask = 1 - smoothstep(0.5, 0.98, Math.hypot(du, dv * 0.86))
       if (mask <= 0) continue
       const dark = Math.min(1 - lum(u, v), INK_CAP)
       const r = Math.pow(dark, GAMMA) * dotMax * mask
@@ -120,7 +120,7 @@ export function HalftonePortrait() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const styles = getComputedStyle(document.documentElement)
-    const ink = styles.getPropertyValue('--text-h').trim() || '#2a1d15'
+    const ink = styles.getPropertyValue('--text-h').trim() || '#1e1915'
     const accent = styles.getPropertyValue('--accent').trim() || '#c8502c'
 
     let dots: Dots | null = null

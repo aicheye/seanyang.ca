@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 const CELL = 14
 const DOT = CELL * 0.3 // full dot radius: cells print as halftone dots
 const GROW_TICKS = 3 // a new cell's dot grows to full size over this many generations
-const INK = 'rgba(42, 29, 21, 0.14)'
+const INK = 'rgba(30, 25, 21, 0.1)'
 const TICK = 80
 const SIM_STEPS = 300 // generations to look ahead when scoring a seed
 const SEED_BUDGET_MS = 500 // max time spent searching for a lively seed
@@ -215,7 +215,7 @@ export function GameOfLife() {
           ctx.fill()
           if (s > HUE_FLOOR) {
             const hue = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
-            ctx.globalAlpha = s * 0.6
+            ctx.globalAlpha = s * 0.45
             ctx.fillStyle = `hsl(${hue}, 60%, 48%)`
             ctx.beginPath()
             ctx.arc(cx, cy, dot, 0, Math.PI * 2)
@@ -433,6 +433,7 @@ export function GameOfLife() {
     <>
       <canvas
         ref={canvasRef}
+        className="gol-canvas"
         style={{
           position: 'fixed',
           inset: 0,
