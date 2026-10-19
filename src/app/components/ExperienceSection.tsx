@@ -52,6 +52,11 @@ export function ExperienceSection() {
                       meta={[dates, job.location].filter(Boolean)}
                     />
                   </strong>
+                  {job.current && (
+                    <span className="new-badge blink" aria-label="current">
+                      NEW!
+                    </span>
+                  )}
                   {job.description && <p className="job-description">{job.description}</p>}
                   {job.technologies.length > 0 && (
                     <div className="badges badges-right">

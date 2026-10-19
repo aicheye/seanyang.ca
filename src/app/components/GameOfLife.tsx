@@ -197,12 +197,14 @@ export function GameOfLife() {
           const hx = hv[2 * i]
           const hy = hv[2 * i + 1]
           const s = Math.min(1, Math.hypot(hx, hy))
-          ctx.fillStyle = '#eae3cd'
+          // Lime on the starfield, like a phosphor terminal; painted cells
+          // take a fully saturated hue so they read as neon.
+          ctx.fillStyle = '#00a000'
           ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
           if (s > HUE_FLOOR) {
             const hue = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
             ctx.globalAlpha = s
-            ctx.fillStyle = `hsl(${hue}, 65%, 82%)`
+            ctx.fillStyle = `hsl(${hue}, 100%, 55%)`
             ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
             ctx.globalAlpha = 1
           }
@@ -413,7 +415,7 @@ export function GameOfLife() {
           transition: 'opacity 0.6s ease-out',
         }}
       />
-      <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 24, zIndex: 2 }}>
+      <div className="gol-controls" style={{ position: 'fixed', top: 20, right: 20, zIndex: 2 }}>
         <a
           href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
           target="_blank"
