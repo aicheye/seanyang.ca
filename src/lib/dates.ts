@@ -43,3 +43,14 @@ export function formatDateRange(dates: string[]): string {
   if (from.month === to.month) return render(from)
   return `${MONTHS[from.month - 1]} – ${MONTHS[to.month - 1]} ${from.year}`
 }
+
+/** True when a "YYYY.M" / "YYYY" token lies after `now`; false for anything unparsable. */
+export function isFuture(token: string, now: Date = new Date()): boolean {
+  const parsed = parse(token)
+  if (!parsed) return false
+  const month = parsed.month ?? 1
+  return (
+    parsed.year > now.getFullYear() ||
+    (parsed.year === now.getFullYear() && month > now.getMonth() + 1)
+  )
+}
