@@ -18,7 +18,7 @@ function role(job: Job): string {
 }
 
 export function pageDescription(now: Date = new Date()): string {
-  const intro = `Software engineering student at UWaterloo, based in ${location}.`
+  const intro = `Student and engineer at UWaterloo, based in ${location}.`
 
   const current = jobs.filter((j) => j.current)
   const incoming = jobs.filter((j) => !j.current && isFuture(j.dates[0] ?? '', now))
