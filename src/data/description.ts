@@ -1,4 +1,3 @@
-import { location } from '@/data/adjectives'
 import jobs, { type Job } from '@/data/jobs'
 import { isFuture } from '@/lib/dates'
 
@@ -19,8 +18,8 @@ function role(job: Job): string {
 
 export function pageDescription(now: Date = new Date()): string {
   const intro =
-    `Student and engineer studying software engineering at UWaterloo, based in ${location}. ` +
-    'Trying to make this pale blue dot just a little better for us all.'
+    'Student and Engineer. Trying to make this pale blue dot just a little better for us all. ' +
+    'Currently studying software engineering at UWaterloo.'
 
   const current = jobs.filter((j) => j.current)
   const incoming = jobs.filter((j) => !j.current && isFuture(j.dates[0] ?? '', now))
