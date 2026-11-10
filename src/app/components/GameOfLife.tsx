@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const CELL = 14
+const DOT = CELL * 0.3 // full dot radius: cells print as halftone dots
+const GROW_TICKS = 3 // a new cell's dot grows to full size over this many generations
+const INK = 'rgba(30, 25, 21, 0.1)'
 const TICK = 80
 const SIM_STEPS = 300 // generations to look ahead when scoring a seed
 const SEED_BUDGET_MS = 500 // max time spent searching for a lively seed
@@ -168,6 +171,9 @@ export function GameOfLife() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const grid = useRef<Uint8Array>(new Uint8Array(0))
   const hueVec = useRef<Float32Array>(new Float32Array(0))
+  // Generations each cell has been alive, capped at GROW_TICKS: a born cell
+  // prints as a small dot that grows, so the board looks printed, not toggled.
+  const age = useRef<Uint8Array>(new Uint8Array(0))
   const cols = useRef(0)
   const rows = useRef(0)
   const painting = useRef(false)
@@ -190,6 +196,7 @@ export function GameOfLife() {
     const R = rows.current
     const g = grid.current
     const hv = hueVec.current
+    const ages = age.current
     for (let r = 0; r < R; r++) {
       for (let c = 0; c < C; c++) {
         const i = r * C + c
@@ -197,13 +204,22 @@ export function GameOfLife() {
           const hx = hv[2 * i]
           const hy = hv[2 * i + 1]
           const s = Math.min(1, Math.hypot(hx, hy))
-          ctx.fillStyle = '#eae3cd'
-          ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+          // Live cells print as halftone dots in faint ink on the desk;
+          // painted cells take their hue, fading back to ink as it decays.
+          const cx = c * CELL + CELL / 2
+          const cy = r * CELL + CELL / 2
+          const dot = DOT * (0.45 + (0.55 * Math.min(ages[i], GROW_TICKS)) / GROW_TICKS)
+          ctx.fillStyle = INK
+          ctx.beginPath()
+          ctx.arc(cx, cy, dot, 0, Math.PI * 2)
+          ctx.fill()
           if (s > HUE_FLOOR) {
             const hue = ((Math.atan2(hy, hx) * 180) / Math.PI + 360) % 360
-            ctx.globalAlpha = s
-            ctx.fillStyle = `hsl(${hue}, 65%, 82%)`
-            ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2)
+            ctx.globalAlpha = s * 0.45
+            ctx.fillStyle = `hsl(${hue}, 60%, 48%)`
+            ctx.beginPath()
+            ctx.arc(cx, cy, dot, 0, Math.PI * 2)
+            ctx.fill()
             ctx.globalAlpha = 1
           }
         }
@@ -212,12 +228,18 @@ export function GameOfLife() {
   }, [])
 
   const tick = useCallback(() => {
+    const prev = grid.current
     ;[grid.current, hueVec.current] = stepColored(
       grid.current,
       hueVec.current,
       cols.current,
       rows.current,
     )
+    const next = grid.current
+    const ages = age.current
+    for (let i = 0; i < next.length; i++) {
+      ages[i] = next[i] ? (prev[i] ? Math.min(ages[i] + 1, GROW_TICKS) : 0) : 0
+    }
     render()
   }, [render])
 
@@ -291,12 +313,14 @@ export function GameOfLife() {
     }
     grid.current = best
     hueVec.current = new Float32Array(2 * cols.current * rows.current)
+    age.current = new Uint8Array(cols.current * rows.current)
     render()
   }, [buildCandidate, render])
 
   const clear = useCallback(() => {
     grid.current = new Uint8Array(cols.current * rows.current)
     hueVec.current = new Float32Array(2 * cols.current * rows.current)
+    age.current = new Uint8Array(cols.current * rows.current)
     render()
   }, [render])
 
@@ -337,6 +361,7 @@ export function GameOfLife() {
       }
       grid.current = best!
       hueVec.current = new Float32Array(2 * C * R)
+      age.current = new Uint8Array(C * R)
       render()
       setShown(true)
       timer.current = setInterval(tick, TICK)
@@ -354,13 +379,16 @@ export function GameOfLife() {
         const oldCols = cols.current
         const oldRows = rows.current
         const oldHv = hueVec.current
+        const oldAge = age.current
         const newGrid = new Uint8Array(newCols * newRows)
         const newHv = new Float32Array(2 * newCols * newRows)
+        const newAge = new Uint8Array(newCols * newRows)
         const minR = Math.min(oldRows, newRows)
         const minC = Math.min(oldCols, newCols)
         for (let r = 0; r < minR; r++)
           for (let c = 0; c < minC; c++) {
             newGrid[r * newCols + c] = oldGrid[r * oldCols + c]
+            newAge[r * newCols + c] = oldAge[r * oldCols + c]
             newHv[2 * (r * newCols + c)] = oldHv[2 * (r * oldCols + c)]
             newHv[2 * (r * newCols + c) + 1] = oldHv[2 * (r * oldCols + c) + 1]
           }
@@ -370,6 +398,7 @@ export function GameOfLife() {
         rows.current = newRows
         grid.current = newGrid
         hueVec.current = newHv
+        age.current = newAge
         render()
       }, 400)
     }
@@ -404,6 +433,7 @@ export function GameOfLife() {
     <>
       <canvas
         ref={canvasRef}
+        className="gol-canvas"
         style={{
           position: 'fixed',
           inset: 0,
