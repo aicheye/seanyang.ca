@@ -23,20 +23,29 @@ export function HeaderLocation() {
 
 export function HeaderAdjectives() {
   const { adjectives } = useLiveData<Bio>('adjectives.json', bakedData)
+  // The brackets live inside the first and last phrase, so a line never
+  // starts or ends on a bracket of its own when the row wraps. The spaces
+  // around each dot are the only places the row can break: JSX puts no
+  // whitespace between elements by itself.
+  const last = adjectives.length - 1
   return (
     <div className="about">
-      <span className="sep">&#91;</span>
-      {adjectives.flatMap((w, i) =>
-        i === 0
-          ? [<span key={w}>{w}</span>]
+      {adjectives.flatMap((w, i) => [
+        ...(i === 0
+          ? []
           : [
+              ' ',
               <span key={`sep-${i}`} className="sep">
                 ·
               </span>,
-              <span key={w}>{w}</span>,
-            ],
-      )}
-      <span className="sep">&#93;</span>
+              ' ',
+            ]),
+        <span key={w} className="about-word">
+          {i === 0 && <span className="sep">&#91;</span>}
+          {w}
+          {i === last && <span className="sep">&#93;</span>}
+        </span>,
+      ])}
     </div>
   )
 }
